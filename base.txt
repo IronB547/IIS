@@ -1,0 +1,11 @@
+Hosting:
+eva/google
+
+front end:
+Vue
+
+back end:
+Node.js a Express
+
+Databáze:
+MySQL
