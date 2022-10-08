@@ -32,7 +32,8 @@ CREATE TABLE Ticket_photo (
     id INT NOT NULL AUTO_INCREMENT,
     url VARCHAR(511) NOT NULL,
     ticket_id INT NOT NULL,
-    PRIMARY KEY (id, ticket_id) REFERENCES Ticket(id)
+    PRIMARY KEY (id, ticket_id),
+    FOREIGN KEY (ticket_id) REFERENCES Ticket(id)
 );
 
 CREATE TABLE Ticket_comment (
