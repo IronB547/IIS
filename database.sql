@@ -17,6 +17,7 @@ END;
 CREATE TABLE Ticket (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
+    location,
     description VARCHAR(1023) NOT NULL,
     status ENUM ('open', 'waiting', 'solved', 'rejected') NOT NULL,
     user_id INT NOT NULL,
@@ -33,7 +34,9 @@ CREATE TABLE Service_request (
     time_spent VARCHAR(255) DEFAULT '0',
     technician_id INT NOT NULL,
     city_manager_id INT NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    ticket_id INT,
+    FOREIGN KEY (ticket_id) REFERENCES Ticket(id)
 );
 
 CREATE TABLE Service_request_technician (
