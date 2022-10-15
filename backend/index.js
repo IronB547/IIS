@@ -3,7 +3,8 @@ const config = require("./config");
 
 const app = express();
 const port = 3000 || process.env.PORT;
-const db_password = process.env.DB_PASSWORD;
+
+const usersRouter = require("./routes/users");
 
 
 
@@ -18,6 +19,16 @@ app.get("/", (req, res) => {
     console.log(req.query);
 
     res.json({ message: "ok" });
+});
+
+app.use("/users", usersRouter);
+
+/* Error handler middleware */
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    console.error(err.message, err.stack);
+    res.status(statusCode).json({ message: err.message });
+    return;
 });
 
 app.listen(port, () => {
