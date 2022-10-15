@@ -3,6 +3,8 @@ CREATE TABLE Users (
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     user_type ENUM ('admin', 'user', 'city manager', 'technician') NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    phone_num VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -98,7 +100,9 @@ DELETE FROM Users where id = 1;
 
 #insert sample data
 
-INSERT INTO Users (username, password, user_type) VALUES ('admin', 'admin', 'admin');
+INSERT INTO Users (username, password, user_type) VALUES ('admin', 'admin', 'admin', 'admin@admin.cz', '666666666');
+INSERT INTO Users (username, password, user_type) VALUES ('Franta', 'Frantajebest', 'Franta.Pepa@seznam.cz', '786314245');
+INSERT INTO Users (username, password, user_type) VALUES ('Standa', 'Standa123', 'Stanislav.Pokorny@gmail.cz', '626425286');
 
 INSERT INTO Ticket (title, description, status, user_id) VALUES ('Ticket 1', 'Description 1', 'Open', 1);
 
