@@ -51,7 +51,7 @@ TODO: pagination optional
  - TODO optimization by not sending whole objects 
 
 ### GET /tickets/:ticket_id
- - AUTH: user+
+ - AUTH: open?
  - RESPONSE: one ticket
 
 ### POST /tickets

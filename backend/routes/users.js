@@ -16,7 +16,11 @@ router.get('/all', async function(req, res, next) {
 
 router.post('/login', async function(req, res, next) {
 	try {
-		res.json(await users.login(req.body));
+		const result = await users.login(req.body)
+		if(result.token != null)
+			res.json(result);
+		else
+			res.status(401).json({message: "Invalid credentials"});
 	} catch (err) {
 		console.error(`Error while getting users `, err.message);
 	}
@@ -24,29 +28,42 @@ router.post('/login', async function(req, res, next) {
 
 router.get('/:id', async function(req, res, next) {
 	try {
-		res.json(await users.getOne(req.params.id));
+		if(users.authenticateToken(req,res) === true) {
+			res.json(await users.getOne(req.params.id));
+		}
 	} catch (err) {
 		console.error(`Error while getting user `, err.message);
 	}
 });
 
-/* Register new user */
+/* Register new user as a city manager+ */
 router.post('/', async function(req, res, next) {
+	var newUser = req.body;
 	try {
 		if(users.hasAccessToken(req,res) === true) {
-			if(users.authenticateToken(req,res) === true) {
-				console.debug(req.user.userType)
+			console.debug("User has access token");
+			if(users.authorize(req,res, 3)){
+				console.debug("authorized as admin creating new user");
+				res.json(await users.create(req.body));
+			}else if(users.authorize(req,res,2) === true && newUser.userType == 1) {
+				console.debug("authorized as city manager creating new technician"); 
+				res.json(await users.create(req.body));
+			}else{
+				if(!res.headersSent)
+					res.status(403).json({message: "Forbidden"});
 			}
 		}else{
 			next();
 		}
 	} catch (err) {
 		// console.debug(err)
-		res.status(500).json({message: err.message});
+		if(!res.headersSent)
+			res.status(500).json({message: err.message});
 	}
 })
 
 router.post('/', async function(req, res, next) { 
+	req.body.userType = 0; 
 	users.create(req.body).then((result) => {
 		console.debug(result);
 		res.json(result);

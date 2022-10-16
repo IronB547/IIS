@@ -57,11 +57,10 @@ async function getOne(id){
 async function create(user){
 	return new Promise((resolve, reject) => {
 		
-		const query = `INSERT INTO Users (name, surname, password, user_type, email, phone_num) 
-	VALUES ('${user.name}', '${user.surname}', '${user.password}', '${user.userType}', '${user.email}', '${user.phoneNum}')`
-
 		schema.createUserSchema.validateAsync(user).then( async (value) => 
 		{
+			const query = `INSERT INTO Users (name, surname, password, user_type, email, phone_num) 
+	VALUES ('${value.name}', '${value.surname}', '${value.password}', '${value.userType}', '${value.email}', '${value.phoneNum}')`
 			resolve(db.query(query));
 		} ).catch( (err) => {
 			reject(err);
@@ -78,12 +77,13 @@ async function create(user){
 }
 
 async function login(user){
-	const rows = await db.query('SELECT * FROM Users WHERE email = ? AND password = ?', [user.email, crypto.Hash('sha256').update(user.password).digest('hex')]);
+	const rows = await db.query(`SELECT * FROM Users WHERE email = ? AND password = ?`, [user.email, crypto.Hash('sha256').update(user.password).digest('hex')]);
 	const data = helper.emptyOrRows(rows);
 	const meta = {};
 
 	if(data.length > 0){
 		const token = generateAccessToken(data[0]);
+	
 		return {
 			data,
 			meta,
@@ -144,6 +144,41 @@ function authenticateToken(req, res) {
 	return result;
 }
 
+/**
+ * Returns user role
+ * @param {*} req 
+ * @param {*} res 
+ * @returns user role number
+ * @note 0 - user, 1 - service technician, 2 - city manager, 3 - admin, null - not logged in
+ * @note if user is not logged in, will send response with status 401
+ */
+function authorize(req, res){
+	var result = false;
+
+	if(authenticateToken(req, res)){
+		return req.user.userType
+	}
+
+	return null;
+}
+
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} userType 
+ * @returns true if user role is equal or higher than userType 
+ */
+function authorize(req, res, userType){
+	var result = false;
+
+	if(authenticateToken(req, res)){
+		return req.user.userType >= userType
+	}
+
+	return null;
+}
+
 module.exports = {
 	getMultiple,
 	getAll,
@@ -151,5 +186,6 @@ module.exports = {
 	login,
 	generateAccessToken,
 	authenticateToken,
-	hasAccessToken
+	hasAccessToken,
+	authorize
 }
