@@ -10,15 +10,6 @@ const createUserSchema = Joi.object().keys({
     phoneNum: Joi.string().regex(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im).messages({'string.pattern.base': `Phone number must have 10 digits.`}).required()
 });
 
-const createTicketSchema = Joi.object().keys({
-    title: Joi.string().alphanum().min(1).max(255).required(),
-    location: Joi.string().alphanum().min(1).max(511),
-    description: Joi.string().alphanum().min(1).max(1023).required(),
-    status: Joi.number().min(0).max(3).default(0),
-    userID: Joi.number().required
-});
-
 module.exports = {
-    createUserSchema,
-    createTicketSchema
+    createUserSchema
 };

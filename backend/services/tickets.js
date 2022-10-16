@@ -2,7 +2,8 @@ const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
 const joi = require('joi');
-const { func } = require('joi');
+const schema = require('../schemas/tickets')
+const { func, isSchema } = require('joi');
 const crypto = require('crypto');
 
 const jwt = require('jsonwebtoken');
@@ -30,10 +31,15 @@ async function getAll(page = 1){
 }
 
 async function create(ticket, userID){
-	console.debug(ticket);
+	const validationRes = schema.createTicketSchema.validate(ticket);
+	if(validationRes.error) {
+		return {error:validationRes.error}
+	}
+
+	ticket = validationRes.value;	
 	const result = await db.query(`INSERT INTO Tickets (title, location, description, status, user_id)  
 	VALUES ('${ticket.title}', '${ticket.location}', '${ticket.description}', '${ticket.status}', '${userID}')` );
-	console.debug(result);
+
 	return result;
 }
 

@@ -46,11 +46,15 @@ router.get('/search/:param', async function(req, res, next) {
 
 router.post('/', async function(req, res, next) {
 	try {
-		console.debug("Creating ticket");
-		if(users.authorize(req, res, 0)) {
-			console.debug("User is authorized");
+		if(users.authorize(req, res, 0)) {	
 			const result = await tickets.create(req.body, req.user.id);
-			res.json()
+			if(result.error) {
+				res.status(400).send(result.error)
+			}
+			else {
+				res.json(result);
+			}
+			
 		}
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
