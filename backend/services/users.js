@@ -13,7 +13,9 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 // access config var
-process.env.TOKEN_SECRET;
+if(!process.env.TOKEN_SECRET)
+	console.error("TOKEN_SECRET not set");
+
 
 async function getMultiple(page = 1){
 	const offset = helper.getOffset(page, config.listPerPage);
@@ -155,7 +157,7 @@ function authenticateToken(req, res) {
 function getAuthorization(req, res){
 	var result = false;
 
-	if(authenticateToken(req, res)){
+	if(authenticateToken(req, res) !== true){
 		return req.user.userType
 	}
 
@@ -169,14 +171,12 @@ function getAuthorization(req, res){
  * @param {*} userType 
  * @returns true if user role is equal or higher than userType 
  */
-function authorize(req, res, userType){
-	var result = false;
-
-	if(authenticateToken(req, res)){
+function authorize(req, res, userType = 0){
+	if(authenticateToken(req, res) === true){
 		return req.user.userType >= userType
 	}
 
-	return null;
+	return false;
 }
 
 module.exports = {

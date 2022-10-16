@@ -30,8 +30,10 @@ async function getAll(page = 1){
 }
 
 async function create(ticket, userID){
+	console.debug(ticket);
 	const result = await db.query(`INSERT INTO Tickets (title, location, description, status, user_id)  
 	VALUES ('${ticket.title}', '${ticket.location}', '${ticket.description}', '${ticket.status}', '${userID}')` );
+	console.debug(result);
 	return result;
 }
 
