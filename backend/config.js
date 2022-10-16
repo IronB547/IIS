@@ -9,5 +9,6 @@ const config = {
         database: "IIS",
     },
     listPerPage: 2,
+    listPerTicketPage: 9,
     };
 module.exports = config;
