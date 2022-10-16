@@ -41,12 +41,9 @@ router.post('/', async function(req, res, next) {
 	var newUser = req.body;
 	try {
 		if(users.hasAccessToken(req,res) === true) {
-			console.debug("User has access token");
 			if(users.authorize(req,res, 3)){
-				console.debug("authorized as admin creating new user");
 				res.json(await users.create(req.body));
 			}else if(users.authorize(req,res,2) === true && newUser.userType == 1) {
-				console.debug("authorized as city manager creating new technician"); 
 				res.json(await users.create(req.body));
 			}else{
 				if(!res.headersSent)

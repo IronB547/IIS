@@ -152,7 +152,7 @@ function authenticateToken(req, res) {
  * @note 0 - user, 1 - service technician, 2 - city manager, 3 - admin, null - not logged in
  * @note if user is not logged in, will send response with status 401
  */
-function authorize(req, res){
+function getAuthorization(req, res){
 	var result = false;
 
 	if(authenticateToken(req, res)){
@@ -187,5 +187,6 @@ module.exports = {
 	generateAccessToken,
 	authenticateToken,
 	hasAccessToken,
-	authorize
+	authorize,
+	getAuthorization
 }
