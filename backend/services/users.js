@@ -62,7 +62,7 @@ async function login(user){
 	const meta = {};
 
 	if(data.length > 0){
-		const token = generateAccessToken({ id: data[0].id });
+		const token = generateAccessToken(data[0]);
 		return {
 			data,
 			meta,
@@ -77,8 +77,9 @@ async function login(user){
 	}
 }
 
-function generateAccessToken(id) {
-	return jwt.sign(id, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+function generateAccessToken(user) {
+	const user_permission = {userType: user.user_type, id: user.id};
+	return jwt.sign(user_permission, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
 
 function authenticateToken(req, res, next) {
