@@ -4,6 +4,7 @@ const config = require('../config');
 const joi = require('joi');
 const { func } = require('joi');
 const crypto = require('crypto');
+const schema = require('../schemas/users');
 
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
@@ -18,7 +19,7 @@ async function getMultiple(page = 1){
 	const offset = helper.getOffset(page, config.listPerPage);
 
 	const rows = await db.query(
-	  `SELECT id, username, password, user_type, email, phone_num
+	  `SELECT id, name, surname, password, user_type, email, phone_num
 	  FROM Users LIMIT ${offset},${config.listPerPage}`
 	);
 
@@ -31,9 +32,9 @@ async function getMultiple(page = 1){
 	}
 }
 
-async function getAll(page = 1){
+async function getAll(){
 	const rows = await db.query(
-		`SELECT id, username, password, user_type, email, phone_num
+		`SELECT id, name, surname, password, user_type, email, phone_num
 		FROM Users`
 	);
 
@@ -46,13 +47,33 @@ async function getAll(page = 1){
 	}
 }
 
-async function create(user){
-	console.log(`INSERT INTO Users (username, password, user_type, email, phone_num)  
-	VALUES ('${user.username}', '${user.password}', '${user.userType}', '${user.email}', '${user.phoneNum}')` );
+async function getOne(id){
+	const rows = await db.query( `SELECT id, name, surname, password, user_type, email, phone_num FROM Users WHERE id = ?`, [id]);
+	const data = helper.emptyOrRows(rows);
 
-	const result = await db.query(
-		`INSERT INTO Users (username, password, user_type, email, phone_num)  
-		VALUES ('${user.username}', '${user.password}', '${user.userType}', '${user.email}', '${user.phoneNum}')` );
+	return { data };
+}
+
+async function create(user){
+	return new Promise((resolve, reject) => {
+		
+		const query = `INSERT INTO Users (name, surname, password, user_type, email, phone_num) 
+	VALUES ('${user.name}', '${user.surname}', '${user.password}', '${user.userType}', '${user.email}', '${user.phoneNum}')`
+
+		schema.createUserSchema.validateAsync(user).then( async (value) => 
+		{
+			resolve(db.query(query));
+		} ).catch( (err) => {
+			reject(err);
+		} );
+
+	});
+	
+	
+	
+	// console.debug(query);
+	// result = await db.query(query, userArr);
+	
 	return result;
 }
 
@@ -82,7 +103,23 @@ function generateAccessToken(user) {
 	return jwt.sign(user_permission, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
 
-function authenticateToken(req, res, next) {
+function hasAccessToken(req,res){
+	const authHeader = req.headers.authorization
+
+	if(authHeader == null){
+		return false
+	}
+
+	const token = authHeader && authHeader.split(' ')[1]
+  
+	if (token == null){
+		return false
+	}
+
+	return true;
+}
+
+function authenticateToken(req, res) {
 	const authHeader = req.headers.authorization
 	var result = false;
 
@@ -113,5 +150,6 @@ module.exports = {
 	create,
 	login,
 	generateAccessToken,
-	authenticateToken
+	authenticateToken,
+	hasAccessToken
 }

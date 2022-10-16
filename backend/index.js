@@ -6,7 +6,8 @@ const app = express();
 const port = 3000 || process.env.PORT;
 
 const usersRouter = require("./routes/users");
-
+const ticketsRouter = require("./routes/tickets");
+const serviceRequestsRouter = require("./routes/serviceRequests");
 
 
 app.use(express.json());
@@ -23,6 +24,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/users", usersRouter);
+
+app.use("/tickets", ticketsRouter);
+
+app.use("/serviceRequests", serviceRequestsRouter);
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {
