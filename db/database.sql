@@ -1,9 +1,13 @@
+# USER_TYPE: 0,1,2,3
+#            'user', 'technician', 'city_manager', 'admin'
+
 CREATE TABLE Users (
     id INT NOT NULL AUTO_INCREMENT,
-    username VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    surname VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
-    user_type ENUM ('admin', 'user', 'city manager', 'technician') NOT NULL,
-    email VARCHAR(255) NOT NULL,
+    user_type INT NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
     phone_num VARCHAR(255) NOT NULL,
     PRIMARY KEY (id)
 );
@@ -16,7 +20,7 @@ BEGIN
     SET NEW.password = SHA2(NEW.password, 256);
 END;
 
-CREATE TABLE Ticket (
+CREATE TABLE Tickets (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     location VARCHAR(511),
@@ -34,11 +38,10 @@ CREATE TABLE Service_request (
     solution_time VARCHAR(255) DEFAULT '0',
     solution_state ENUM ('unsolved', 'solved') NOT NULL DEFAULT 'unsolved',
     time_spent VARCHAR(255) DEFAULT '0',
-    technician_id INT NOT NULL,
     city_manager_id INT NOT NULL,
     PRIMARY KEY (id),
     ticket_id INT,
-    FOREIGN KEY (ticket_id) REFERENCES Ticket(id)
+    FOREIGN KEY (ticket_id) REFERENCES Tickets(id)
 );
 
 CREATE TABLE Service_request_technician (
@@ -54,7 +57,7 @@ CREATE TABLE Ticket_photo (
     url VARCHAR(511) NOT NULL,
     ticket_id INT NOT NULL,
     PRIMARY KEY (id, ticket_id),
-    FOREIGN KEY (ticket_id) REFERENCES Ticket(id) ON DELETE CASCADE
+    FOREIGN KEY (ticket_id) REFERENCES Tickets(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Ticket_comment (
@@ -64,7 +67,7 @@ CREATE TABLE Ticket_comment (
     ticket_id INT NOT NULL,
     user_id INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (ticket_id) REFERENCES Ticket(id) ON DELETE CASCADE,
+    FOREIGN KEY (ticket_id) REFERENCES Tickets(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
@@ -88,7 +91,7 @@ BEGIN
     DROP TABLE IF EXISTS Service_request_comment;
     DROP TABLE IF EXISTS Service_request_technician;
     DROP TABLE IF EXISTS Service_request;
-    DROP TABLE IF EXISTS Ticket;
+    DROP TABLE IF EXISTS Tickets;
     DROP TABLE IF EXISTS Users;
 END
 
@@ -100,10 +103,26 @@ DELETE FROM Users where id = 1;
 
 #insert sample data
 
-INSERT INTO Users (username, password, user_type, email, phone_num) VALUES ('admin', 'admin', 'admin', 'admin@admin.cz', '666666666');
-INSERT INTO Users (username, password, user_type, email, phone_num) VALUES ('Franta', 'Frantajebest', 'user', 'Franta.Pepa@seznam.cz', '786314245');
-INSERT INTO Users (username, password, user_type, email, phone_num) VALUES ('Standa', 'Standa123', 'technician', 'Stanislav.Pokorny@gmail.cz', '626425286');
+INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Zdenda', 'Holý', 'admin', 3, 'admin@admin.cz', '666666666');
+INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Franta', 'Novák', 'Frantajebest', 0, 'Franta.Pepa@seznam.cz', '786314245');
+INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Standa', 'Dvořák', 'Standa123', 1, 'Stanislav.Pokorny@gmail.com', '626425286');
+INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Milda', 'Zeman', 'SuperManager123', 2, 'Milda.Zeman@gmail.com', '618485631');
 
-INSERT INTO Ticket (title, description, status, user_id) VALUES ('Ticket 1', 'Description 1', 'Open', 1);
+INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Ticket 1', 'Location 1', 'Description 1', 'open', 1);
+INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Rozbitá pouliční lampa', 'U lávky nedaleko řeky', 'Je rozbitá lampa u lávky, asi dva týdny už nesvítí', 'solved', 2);
+INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Posprejovaná zítka u hřiště', 'Fotbalové hřiště na cacovickém ostrově', 'Včera někdo v noci posprejoval zítku, mohli byste ji prosím přemalovat?', 'rejected', 3);
 
-INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Fixed the street light', '2019-01-01 00:00:00', 1, 1);
+# Ticket Comments
+INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Comment 1', '2019-01-01 00:00:00', 1, 1);
+
+INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Prosím, už je to další týden a nedostal jsem žádnou odpověď na ticket. Moje žena se tudy bojí chodit po tmě sama.', '2020-05-30 18:02:16', 2, 2);
+INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Nebojte, zavolal jsem na to Standu, postará se o to.', '2020-05-31 09:12:36', 2, 4);
+INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Ještě dnes se na to podívám, nebojte se :)', '2020-05-31 10:18:36', 2, 3);
+
+INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Promiňte, ale kdybychom ji přemalovali teď, tak by ji v nejbližší době zase někdo pomaloval, prodiskutujeme situaci a rozhodneme se jak dále postupovat.', '2020-08-10 12:02:27', 2, 4);
+INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Škoda no... tak to asi budeme muset udělat na vlastní pěst.', '2020-08-11 15:17:55', 2, 3);
+
+INSERT INTO Service_request (title, description, solution_time, time_spent, city_manager_id, ticket_id) VALUES ('Výměna žárovky v lampě', 'Nutná výměna žárovky v lampě', '' , '', 4, 2);
+INSERT INTO Service_request_technician (service_request_id, technician_id) VALUES (1, 3);
+
+INSERT INTO Service_request_comment (comment, created_at, service_request_id, user_id) VALUES ('Vyřešil jsem problém, žárovka svítí', '2020-05-31 19:51:12', 1, 3);
