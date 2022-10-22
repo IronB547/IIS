@@ -18,7 +18,7 @@ if(!process.env.TOKEN_SECRET)
 
 
 async function getMultiple(page = 1){
-	const offset = helper.getOffset(page, config.listPerPage);
+	const offset = helper.getOffset(page, config.usersPerPage);
 
 	const rows = await db.query(
 	  `SELECT id, name, surname, password, user_type, email, phone_num
@@ -34,10 +34,12 @@ async function getMultiple(page = 1){
 	}
 }
 
-async function getAll(){
+async function getAll(page = 1){
+	const offset = helper.getOffset(page, config.usersPerPage);
+
 	const rows = await db.query(
 		`SELECT id, name, surname, password, user_type, email, phone_num
-		FROM Users`
+		FROM Users LIMIT ${offset}, ${config.listPerTicketPage}`
 	);
 
 	const data = helper.emptyOrRows(rows);

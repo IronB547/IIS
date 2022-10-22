@@ -55,7 +55,7 @@ TODO: pagination optional
  - RESPONSE: list of solved tickets
  - TODO optimization by not sending whole objects 
 
-### GET /tickets/search/:param/:page
+### GET /tickets/search/:param/:page DONE
  - AUTH: open?
  - RESPONSE: list of tickets containing the param string
 
@@ -64,7 +64,7 @@ TODO: pagination optional
  - RESPONSE: list of all tickets
  - TODO optimization by not sending whole objects 
 
-### GET /tickets/:ticket_id
+### GET /tickets/:ticket_id DONE
  - AUTH: open?
  - RESPONSE: one ticket
  - contains also the image urls
@@ -75,6 +75,9 @@ TODO: pagination optional
    - BODY: {ticket_name, description, ...}
  - RESPONSE:
    - TICKET with correct ID
+
+### POST /tickets/:id/comments
+ - AUTHORIZATION: user+
 
 ### PUT /tickets/:ticket_id/status?
  - Used by city manager
@@ -108,20 +111,22 @@ Managing service requests
 AUTHORIZATION: service technician, city manager
  - unless specified differently 
 
-### GET /service-requests
+### GET /requests
  - list of service requests
 
-### GET /service-requests/:user_id
+### GET /requests/technician/:user_id
  - useful for filtering only assigned requests by a service
 technician
   
-### GET /service-requests/:request_id
+### GET /requests/?ticket_id=:ticket_id&user_id=:used_id
+ - searching and filtering based on query params
+
+### GET /requests/:request_id
  - RESPONSE: contains also assigned technicians
 
-### POST /service-requests
+### POST /requests
  - AUTH: city manager
  - create new serice request
-
 
 ### PUT /service-requests/:request_id
  - AUTH: city manager, assigned technician

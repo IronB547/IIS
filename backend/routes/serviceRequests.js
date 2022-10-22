@@ -4,42 +4,36 @@ const router = express.Router();
 const users = require('../services/usersService');
 const serviceRequests = require('../services/serviceRequestsService');
 
-router.get('/Unsolved', async function(req, res, next) {
-	try {
-		
-		res.json("Hello");
-		console.log(req.query.status);
-	} catch (err) {
-		console.error(`Error while getting requests `, err.message);
-		res.status(400).json(err.message)
-	}
-});
-
-router.get('/search/:param/:page?', async function(req, res, next) {
+router.get('/search/:param?/:page?', async function(req, res, next) {
 	try {
 		const page = req.params.page;
-		const param = req.params.param;
-		res.json(await serviceRequests.getBySearch(param, page));
+		const param = req.params.param ? req.params.param : "";
+		const query = req.query;
+		
+		res.json(await serviceRequests.getBySearch(param, page, query));
 	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
+		console.error(`Error while getting service requests `, err.message);
 		res.status(400).send()
 	}
 });
 
-router.get('/:page?', async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
 	try {
-		const page = req.params.page;
-		let params = req.query;
-		res.json(await serviceRequests.getAll(page, params));
+		const ticket_id = req.params.id;
+		const result = await serviceRequests.getByID(ticket_id)
+		if(result != null)
+			res.json(result);
+		else
+			res.status(404).json({message: "Not found"});
 	} catch (err) {
-		console.error(`Error while getting requests `, err.message);
-		res.status(400).json(err.message)
+		console.error(`Error while getting service requests `, err.message);
+		res.status(400).send()
 	}
 });
 
 router.post('/', async function(req, res, next) {
 	try {
-		if(users.authorize(req, res, 0)) {	
+		if(users.authorize(req, res, 2)) {	
 			const result = await serviceRequests.create(req.body, req.user.id);
 			if(result.error) {
 				res.status(400).send(result.error)
@@ -47,10 +41,12 @@ router.post('/', async function(req, res, next) {
 			else {
 				res.json(result);
 			}
-			
+		}else{
+			if(!res.headersSent)
+				res.status(403).json({message: "Forbidden"});
 		}
 	} catch (err) {
-		console.error(`Error while getting requests `, err.message);
+		console.error(`Error while posting servicer requests `, err.message);
 		res.status(400).send()
 	}
 });

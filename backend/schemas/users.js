@@ -2,8 +2,8 @@ const Joi = require('joi');
 
 //First define schema for the object
 const createUserSchema = Joi.object().keys({
-    name: Joi.string().alphanum().min(2).max(30).required(),
-    surname: Joi.string().alphanum().min(2).max(30).required(),
+    name: Joi.string().min(2).max(30).required(),
+    surname: Joi.string().min(2).max(30).required(),
     email: Joi.string().email(),
     password: Joi.string().alphanum().min(8).max(33).required(),
     userType: Joi.number().min(0).max(3).default(0),

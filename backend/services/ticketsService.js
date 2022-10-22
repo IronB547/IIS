@@ -8,6 +8,7 @@ const crypto = require('crypto');
 
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const moment = require('moment');
 
 // get config vars
 dotenv.config();
@@ -37,8 +38,8 @@ async function create(ticket, userID){
 	}
 
 	ticket = validationRes.value;	
-	const result = await db.query(`INSERT INTO Tickets (title, location, description, status, user_id)  
-	VALUES ('${ticket.title}', '${ticket.location}', '${ticket.description}', '${ticket.status}', '${userID}')` );
+	const result = await db.query(`INSERT INTO Tickets (title, location, description, status, user_id, created_at)  
+	VALUES ('${ticket.title}', '${ticket.location}', '${ticket.description}', '${ticket.status}', '${userID}', '${moment().format("YYYY-MM-DD HH:mm:ss")}')` );
 
 	return result;
 }
@@ -75,6 +76,10 @@ async function getByID(ticket_id) {
 	WHERE ticket_id = ?`, [ticket_id]);
 
 	let ticket = tickets[0];
+	
+	if(!ticket)
+		return null;
+		
 	ticket.photos = photos;
 	ticket.comments = comments;
 

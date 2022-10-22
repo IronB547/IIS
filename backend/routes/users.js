@@ -4,10 +4,14 @@ const { db } = require('../config');
 const router = express.Router();
 const users = require('../services/usersService');
 
-router.get('/all', async function(req, res, next) {
+router.get('/all/:page?', async function(req, res, next) {
 	try {
-		if(users.authenticateToken(req,res) === true) {
-			res.json(await users.getAll());
+		if(users.authorize(req, res, 3)) {
+			const page = req.params.page;
+			res.json(await users.getAll(page));
+		}else{
+			if(!res.headersSent)
+				res.status(403).json({message: "Forbidden"});
 		}
 	} catch (err) {
 		console.error(`Error while getting users `, err.message);
@@ -50,6 +54,7 @@ router.post('/', async function(req, res, next) {
 					res.status(403).json({message: "Forbidden"});
 			}
 		}else{
+			console.log("No access token");
 			next();
 		}
 	} catch (err) {
