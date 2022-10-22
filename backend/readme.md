@@ -45,14 +45,29 @@ These routes are used for user management
 Managing tickets
 TODO: pagination optional
 
-### GET /tickets
+### GET /tickets/unsolved/:page DONE
  - AUTH: open?
- - RESPONSE: list of tickets
+ - RESPONSE: list of unsolved tickets
+ - TODO optimization by not sending whole objects 
+  
+### GET /tickets/solved/:page DONE
+ - AUTH: open?
+ - RESPONSE: list of solved tickets
+ - TODO optimization by not sending whole objects 
+
+### GET /tickets/search/:param/:page
+ - AUTH: open?
+ - RESPONSE: list of tickets containing the param string
+
+### GET /tickets/all/:page
+ - AUTH: open?
+ - RESPONSE: list of all tickets
  - TODO optimization by not sending whole objects 
 
 ### GET /tickets/:ticket_id
  - AUTH: open?
  - RESPONSE: one ticket
+ - contains also the image urls
 
 ### POST /tickets
  - AUTHORIZATION: user+
@@ -75,6 +90,15 @@ TODO: pagination optional
 
 ### DELETE /tickets/:ticket_id
  - AUTH: author, city manager?
+ - Includes list of image urls 
+
+<!-- ### GET /tickets/:ticket_id/images/:image_id -->
+
+
+### POST /tickets/:ticket_id/images/
+- Adding new image to a ticket
+- AUTHORIZATION: user (if author), city manager
+
 
 
 ## Service requests

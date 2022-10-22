@@ -1,8 +1,8 @@
 const express = require('express');
 const { db } = require('../config');
 const router = express.Router();
-const users = require('../services/users');
-const tickets = require('../services/tickets');
+const users = require('../services/usersService');
+const tickets = require('../services/ticketsService');
 
 router.get('/', async function(req, res, next) {
 	try {

@@ -2,7 +2,7 @@ const express = require('express');
 const Joi = require('joi');
 const { db } = require('../config');
 const router = express.Router();
-const users = require('../services/users');
+const users = require('../services/usersService');
 
 router.get('/all', async function(req, res, next) {
 	try {

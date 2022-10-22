@@ -1,42 +1,65 @@
 const express = require('express');
 const { db } = require('../config');
 const router = express.Router();
-const users = require('../services/users');
-const serviceRequests = require('../services/serviceRequests');
+const users = require('../services/usersService');
+const serviceRequests = require('../services/serviceRequestsService');
 
-router.get('/all', async function(req, res, next) {
+router.get('/', async function(req, res, next) {
 	try {
-		if(users.authenticateToken(req,res) === true) {
-			res.json(await users.getAll());
-		}
+		res.json(await serviceRequests.getAll());
 	} catch (err) {
-		console.error(`Error while getting users `, err.message);
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).json(err.message)
 	}
 });
 
-router.post('/login', async function(req, res, next) {
+router.get('/Solved/:page?', async function(req, res, next) {
 	try {
-		res.json(await users.login(req.body));
+		const page = req.params.page;
+		res.json(await serviceRequests.getSolved());
 	} catch (err) {
-		console.error(`Error while getting users `, err.message);
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).json(err.message)
 	}
 });
 
-/* GET programming languages. */
-router.get('/:page', async function(req, res, next) {
+router.get('/Unsolved/:page?', async function(req, res, next) {
 	try {
-		res.json(await users.getMultiple(req.query.page));
+		const page = req.params.page;
+		res.json(await serviceRequests.getUnsolved(page));
 	} catch (err) {
-		console.error(`Error while getting users `, err.message);
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).json(err.message)
 	}
 });
+
+router.get('/search/:param', async function(req, res, next) {
+	try {
+		const param = req.params.param;
+		res.json(await serviceRequests.getBySearch(param));
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
 
 router.post('/', async function(req, res, next) {
 	try {
-		res.json(await users.create(req.body));
+		if(users.authorize(req, res, 0)) {	
+			const result = await serviceRequests.create(req.body, req.user.id);
+			if(result.error) {
+				res.status(400).send(result.error)
+			}
+			else {
+				res.json(result);
+			}
+			
+		}
 	} catch (err) {
-		console.error(`Error while creating user `, err.message);
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
 	}
-})
+});
 
 module.exports = router;
