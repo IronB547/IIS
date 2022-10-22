@@ -20,23 +20,27 @@ BEGIN
     SET NEW.password = SHA2(NEW.password, 256);
 END;
 
+# STATUS: 0,1,2,3
+#         'open', 'waiting', 'solved', 'rejected'
 CREATE TABLE Tickets (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     location VARCHAR(511),
     description VARCHAR(1023) NOT NULL,
-    status ENUM ('open', 'waiting', 'solved', 'rejected') NOT NULL,
+    status INT NOT NULL,
     user_id INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
 
+# SOLUTION_STATE: 0,1
+#                 'unsolved', 'solved'
 CREATE TABLE Service_request (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(255) NOT NULL,
     description VARCHAR(1023) NOT NULL,
     solution_time VARCHAR(255) DEFAULT '0',
-    solution_state ENUM ('unsolved', 'solved') NOT NULL DEFAULT 'unsolved',
+    solution_state INT NOT NULL DEFAULT 0,
     time_spent VARCHAR(255) DEFAULT '0',
     city_manager_id INT NOT NULL,
     PRIMARY KEY (id),
@@ -103,18 +107,21 @@ DELETE FROM Users where id = 1;
 
 #insert sample data
 
+# USER_TYPE: 0,1,2,3
+#            'user', 'technician', 'city_manager', 'admin'
 INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Zdenda', 'Holý', 'admin', 3, 'admin@admin.cz', '666666666');
 INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Franta', 'Novák', 'Frantajebest', 0, 'Franta.Pepa@seznam.cz', '786314245');
 INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Standa', 'Dvořák', 'Standa123', 1, 'Stanislav.Pokorny@gmail.com', '626425286');
 INSERT INTO Users (name, surname, password, user_type, email, phone_num) VALUES ('Milda', 'Zeman', 'SuperManager123', 2, 'Milda.Zeman@gmail.com', '618485631');
 
-INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Ticket 1', 'Location 1', 'Description 1', 'open', 1);
-INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Rozbitá pouliční lampa', 'U lávky nedaleko řeky', 'Je rozbitá lampa u lávky, asi dva týdny už nesvítí', 'solved', 2);
-INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Posprejovaná zítka u hřiště', 'Fotbalové hřiště na cacovickém ostrově', 'Včera někdo v noci posprejoval zítku, mohli byste ji prosím přemalovat?', 'rejected', 3);
+
+# STATUS: 0,1,2,3
+#         'open', 'waiting', 'solved', 'rejected'
+INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Ticket 1', 'Location 1', 'Description 1', 0, 1);
+INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Rozbitá pouliční lampa', 'U lávky nedaleko řeky', 'Je rozbitá lampa u lávky, asi dva týdny už nesvítí', 2, 2);
+INSERT INTO Tickets (title, location, description, status, user_id) VALUES ('Posprejovaná zítka u hřiště', 'Fotbalové hřiště na cacovickém ostrově', 'Včera někdo v noci posprejoval zítku, mohli byste ji prosím přemalovat?', 3, 3);
 
 # Ticket Comments
-INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Comment 1', '2019-01-01 00:00:00', 1, 1);
-
 INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Prosím, už je to další týden a nedostal jsem žádnou odpověď na ticket. Moje žena se tudy bojí chodit po tmě sama.', '2020-05-30 18:02:16', 2, 2);
 INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Nebojte, zavolal jsem na to Standu, postará se o to.', '2020-05-31 09:12:36', 2, 4);
 INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Ještě dnes se na to podívám, nebojte se :)', '2020-05-31 10:18:36', 2, 3);
@@ -122,6 +129,10 @@ INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Je
 INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Promiňte, ale kdybychom ji přemalovali teď, tak by ji v nejbližší době zase někdo pomaloval, prodiskutujeme situaci a rozhodneme se jak dále postupovat.', '2020-08-10 12:02:27', 2, 4);
 INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Škoda no... tak to asi budeme muset udělat na vlastní pěst.', '2020-08-11 15:17:55', 2, 3);
 
+INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES ('Comment 1', '2019-01-01 00:00:00', 1, 1);
+
+# SOLUTION_STATE: 0,1
+#                 'unsolved', 'solved'
 INSERT INTO Service_request (title, description, solution_time, time_spent, city_manager_id, ticket_id) VALUES ('Výměna žárovky v lampě', 'Nutná výměna žárovky v lampě', '' , '', 4, 2);
 INSERT INTO Service_request_technician (service_request_id, technician_id) VALUES (1, 3);
 

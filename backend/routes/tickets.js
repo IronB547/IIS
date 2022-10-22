@@ -33,10 +33,11 @@ router.get('/Unsolved/:page?', async function(req, res, next) {
 	}
 });
 
-router.get('/search/:param', async function(req, res, next) {
+router.get('/search/:param/:page', async function(req, res, next) {
 	try {
+		const page = req.params.page;
 		const param = req.params.param;
-		res.json(await tickets.getBySearch(param));
+		res.json(await tickets.getBySearch(param, page));
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
 		res.status(400).send()
