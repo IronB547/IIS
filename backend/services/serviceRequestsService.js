@@ -31,13 +31,13 @@ async function getMultiple(page = 1){
 	}
 }
 
-async function getAll(page = 1){
+async function getAll(page = 1, params){
+	const offset = helper.getOffset(page, config.listPerTicketPage);
 	const rows = await db.query(
-		`SELECT id, username, password, user_type, email, phone_num
-		FROM Users`
+		`SELECT title, solution_state, description, city_manager_id, created_at FROM Service_request ORDER BY solution_state, created_at DESC LIMIT ${offset}, ${config.listPerTicketPage}`
 	);
-
 	const data = helper.emptyOrRows(rows);
+
 	const meta = {page};
 
 	return {
@@ -56,8 +56,18 @@ async function create(user){
 	return result;
 }
 
+async function getBySearch(param, page = 1) {
+	const offset = helper.getOffset(page, config.listPerTicketPage);
+	const value = `%${param}%`;
+	const rows = await db.query(`SELECT * FROM Service_request WHERE title LIKE ? LIMIT ${offset}, ${config.listPerTicketPage}`, [value]);
+	const data = helper.emptyOrRows(rows);
+
+	return data;
+}
+
 module.exports = {
 	getMultiple,
 	getAll,
+	getBySearch,
 	create,
 }

@@ -4,45 +4,38 @@ const router = express.Router();
 const users = require('../services/usersService');
 const serviceRequests = require('../services/serviceRequestsService');
 
-router.get('/', async function(req, res, next) {
+router.get('/Unsolved', async function(req, res, next) {
 	try {
-		res.json(await serviceRequests.getAll());
+		
+		res.json("Hello");
+		console.log(req.query.status);
 	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
+		console.error(`Error while getting requests `, err.message);
 		res.status(400).json(err.message)
 	}
 });
 
-router.get('/Solved/:page?', async function(req, res, next) {
+router.get('/search/:param/:page?', async function(req, res, next) {
 	try {
 		const page = req.params.page;
-		res.json(await serviceRequests.getSolved());
-	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
-		res.status(400).json(err.message)
-	}
-});
-
-router.get('/Unsolved/:page?', async function(req, res, next) {
-	try {
-		const page = req.params.page;
-		res.json(await serviceRequests.getUnsolved(page));
-	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
-		res.status(400).json(err.message)
-	}
-});
-
-router.get('/search/:param', async function(req, res, next) {
-	try {
 		const param = req.params.param;
-		res.json(await serviceRequests.getBySearch(param));
+		res.json(await serviceRequests.getBySearch(param, page));
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
 		res.status(400).send()
 	}
 });
 
+router.get('/:page?', async function(req, res, next) {
+	try {
+		const page = req.params.page;
+		let params = req.query;
+		res.json(await serviceRequests.getAll(page, params));
+	} catch (err) {
+		console.error(`Error while getting requests `, err.message);
+		res.status(400).json(err.message)
+	}
+});
 
 router.post('/', async function(req, res, next) {
 	try {
@@ -57,7 +50,7 @@ router.post('/', async function(req, res, next) {
 			
 		}
 	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
+		console.error(`Error while getting requests `, err.message);
 		res.status(400).send()
 	}
 });

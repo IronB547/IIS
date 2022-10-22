@@ -9,6 +9,7 @@ const usersRouter = require("./routes/users");
 const ticketsRouter = require("./routes/tickets");
 const serviceRequestsRouter = require("./routes/serviceRequests");
 
+app.set("query parser", "simple");
 
 app.use(express.json());
 app.use(
@@ -27,7 +28,7 @@ app.use("/users", usersRouter);
 
 app.use("/tickets", ticketsRouter);
 
-app.use("/serviceRequests", serviceRequestsRouter);
+app.use("/requests", serviceRequestsRouter);
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {

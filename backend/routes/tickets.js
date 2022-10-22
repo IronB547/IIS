@@ -3,15 +3,7 @@ const { db } = require('../config');
 const router = express.Router();
 const users = require('../services/usersService');
 const tickets = require('../services/ticketsService');
-
-router.get('/', async function(req, res, next) {
-	try {
-		res.json(await tickets.getAll());
-	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
-		res.status(400).json(err.message)
-	}
-});
+const moment = require("moment");
 
 router.get('/Solved/:page?', async function(req, res, next) {
 	try {
@@ -44,6 +36,26 @@ router.get('/search/:param/:page', async function(req, res, next) {
 	}
 });
 
+router.get('/', async function(req, res, next) {
+	try {
+
+		const ticket_id = req.query.ticket_id;
+		res.json(await tickets.getByID(ticket_id));
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.get('/:page', async function(req, res, next) {
+	try {
+		const page = req.params.page;
+		res.json(await tickets.getAll(page));
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).json(err.message)
+	}
+});
 
 router.post('/', async function(req, res, next) {
 	try {
@@ -57,6 +69,31 @@ router.post('/', async function(req, res, next) {
 			}
 			
 		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.post('/:ticket_id/comments', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let comment = {};
+			comment.text = req.body.comment; 
+			comment.created_at = moment().format("YYYY-MM-DD HH:mm:ss");
+			comment.user_id = req.user.id;
+			comment.ticket_id = req.params.ticket_id;
+
+			console.log(comment.created_at);
+			const result = await tickets.addComment(comment);
+			if(result.error) {
+				res.status(400).send(result.error)
+			}
+			else {
+				res.json(result);
+			}
+		}
+		
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
 		res.status(400).send()
