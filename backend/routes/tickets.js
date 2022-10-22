@@ -25,10 +25,10 @@ router.get('/Unsolved/:page?', async function(req, res, next) {
 	}
 });
 
-router.get('/search/:param/:page', async function(req, res, next) {
+router.get('/search/:param?/:page?', async function(req, res, next) {
 	try {
 		const page = req.params.page;
-		const param = req.params.param;
+		const param = req.params.param ? req.params.param : "";
 		res.json(await tickets.getBySearch(param, page));
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
@@ -36,10 +36,10 @@ router.get('/search/:param/:page', async function(req, res, next) {
 	}
 });
 
-router.get('/', async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
 	try {
+		const ticket_id = req.params.id;
 
-		const ticket_id = req.query.ticket_id;
 		res.json(await tickets.getByID(ticket_id));
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
@@ -47,8 +47,10 @@ router.get('/', async function(req, res, next) {
 	}
 });
 
+/*
 router.get('/:page', async function(req, res, next) {
 	try {
+		console.log("Hello")
 		const page = req.params.page;
 		res.json(await tickets.getAll(page));
 	} catch (err) {
@@ -56,6 +58,7 @@ router.get('/:page', async function(req, res, next) {
 		res.status(400).json(err.message)
 	}
 });
+*/
 
 router.post('/', async function(req, res, next) {
 	try {

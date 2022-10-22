@@ -34,7 +34,8 @@ async function getMultiple(page = 1){
 async function getAll(page = 1, params){
 	const offset = helper.getOffset(page, config.listPerTicketPage);
 	const rows = await db.query(
-		`SELECT title, solution_state, description, city_manager_id, created_at FROM Service_request ORDER BY solution_state, created_at DESC LIMIT ${offset}, ${config.listPerTicketPage}`
+		`SELECT title, solution_state, description, city_manager_id, created_at FROM Service_request 
+		ORDER BY solution_state, created_at DESC LIMIT ${offset}, ${config.listPerTicketPage}`
 	);
 	const data = helper.emptyOrRows(rows);
 

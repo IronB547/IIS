@@ -71,7 +71,8 @@ async function getBySearch(param, page = 1) {
 async function getByID(ticket_id) {
 	const tickets = await db.query(`SELECT * FROM Tickets WHERE Tickets.id = ?`, [ticket_id]);
 	const photos = await db.query(`SELECT url, id FROM Ticket_photo WHERE ticket_id = ?`, [ticket_id]);
-	const comments = await db.query(`SELECT comment, created_at, user_id FROM Ticket_comment WHERE ticket_id = ?`, [ticket_id]);
+	const comments = await db.query(`SELECT comment, created_at, user_id FROM Ticket_comment 
+	WHERE ticket_id = ?`, [ticket_id]);
 
 	let ticket = tickets[0];
 	ticket.photos = photos;
