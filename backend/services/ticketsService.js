@@ -76,10 +76,6 @@ async function getByID(ticket_id) {
 	WHERE ticket_id = ?`, [ticket_id]);
 
 	let ticket = tickets[0];
-	
-	if(!ticket)
-		return null;
-		
 	ticket.photos = photos;
 	ticket.comments = comments;
 
@@ -87,7 +83,29 @@ async function getByID(ticket_id) {
 }
 
 async function addComment(comment) {
-	const result = await db.query(`INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES (?, '${comment.created_at}', ${comment.ticket_id}, ${comment.user_id})`, [comment.text]);	return result;
+	const result = await db.query(`INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES 
+	(?, '${comment.created_at}', ${comment.ticket_id}, ${comment.user_id})`, [comment.text]);
+	return result;
+}
+
+async function editTicket(ticket, req) {
+	const result = await db.query(`
+	UPDATE Tickets
+	SET title = ?,
+		location = ?,
+		description = ?
+	WHERE Tickets.id = ? AND Ticket.user_id =  ${req.user.id}`, [ticket.title, ticket.location, ticket.description, ticket.ticket_id]);
+
+	return result;
+}
+
+async function editComment(ticket, req) {
+	const result = await db.query(`
+	UPDATE Ticket_comment
+	SET comment = ?
+	WHERE Ticket_comment.id = ? AND Ticket_comment.user_id =  ${req.user.id}`, [ticket.comment, ticket.ticket_id]);
+
+	return result;
 }
 
 module.exports = {
@@ -97,5 +115,7 @@ module.exports = {
 	getBySearch,
 	getByID,
 	addComment,
+	editTicket,
+	editComment,
 	create,
 }

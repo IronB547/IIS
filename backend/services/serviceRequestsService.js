@@ -100,11 +100,21 @@ async function getByID(requestID) {
 	return request;
 }
 
+async function editRequest(request, req) {
+	const result = await db.query(`
+	UPDATE Service_request
+	SET title = ?,
+		description = ?
+	WHERE Service_request.id = ? AND Service_request.city_manager_id =  ${req.user.id}`, [request.title, request.description, request.request_id]);
+
+	return result;
+}
 
 module.exports = {
 	getMultiple,
 	getAll,
 	getBySearch,
 	getByID,
+	editRequest,
 	create,
 }

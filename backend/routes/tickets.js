@@ -58,7 +58,7 @@ router.post('/', async function(req, res, next) {
 				res.status(400).send(result.error)
 			}
 			else {
-				res.json(result);
+				res.status(201).json(result);
 			}
 			
 		}else{
@@ -80,16 +80,67 @@ router.post('/:ticket_id/comments', async function(req, res, next) {
 			comment.user_id = req.user.id;
 			comment.ticket_id = req.params.ticket_id;
 
-			console.log(comment.created_at);
 			const result = await tickets.addComment(comment);
 			if(result.error) {
 				res.status(400).send(result.error)
 			}
 			else {
-				res.json(result);
+				res.status(201).json(result);
 			}
 		}
 		
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.put('/:ticket_id', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let ticket = {};
+				ticket.title = req.body.title;
+				ticket.location = req.body.location;
+				ticket.description = req.body.description
+				ticket.ticket_id = req.params.ticket_id;
+				ticket.user = req.user.id;
+
+				const result = await tickets.editTicket(ticket, req);
+				if(result.error) {
+					res.status(400).send(result.error)
+				}
+				else {
+					res.status(204).json(result)
+				}
+		}
+		else {
+			res.status(401).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.put('/comments/:ticket_id', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let ticket = {};
+				ticket.comment = req.body.comment;
+				ticket.ticket_id = req.params.ticket_id;
+				ticket.user = req.user.id;
+				
+				const result = await tickets.editComment(ticket, req);
+				if(result.error) {
+					res.status(400).send(result.error)
+				}
+				else {
+					res.status(204).json(result)
+				}
+		}
+		else {
+			res.status(401).send()
+		}
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
 		res.status(400).send()

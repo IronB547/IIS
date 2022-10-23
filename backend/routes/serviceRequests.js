@@ -39,7 +39,7 @@ router.post('/', async function(req, res, next) {
 				res.status(400).send(result.error)
 			}
 			else {
-				res.json(result);
+				res.status(201).json(result);
 			}
 		}else{
 			if(!res.headersSent)
@@ -47,6 +47,33 @@ router.post('/', async function(req, res, next) {
 		}
 	} catch (err) {
 		console.error(`Error while posting servicer requests `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.put('/:request_id', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 2)) {
+			let request = {};
+				request.title = req.body.title;
+				request.description = req.body.description
+				request.request_id = req.params.request_id;
+				request.user = req.user.id;
+
+				const result = await serviceRequests.editRequest(request, req);
+				console.log(result)				
+				if(result.affectedRows == 0 || result.error) {
+					res.status(400).send()
+				}
+				else {
+					res.status(204).json(result)
+				}
+		}
+		else {
+			res.status(401).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
 		res.status(400).send()
 	}
 });
