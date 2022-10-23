@@ -29,7 +29,7 @@ router.post('/login', async function(req, res, next) {
 	try {
 		const result = await users.login(req.body)
 		if(result.token != null)
-			res.json(result);
+			res.status(200).json(result);
 		else
 			res.status(401).json({message: "Invalid credentials"});
 	} catch (err) {
@@ -77,7 +77,7 @@ router.post('/', async function(req, res, next) {
 	req.body.userType = 0; 
 	users.create(req.body).then((result) => {
 		console.debug(result);
-		res.json(result);
+		res.status(201).json(result);
 	}).catch((err) => { 
 		if(err.code === 'ER_DUP_ENTRY') {
 			res.status(409).json({message: 'User already exists'});
