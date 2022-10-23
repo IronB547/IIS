@@ -22,7 +22,7 @@ This document describes the paths provided by our REST API
 
 These routes are used for user management 
 
-### POST /users
+### POST /users DONE
  - used for signing up
  - REQUEST: 
    - BODY: {email, password, name, ...}
@@ -58,11 +58,6 @@ TODO: pagination optional
 ### GET /tickets/search/:param/:page DONE
  - AUTH: open?
  - RESPONSE: list of tickets containing the param string
-
-### GET /tickets/all/:page
- - AUTH: open?
- - RESPONSE: list of all tickets
- - TODO optimization by not sending whole objects 
 
 ### GET /tickets/:ticket_id DONE
  - AUTH: open?

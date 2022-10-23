@@ -3,10 +3,12 @@ const Joi = require('joi');
 const { db } = require('../config');
 const router = express.Router();
 const users = require('../services/usersService');
+const ValidationError = require('../helper').ValidationError;
 
 router.get('/all/:page?', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 3)) {
+			console.debug(req.params)
 			const page = req.params.page;
 			res.json(await users.getAll(page));
 		}else{
@@ -14,6 +16,11 @@ router.get('/all/:page?', async function(req, res, next) {
 				res.status(403).json({message: "Forbidden"});
 		}
 	} catch (err) {
+		if(err instanceof ValidationError)
+			res.status(400).json({message: err.message});
+		else
+			res.status(500).json({message: "Internal Server Error"});
+		
 		console.error(`Error while getting users `, err.message);
 	}
 });
@@ -27,6 +34,7 @@ router.post('/login', async function(req, res, next) {
 			res.status(401).json({message: "Invalid credentials"});
 	} catch (err) {
 		console.error(`Error while getting users `, err.message);
+		res.status(500).json({message: "Internal Server Error"});
 	}
 });
 
@@ -37,6 +45,7 @@ router.get('/:id', async function(req, res, next) {
 		}
 	} catch (err) {
 		console.error(`Error while getting user `, err.message);
+		res.status(500).json({message: "Internal Server Error"});
 	}
 });
 

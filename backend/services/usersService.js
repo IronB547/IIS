@@ -64,8 +64,9 @@ async function create(user){
 		schema.createUserSchema.validateAsync(user).then( async (value) => 
 		{
 			const query = `INSERT INTO Users (name, surname, password, user_type, email, phone_num) 
-	VALUES ('${value.name}', '${value.surname}', '${value.password}', '${value.userType}', '${value.email}', '${value.phoneNum}')`
-			resolve(db.query(query));
+		VALUES (?, ?, ?, ?, ?, ?)`
+			resolve(db.query(query,
+				[value.name, value.surname, value.password, value.userType, value.email, value.phoneNum]));
 		} ).catch( (err) => {
 			reject(err);
 		} );

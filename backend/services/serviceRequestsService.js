@@ -4,6 +4,7 @@ const config = require('../config');
 const joi = require('joi');
 const { func } = require('joi');
 const crypto = require('crypto');
+const QueryParser = require('./queryParser');
 
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
@@ -71,12 +72,16 @@ async function create(serviceRequests, userID){
 	return result;
 }
 
-async function getBySearch(param, page = 1, query) {
+async function getBySearch(page = 1, query) {
 	const offset = helper.getOffset(page, config.listPerTicketPage);
-	const value = `%${param}%`;
-	const where = helper.getWhereClause(query);
+	
+	const parser = new QueryParser(query);
+	let where = parser.generateWhereClause()
 
-	const rows = await db.query(`SELECT * FROM Service_request WHERE title LIKE ? ${where} LIMIT ${offset}, ${config.listPerTicketPage}`, [value]);
+	where = where ? `WHERE ${where}` : "";
+	
+	const call = `SELECT * FROM Service_request ${where} LIMIT ${offset}, ${config.listPerTicketPage}`
+	const rows = await db.query(call);
 	const data = helper.emptyOrRows(rows);
 
 	return data;

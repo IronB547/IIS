@@ -4,16 +4,15 @@ const router = express.Router();
 const users = require('../services/usersService');
 const serviceRequests = require('../services/serviceRequestsService');
 
-router.get('/search/:param?/:page?', async function(req, res, next) {
+router.get('/list/:page?', async function(req, res, next) {
 	try {
 		const page = req.params.page;
-		const param = req.params.param ? req.params.param : "";
 		const query = req.query;
 		
-		res.json(await serviceRequests.getBySearch(param, page, query));
+		res.json(await serviceRequests.getBySearch(page, query));
 	} catch (err) {
 		console.error(`Error while getting service requests `, err.message);
-		res.status(400).send()
+		res.status(500).send()
 	}
 });
 
@@ -27,7 +26,7 @@ router.get('/:id', async function(req, res, next) {
 			res.status(404).json({message: "Not found"});
 	} catch (err) {
 		console.error(`Error while getting service requests `, err.message);
-		res.status(400).send()
+		res.status(500).send()
 	}
 });
 
@@ -47,7 +46,7 @@ router.post('/', async function(req, res, next) {
 		}
 	} catch (err) {
 		console.error(`Error while posting servicer requests `, err.message);
-		res.status(400).send()
+		res.status(500).send()
 	}
 });
 

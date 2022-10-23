@@ -1,4 +1,14 @@
+class ValidationError extends Error {
+	constructor(message) {
+	  super(message); // (1)
+	  this.name = "ValidationError"; // (2)
+	}
+}
+
 function getOffset(currentPage = 1, listPerPage) {
+	if(!Number.isInteger(Number(currentPage)))
+		throw new ValidationError("Page number must be an integer");
+
     return (currentPage - 1) * [listPerPage];
 }
   
@@ -34,6 +44,7 @@ function getWhereClause(params) {
 module.exports = {
     getOffset,
     emptyOrRows,
-    getWhereClause
+    getWhereClause,
+	ValidationError
 }
 
