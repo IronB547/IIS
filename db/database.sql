@@ -28,7 +28,7 @@ CREATE TABLE Tickets (
     location VARCHAR(511),
     description VARCHAR(1023) NOT NULL,
     status INT NOT NULL,
-    userID INT NOT NULL,
+    userID INT,
     createdAt DATETIME NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (userID) REFERENCES Users(id) ON DELETE CASCADE
@@ -47,7 +47,7 @@ CREATE TABLE Service_request (
     createdAt DATETIME NOT NULL,
     PRIMARY KEY (id),
     ticketID INT,
-    FOREIGN KEY (ticketID) REFERENCES Tickets(id)
+    FOREIGN KEY (ticketID) REFERENCES Tickets(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Service_request_technician (
@@ -84,8 +84,8 @@ CREATE TABLE Service_request_comment (
     serviceRequestID INT NOT NULL,
     userID INT NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (serviceRequestID) REFERENCES Service_request(id),
-    FOREIGN KEY (userID) REFERENCES Users(id)
+    FOREIGN KEY (serviceRequestID) REFERENCES Service_request(id) ON DELETE CASCADE ,
+    FOREIGN KEY (userID) REFERENCES Users(id) ON DELETE CASCADE
 );
 
 #function to drop all tables
@@ -148,3 +148,7 @@ INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (
 INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (2, 4);
 
 INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Vyřešil jsem problém, žárovka svítí', '2020-05-31 19:51:12', 1, 3);
+
+
+
+DELETE FROM Users WHERE id = 2;
