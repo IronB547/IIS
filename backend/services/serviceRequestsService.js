@@ -1,12 +1,8 @@
 const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
-const joi = require('joi');
-const { func } = require('joi');
-const crypto = require('crypto');
 const QueryParser = require('./queryParser');
 
-const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const schema = require('../schemas/serviceRequests');
 const moment = require('moment');
@@ -106,13 +102,13 @@ async function getByID(requestID) {
 }
 
 async function editRequest(request, req) {
-	const userVerification = (req.user.userType >= 2) ? "" : `AND Tickets.user_id =  ${ticket.userID}`;
-	
+	const userVerification = (req.user.userType > 2) ? "" : `AND Service_request.city_manager_id =  ${req.user.id}`;
+
 	const result = await db.query(`
 	UPDATE Service_request
 	SET title = ?,
 		description = ?
-	WHERE Service_request.id = ? ${userVerification}`, [request.title, request.description, request.request_id]);
+	WHERE Service_request.id = ? ${userVerification}`, [request.title, request.description, request.requestID]);
 
 	return result;
 }

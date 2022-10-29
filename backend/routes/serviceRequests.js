@@ -18,8 +18,8 @@ router.get('/list/:page?', async function(req, res, next) {
 
 router.get('/:id', async function(req, res, next) {
 	try {
-		const ticket_id = req.params.id;
-		const result = await serviceRequests.getByID(ticket_id)
+		const ticketID = req.params.id;
+		const result = await serviceRequests.getByID(ticketID)
 		if(result != null)
 			res.json(result);
 		else
@@ -50,13 +50,13 @@ router.post('/', async function(req, res, next) {
 	}
 });
 
-router.put('/:request_id', async function(req, res, next) {
+router.put('/:requestID', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 2)) {
 			let request = {};
 				request.title = req.body.title;
 				request.description = req.body.description
-				request.request_id = req.params.request_id;
+				request.requestID = req.params.requestID;
 				request.user = req.user.id;
 
 				const result = await serviceRequests.editRequest(request, req);
@@ -73,7 +73,7 @@ router.put('/:request_id', async function(req, res, next) {
 		}
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
-		res.status(400).send()
+		res.status(500).send()
 	}
 });
 

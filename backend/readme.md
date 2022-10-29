@@ -15,6 +15,11 @@ Revoking acceess: https://supertokens.com/blog/revoking-access-with-a-jwt-blackl
 
 ## TODO 
  - validating input (joi or something similar)
+ - all in camel case
+ - service request get authorization
+ - delete & put requests
+ - optimization when building objects from multiple tables (connection pool?)
+ - filtering service requests by assigned technician
   
 This document describes the paths provided by our REST API
 
