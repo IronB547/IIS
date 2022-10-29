@@ -61,7 +61,7 @@ async function create(serviceRequests, userID){
 	serviceRequests = validationRes.value;	
 
 	const result = await db.query(
-		`INSERT INTO Service_request (ticketId, cityManagerID, createdAt, title, description)
+		`INSERT INTO Service_request (ticketID, cityManagerID, createdAt, title, description)
 		 VALUES (${serviceRequests.ticketID}, ?, '${moment().format("YYYY-MM-DD HH:mm:ss")}', ?, ?)`, 
 		[userID, serviceRequests.title, serviceRequests.description])  
 
@@ -102,7 +102,7 @@ async function getByID(requestID) {
 }
 
 async function editRequest(request, req) {
-	const userVerification = (req.user.userType > 2) ? "" : `AND Service_request.cityManagerId =  ${req.user.id}`;
+	const userVerification = (req.user.userType >= 2) ? "" : `AND Service_request.cityManagerID =  ${req.user.id}`;
 
 	const result = await db.query(`
 	UPDATE Service_request
@@ -113,11 +113,55 @@ async function editRequest(request, req) {
 	return result;
 }
 
+async function addRequestComment(comment) {
+	const result = await db.query(
+		`INSERT INTO Service_request_comment (comment, createdAt, ServiceRequestID, userID)
+		 VALUES (?, '${comment.createdAt}', ?, ?)`, 
+		[comment.text, comment.requestID, comment.userID])
+
+	return result;
+}
+
+async function editRequestComment(comment, req) {
+	const userVerification = (req.user.userType > 2) ? "" : `AND Service_request_comment.userID =  ${req.user.id}`;
+
+	const result = await db.query(`
+	UPDATE Service_request_comment
+	SET comment = ?
+	WHERE Service_request_comment.id = ? ${userVerification}`, [comment.text, comment.commentID]);
+
+	return result;
+}
+
+async function deleteRequest(request, req) {
+	const userVerification = (req.user.userType >= 2) ? "" : `AND Service_request.userID =  ${request.userID}`;
+
+	const result = await db.query(`
+	DELETE FROM Service_request
+	WHERE Service_request.id = ? ${userVerification}`, [request.requestID]);
+
+	return result;
+}
+
+async function deleteRequestComment(request, req) {
+	const userVerification = (req.user.userType > 2) ? "" : `AND Service_request_comment.userID =  ${request.userID}`;
+	
+	const result = await db.query(`
+	DELETE FROM Service_request_comment
+	WHERE Service_request_comment.id = ? ${userVerification}`, [request.commentID]);
+
+	return result;
+}
+
 module.exports = {
 	getMultiple,
 	getAll,
 	getBySearch,
 	getByID,
 	editRequest,
+	addRequestComment,
+	editRequestComment,
+	deleteRequest,
+	deleteRequestComment,
 	create,
 }

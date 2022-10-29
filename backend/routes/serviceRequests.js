@@ -3,6 +3,7 @@ const { db } = require('../config');
 const router = express.Router();
 const users = require('../services/usersService');
 const serviceRequests = require('../services/serviceRequestsService');
+const moment = require('moment');
 
 router.get('/list/:page?', async function(req, res, next) {
 	try {
@@ -50,6 +51,32 @@ router.post('/', async function(req, res, next) {
 	}
 });
 
+router.post('/:requestID/comments', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 1)) {	
+			let comment = {};
+			comment.text = req.body.comment; 
+			comment.createdAt = moment().format("YYYY-MM-DD HH:mm:ss");
+			comment.userID = req.user.id;
+			comment.requestID = req.params.requestID;
+
+			const result = await serviceRequests.addRequestComment(comment);
+			if(result.error) {
+				res.status(400).send(result.error)
+			}
+			else {
+				res.status(201).json(result);
+			}
+		}else{
+			if(!res.headersSent)
+				res.status(403).json({message: "Forbidden"});
+		}
+	} catch (err) {
+		console.error(`Error while posting servicer requests `, err.message);
+		res.status(500).send()
+	}
+});
+
 router.put('/:requestID', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 2)) {
@@ -62,7 +89,7 @@ router.put('/:requestID', async function(req, res, next) {
 				const result = await serviceRequests.editRequest(request, req);
 				
 				if(result.affectedRows == 0 || result.error) {
-					res.status(400).send()
+					res.status(403).send()
 				}
 				else {
 					res.status(204).json(result)
@@ -74,6 +101,80 @@ router.put('/:requestID', async function(req, res, next) {
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
 		res.status(500).send()
+	}
+});
+
+router.put('/comments/:commentID', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 1)) {
+			let comment = {};
+				comment.text = req.body.comment;
+				comment.commentID = req.params.commentID;
+				comment.userID = req.user.id;
+
+				const result = await serviceRequests.editRequestComment(comment, req);
+				
+				if(result.affectedRows == 0 || result.error) {
+					res.status(403).send()
+				}
+				else {
+					res.status(204).json(result)
+				}
+		}
+		else {
+			res.status(403).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(500).send()
+	}
+});
+
+router.delete('/:requestID', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let request = {};
+				request.requestID = req.params.requestID;
+				request.userID = req.user.id;
+
+			const result = await serviceRequests.deleteRequest(request, req);
+			if(result.affectedRows == 0 || result.error) {
+				res.status(403).send(result.error)
+			}
+			else {
+				res.status(204).json(result)
+			}
+		}
+		else {
+			res.status(401).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting requests `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.delete('/comments/:commentID', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let request = {};
+				request.commentID = req.params.commentID;
+				request.userID = req.user.id;
+
+			const result = await serviceRequests.deleteRequestComment(request, req);
+			if(result.affectedRows == 0 || result.error) {
+				res.status(403).send(result.error)
+			}
+			else {
+				res.status(204).json(result)
+			}
+		}
+		else {
+			res.status(401).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting requests `, err.message);
+		res.status(400).send()
 	}
 });
 

@@ -88,7 +88,6 @@ CREATE TABLE Service_request_comment (
     FOREIGN KEY (userID) REFERENCES Users(id)
 );
 
-
 #function to drop all tables
 CREATE PROCEDURE delete_all_tables()
 BEGIN
@@ -138,7 +137,7 @@ INSERT INTO Ticket_photo (url, ticketID) VALUES ('https://images.pexels.com/phot
 # SOLUTION_STATE: 0,1
 #                 'unsolved', 'solved'
 INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Title 1', 'Description 1', '0', '0', 5, 1, '2020-01-23 12:14:50');
-INSERT INTO Service_request (title, description, solutionState, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Title 1', 'Description 1', 1, '0', '0', 6, 1, '2020-01-23 12:14:50');
+INSERT INTO Service_request (title, description, solutionState, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Title 2', 'Description 2', 1, '0', '0', 6, 1, '2021-01-01 00:00:00');
 
 INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Výměna žárovky v lampě', 'Nutná výměna žárovky v lampě', '0', '0', 6, 2, '2020-05-31 08:50:12');
 INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Kontrola kabelů v lampě', 'Je potřeba rutinní prohlídka kabelů, zda li nejsou steřelé nebo vypadené', '0', '0', 5, 2, '2020-05-31 08:53:55');

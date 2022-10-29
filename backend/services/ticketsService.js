@@ -82,6 +82,37 @@ async function getByID(ticketID) {
 	return ticket;
 }
 
+
+async function addPhoto(photo, req) {
+	const ticket = await db.query(`SELECT userID FROM Tickets WHERE Tickets.id = ${photo.ticketID}`);
+
+	if(ticket[0]?.userID == photo.userID || req.user.userType > 2) {
+		const result = await db.query(`INSERT INTO Ticket_photo (url, ticketID) VALUES (?, ${photo.ticketID})`, [photo.url]);
+		
+		return result;
+	}
+	else {
+		return {
+			error: "Forbidden"
+		};
+	}
+}
+
+async function deletePhoto(photo, req) {
+	const ticket = await db.query(`SELECT userID FROM Tickets WHERE Tickets.id = ${photo.photoID}`);
+	
+	if(ticket[0]?.userID == photo.userID || req.user.userType >= 2) {
+		const result = await db.query(`DELETE FROM Ticket_photo WHERE Ticket_photo.id = ? `, [photo.photoID]);
+		
+		return result;
+	}
+	else {
+		return {
+			error: "Forbidden"
+		};
+	}
+}
+
 async function addComment(comment) {
 	const result = await db.query(`INSERT INTO Ticket_comment (comment, createdAt, ticketID, userID) VALUES 
 	(?, '${comment.createdAt}', ${comment.ticketID}, ${comment.userID})`, [comment.text]);
@@ -112,14 +143,38 @@ async function editComment(ticket, req) {
 	return result;
 }
 
+async function deleteTicket(ticket, req) {
+	const userVerification = (req.user.userType >= 2) ? "" : `AND Tickets.userID =  ${ticket.userID}`;
+	
+	const result = await db.query(`
+	DELETE FROM Tickets
+	WHERE Tickets.id = ? ${userVerification}`, [ticket.ticketID]);
+
+	return result;
+}
+
+async function deleteTicketComment(ticket, req) {
+	const userVerification = (req.user.userType > 2) ? "" : `AND Ticket_comment.userID =  ${ticket.userID}`;
+	
+	const result = await db.query(`
+	DELETE FROM Ticket_comment
+	WHERE Ticket_comment.id = ? ${userVerification}`, [ticket.commentID]);
+
+	return result;
+}
+
 module.exports = {
 	getAll,
 	getUnsolved,
 	getSolved,
 	getBySearch,
 	getByID,
+	addPhoto,
+	deletePhoto,
 	addComment,
 	editTicket,
 	editComment,
+	deleteTicket,
+	deleteTicketComment,
 	create,
 }

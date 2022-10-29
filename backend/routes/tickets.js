@@ -95,6 +95,32 @@ router.post('/:ticketID/comments', async function(req, res, next) {
 	}
 });
 
+router.post('/:ticketID/photo', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let photo = {};
+			photo.ticketID = req.params.ticketID;
+			photo.url = req.body.url;
+			photo.userID = req.user.id;
+
+			const result = await tickets.addPhoto(photo, req);
+			if(result.error) {
+				res.status(403).send(result.error)
+			}
+			else {
+				res.status(201).json(result);
+			}
+			
+		}else{
+			if(!res.headersSent)
+				res.status(403).json({message: "Forbidden"});
+		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
 router.put('/:ticketID', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 0)) {
@@ -139,6 +165,78 @@ router.put('/comments/:commentID', async function(req, res, next) {
 				else {
 					res.status(204).json(result)
 				}
+		}
+		else {
+			res.status(401).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.delete('/:ticketID', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let ticket = {};
+				ticket.ticketID = req.params.ticketID;
+				ticket.userID = req.user.id;
+
+			const result = await tickets.deleteTicket(ticket, req);
+			if(result.affectedRows == 0 || result.error) {
+				res.status(403).send(result.error)
+			}
+			else {
+				res.status(204).json(result)
+			}
+		}
+		else {
+			res.status(401).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.delete('/comments/:commentID', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let ticket = {};
+				ticket.commentID = req.params.commentID;
+				ticket.userID = req.user.id;
+
+			const result = await tickets.deleteTicketComment(ticket, req);
+			if(result.affectedRows == 0 || result.error) {
+				res.status(403).send(result.error)
+			}
+			else {
+				res.status(204).json(result)
+			}
+		}
+		else {
+			res.status(401).send()
+		}
+	} catch (err) {
+		console.error(`Error while getting tickets `, err.message);
+		res.status(400).send()
+	}
+});
+
+router.delete('/photo/:photoID', async function(req, res, next) {
+	try {
+		if(users.authorize(req, res, 0)) {
+			let photo = {};
+				photo.photoID = req.params.photoID;
+				photo.userID = req.user.id;
+
+			const result = await tickets.deletePhoto(photo, req);
+			if(result.affectedRows == 0 || result.error) {
+				res.status(403).send(result.error)
+			}
+			else {
+				res.status(204).json(result)
+			}
 		}
 		else {
 			res.status(401).send()
