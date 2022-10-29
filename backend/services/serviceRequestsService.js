@@ -106,11 +106,13 @@ async function getByID(requestID) {
 }
 
 async function editRequest(request, req) {
+	const userVerification = (req.user.userType >= 2) ? "" : `AND Tickets.user_id =  ${ticket.userID}`;
+	
 	const result = await db.query(`
 	UPDATE Service_request
 	SET title = ?,
 		description = ?
-	WHERE Service_request.id = ? AND Service_request.city_manager_id =  ${req.user.id}`, [request.title, request.description, request.request_id]);
+	WHERE Service_request.id = ? ${userVerification}`, [request.title, request.description, request.request_id]);
 
 	return result;
 }

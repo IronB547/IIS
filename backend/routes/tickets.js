@@ -95,20 +95,22 @@ router.post('/:ticket_id/comments', async function(req, res, next) {
 	}
 });
 
-router.put('/:ticket_id', async function(req, res, next) {
+router.put('/:ticketID', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 0)) {
 			let ticket = {};
 				ticket.title = req.body.title;
 				ticket.location = req.body.location;
 				ticket.description = req.body.description
-				ticket.ticket_id = req.params.ticket_id;
-				ticket.user = req.user.id;
+				ticket.ticketID = req.params.ticketID;
+				ticket.userID = req.user.id;
 
 				const result = await tickets.editTicket(ticket, req);
-				if(result.error) {
-					res.status(400).send(result.error)
+				
+				if(result.affectedRows == 0 || result.error) {
+					res.status(403).send(result.error)
 				}
+				
 				else {
 					res.status(204).json(result)
 				}
@@ -122,17 +124,17 @@ router.put('/:ticket_id', async function(req, res, next) {
 	}
 });
 
-router.put('/comments/:ticket_id', async function(req, res, next) {
+router.put('/comments/:commentID', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 0)) {
 			let ticket = {};
 				ticket.comment = req.body.comment;
-				ticket.ticket_id = req.params.ticket_id;
-				ticket.user = req.user.id;
-				
+				ticket.commentID = req.params.commentID;
+				ticket.userID = req.user.id;
+
 				const result = await tickets.editComment(ticket, req);
-				if(result.error) {
-					res.status(400).send(result.error)
+				if(result.affectedRows == 0 || result.error) {
+					res.status(403).send(result.error)
 				}
 				else {
 					res.status(204).json(result)

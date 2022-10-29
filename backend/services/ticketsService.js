@@ -89,21 +89,25 @@ async function addComment(comment) {
 }
 
 async function editTicket(ticket, req) {
+	const userVerification = (req.user.userType >= 2) ? "" : `AND Tickets.user_id =  ${ticket.userID}`;
+
 	const result = await db.query(`
 	UPDATE Tickets
 	SET title = ?,
 		location = ?,
 		description = ?
-	WHERE Tickets.id = ? AND Ticket.user_id =  ${req.user.id}`, [ticket.title, ticket.location, ticket.description, ticket.ticket_id]);
+	WHERE Tickets.id = ? ${userVerification}`, [ticket.title, ticket.location, ticket.description, ticket.ticketID]);
 
 	return result;
 }
 
 async function editComment(ticket, req) {
+	const userVerification = (req.user.userType > 2) ? "" : `AND Ticket_comment.user_id =  ${ticket.userID}`;
+	
 	const result = await db.query(`
 	UPDATE Ticket_comment
 	SET comment = ?
-	WHERE Ticket_comment.id = ? AND Ticket_comment.user_id =  ${req.user.id}`, [ticket.comment, ticket.ticket_id]);
+	WHERE Ticket_comment.id = ? ${userVerification}`, [ticket.comment, ticket.commentID]);
 
 	return result;
 }

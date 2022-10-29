@@ -69,7 +69,7 @@ router.put('/:request_id', async function(req, res, next) {
 				}
 		}
 		else {
-			res.status(401).send()
+			res.status(403).send()
 		}
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
