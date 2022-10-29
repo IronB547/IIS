@@ -15,11 +15,10 @@ Revoking acceess: https://supertokens.com/blog/revoking-access-with-a-jwt-blackl
 
 ## TODO 
  - validating input (joi or something similar)
- - all in camel case
- - service request get authorization
  - delete & put requests
+ - PUT allowing to change photos
  - optimization when building objects from multiple tables (connection pool?)
- - filtering service requests by assigned technician
+ - foreign key contraints fix in ticket photo and comments
   
 This document describes the paths provided by our REST API
 
@@ -64,26 +63,26 @@ TODO: pagination optional
  - AUTH: open?
  - RESPONSE: list of tickets containing the param string
 
-### GET /tickets/:ticket_id DONE
+### GET /tickets/:ticketID DONE
  - AUTH: open?
  - RESPONSE: one ticket
  - contains also the image urls
 
-### POST /tickets
+### POST /tickets DONE
  - AUTHORIZATION: user+
  - REQUEST:
-   - BODY: {ticket_name, description, ...}
+   - BODY: {ticketTitle, description, ...}
  - RESPONSE:
    - TICKET with correct ID
 
-### POST /tickets/:id/comments
+### POST /tickets/:id/comments DONE
  - AUTHORIZATION: user+
 
-### PUT /tickets/:ticket_id/status?
+### PUT /tickets/:ticketID/status?
  - Used by city manager
 
 
-### PUT /tickets/:ticket_id
+### PUT /tickets/:ticketID DONE
  - AUTHORIZATION: user (if author), city manager
  - TODO should we create separate paths for author & city manager? Because they perform can different operations with tickets.
  - REQUEST:
@@ -91,14 +90,14 @@ TODO: pagination optional
  - RESPONSE:
    - TBD
 
-### DELETE /tickets/:ticket_id
+### DELETE /tickets/:ticketID
  - AUTH: author, city manager?
  - Includes list of image urls 
 
-<!-- ### GET /tickets/:ticket_id/images/:image_id -->
+<!-- ### GET /tickets/:ticketID/images/:imageID -->
 
 
-### POST /tickets/:ticket_id/images/
+### POST /tickets/:ticketID/images/
 - Adding new image to a ticket
 - AUTHORIZATION: user (if author), city manager
 
@@ -111,25 +110,23 @@ Managing service requests
 AUTHORIZATION: service technician, city manager
  - unless specified differently 
 
-### GET /requests
+### GET /requests/list/?page DONE
  - list of service requests
+ - filtering by query params
+ - has filtering by parameters of the service request as well as by the assigned technician (technicianID)
 
-### GET /requests/technician/:user_id
- - useful for filtering only assigned requests by a service
-technician
-  
-### GET /requests/?ticket_id=:ticket_id&user_id=:used_id
- - searching and filtering based on query params
-
-### GET /requests/:request_id
+### GET /requests/:requestID DONE
  - RESPONSE: contains also assigned technicians
 
-### POST /requests
+### POST /requests DONE
  - AUTH: city manager
  - create new serice request
 
-### PUT /service-requests/:request_id
+### PUT /requests/:requestID DONE
  - AUTH: city manager, assigned technician
 
-### DELETE /service-requests/:request_id
+### DELETE /requests/:requestID
  - AUTH: city manager
+
+### PUT /requests/:requestID/comments DONE
+ - AUTH: city manager, assigned technician

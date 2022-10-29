@@ -21,7 +21,7 @@ async function getMultiple(page = 1){
 	const offset = helper.getOffset(page, config.usersPerPage);
 
 	const rows = await db.query(
-	  `SELECT id, name, surname, password, user_type, email, phone_num
+	  `SELECT id, name, surname, password, userType, email, phoneNum
 	  FROM Users LIMIT ${offset},${config.listPerPage}`
 	);
 
@@ -72,13 +72,20 @@ async function create(user){
 		} );
 
 	});
-	
-	
-	
 	// console.debug(query);
 	// result = await db.query(query, userArr);
 	
 	return result;
+}
+
+async function remove(requestingUser, id){
+	if(requestingUser.id == id || requestingUser.userType >= 3){
+		return result = await db.query(`DELETE FROM Users WHERE id = ?`, [id]);
+	}else if(requestingUser.userType == 2){
+		return result = await db.query(`DELETE FROM Users WHERE id = ? AND userType = 1`, [id]);
+	}else{
+		return {error: "User is not authorized to delete this user"};
+	}
 }
 
 async function login(user){
@@ -128,18 +135,18 @@ function authenticateToken(req, res) {
 	const authHeader = req.headers.authorization
 	var result = false;
 
-
 	if(authHeader == null){
-		return res.sendStatus(401)
+		return res.status(401).send("No Bearer token provided");
 	}
 
 	const token = authHeader && authHeader.split(' ')[1]
   
 	if (token == null){
-		return res.sendStatus(401)
+		return res.status(401).send("Wrong Bearer token format");
 	}
 
 	jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
+		
 		if (err) return res.sendStatus(403)
 	
 		req.user = user
@@ -174,9 +181,16 @@ function getAuthorization(req, res){
  * @param {*} userType 
  * @returns true if user role is equal or higher than userType 
  */
-function authorize(req, res, userType = 0){
+function authorize(req, res, userType = 0, sendForbidden = false){
+	
 	if(authenticateToken(req, res) === true){
-		return req.user.userType >= userType
+		const result = req.user.userType >= userType
+		if(result === false && sendForbidden === true){
+			if(res.headersSent === false){
+				res.status(403).send("Forbidden");
+			}
+		}
+		return result;
 	}
 
 	return false;
@@ -186,6 +200,7 @@ module.exports = {
 	getMultiple,
 	getAll,
 	create,
+	remove,
 	login,
 	generateAccessToken,
 	authenticateToken,

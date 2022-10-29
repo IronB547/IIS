@@ -7,6 +7,10 @@ const moment = require('moment');
 
 router.get('/list/:page?', async function(req, res, next) {
 	try {
+		
+		if(!users.authorize(req, res, 1, true))
+			return;
+
 		const page = req.params.page;
 		const query = req.query;
 		
@@ -19,8 +23,12 @@ router.get('/list/:page?', async function(req, res, next) {
 
 router.get('/:id', async function(req, res, next) {
 	try {
+		if(!users.authorize(req, res, 1, true))
+			return;
+
 		const ticketID = req.params.id;
 		const result = await serviceRequests.getByID(ticketID)
+		
 		if(result != null)
 			res.json(result);
 		else

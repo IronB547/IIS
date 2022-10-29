@@ -72,6 +72,7 @@ router.post('/', async function(req, res, next) {
 	}
 })
 
+/** Register new user without being a manager or admin (falls back to this via next() in the other post ) */
 router.post('/', async function(req, res, next) { 
 	req.body.userType = 0; 
 	users.create(req.body).then((result) => {
@@ -85,6 +86,23 @@ router.post('/', async function(req, res, next) {
 			res.status(400).json({message: err.message});
 		}
 	});
+});
+
+router.delete('/:id', async function(req, res, next) {
+	try {
+		if(!users.authorize(req,res, 0, true))
+			return;
+		
+		const result = await users.remove(req.user,req.params.id);
+
+		if(result.affectedRows === 0 || result.error)
+			res.status(404).json({message: "User not found"});
+		else
+			res.status(204).json();
+	} catch (err) {
+		console.error(`Error while deleting user `, err.message);
+		res.status(500).json({message: "Internal Server Error"});
+	}
 });
 
 module.exports = router;

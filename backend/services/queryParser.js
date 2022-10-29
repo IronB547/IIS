@@ -19,6 +19,7 @@ class QueryParser {
             "solutionState",
             "description",
             "cityManagerID",
+            "technicianID",
             "createdAt",
             "assigned",
             "ticketID"
@@ -27,7 +28,9 @@ class QueryParser {
         for (let key in this.query) {
             let value = this.query[key]
             //!TODO validate value
-            if(key == "q"){
+            if(key == "technicianID"){
+                where += ` id IN (SELECT serviceRequestID FROM Service_request_technician WHERE technicianID = ${value}) AND`;
+            }else if(key == "q"){
                 where += ` TITLE LIKE '%${this.query[key]}%' AND`;
             }else if (/*key != "page" && key != "limit" &&*/ params.includes(key)) {
                 where += ` ${key} = '${this.query[key]}' AND`;
