@@ -38,7 +38,7 @@ async function getAll(page = 1){
 	const offset = helper.getOffset(page, config.usersPerPage);
 
 	const rows = await db.query(
-		`SELECT id, name, surname, password, user_type, email, phone_num
+		`SELECT id, name, surname, password, userType, email, phoneNum
 		FROM Users LIMIT ${offset}, ${config.listPerTicketPage}`
 	);
 
@@ -52,7 +52,7 @@ async function getAll(page = 1){
 }
 
 async function getOne(id){
-	const rows = await db.query( `SELECT id, name, surname, password, user_type, email, phone_num FROM Users WHERE id = ?`, [id]);
+	const rows = await db.query( `SELECT id, name, surname, password, userType, email, phoneNum FROM Users WHERE id = ?`, [id]);
 	const data = helper.emptyOrRows(rows);
 
 	return { data };
@@ -63,7 +63,7 @@ async function create(user){
 		
 		schema.createUserSchema.validateAsync(user).then( async (value) => 
 		{
-			const query = `INSERT INTO Users (name, surname, password, user_type, email, phone_num) 
+			const query = `INSERT INTO Users (name, surname, password, userType, email, phoneNum) 
 		VALUES (?, ?, ?, ?, ?, ?)`
 			resolve(db.query(query,
 				[value.name, value.surname, value.password, value.userType, value.email, value.phoneNum]));
@@ -104,8 +104,8 @@ async function login(user){
 }
 
 function generateAccessToken(user) {
-	const user_permission = {userType: user.user_type, id: user.id};
-	return jwt.sign(user_permission, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+	const userPermission = {userType: user.userType, id: user.id};
+	return jwt.sign(userPermission, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
 }
 
 function hasAccessToken(req,res){

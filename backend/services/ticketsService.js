@@ -18,7 +18,7 @@ process.env.TOKEN_SECRET;
 
 async function getAll(page = 1){
 	const rows = await db.query(
-		`SELECT id, title, location, description, status, user_id
+		`SELECT id, title, location, description, status, userId
 		FROM Tickets`
 	);
 
@@ -38,7 +38,7 @@ async function create(ticket, userID){
 	}
 
 	ticket = validationRes.value;	
-	const result = await db.query(`INSERT INTO Tickets (title, location, description, status, user_id, created_at)  
+	const result = await db.query(`INSERT INTO Tickets (title, location, description, status, userID, createdAt)  
 	VALUES ('${ticket.title}', '${ticket.location}', '${ticket.description}', '${ticket.status}', '${userID}', '${moment().format("YYYY-MM-DD HH:mm:ss")}')` );
 
 	return result;
@@ -46,7 +46,7 @@ async function create(ticket, userID){
 
 async function getSolved(page = 1) {
 	const offset = helper.getOffset(page, config.listPerTicketPage);
-	const rows = await db.query(`SELECT * FROM Tickets WHERE status BETWEEN 2 AND 3 ORDER BY created_at DESC LIMIT ${offset}, ${config.listPerTicketPage}`)
+	const rows = await db.query(`SELECT * FROM Tickets WHERE status BETWEEN 2 AND 3 ORDER BY createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}`)
 	const data = helper.emptyOrRows(rows);
 
 	return data;
@@ -54,7 +54,7 @@ async function getSolved(page = 1) {
 
 async function getUnsolved(page = 1) {
 	const offset = helper.getOffset(page, config.listPerTicketPage);
-	const rows = await db.query(`SELECT * FROM Tickets WHERE status BETWEEN 0 AND 1 ORDER BY created_at DESC LIMIT ${offset}, ${config.listPerTicketPage}`);
+	const rows = await db.query(`SELECT * FROM Tickets WHERE status BETWEEN 0 AND 1 ORDER BY createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}`);
 	const data = helper.emptyOrRows(rows);
 
 	return data;
@@ -63,17 +63,17 @@ async function getUnsolved(page = 1) {
 async function getBySearch(param, page = 1) {
 	const offset = helper.getOffset(page, config.listPerTicketPage);
 	const value = `%${param}%`;
-	const rows = await db.query(`SELECT * FROM Tickets WHERE title LIKE ? ORDER BY created_at DESC LIMIT ${offset}, ${config.listPerTicketPage}`, [value]);
+	const rows = await db.query(`SELECT * FROM Tickets WHERE title LIKE ? ORDER BY createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}`, [value]);
 	const data = helper.emptyOrRows(rows);
 
 	return data;
 }
 
-async function getByID(ticket_id) {
-	const tickets = await db.query(`SELECT * FROM Tickets WHERE Tickets.id = ?`, [ticket_id]);
-	const photos = await db.query(`SELECT url, id FROM Ticket_photo WHERE ticket_id = ?`, [ticket_id]);
-	const comments = await db.query(`SELECT comment, created_at, user_id FROM Ticket_comment 
-	WHERE ticket_id = ?`, [ticket_id]);
+async function getByID(ticketID) {
+	const tickets = await db.query(`SELECT * FROM Tickets WHERE Tickets.id = ?`, [ticketID]);
+	const photos = await db.query(`SELECT url, id FROM Ticket_photo WHERE ticketID = ?`, [ticketID]);
+	const comments = await db.query(`SELECT comment, createdAt, userID FROM Ticket_comment 
+	WHERE ticketID = ?`, [ticketID]);
 
 	let ticket = tickets[0];
 	ticket.photos = photos;
@@ -83,13 +83,13 @@ async function getByID(ticket_id) {
 }
 
 async function addComment(comment) {
-	const result = await db.query(`INSERT INTO Ticket_comment (comment, created_at, ticket_id, user_id) VALUES 
-	(?, '${comment.created_at}', ${comment.ticket_id}, ${comment.user_id})`, [comment.text]);
+	const result = await db.query(`INSERT INTO Ticket_comment (comment, createdAt, ticketID, userID) VALUES 
+	(?, '${comment.createdAt}', ${comment.ticketID}, ${comment.userID})`, [comment.text]);
 	return result;
 }
 
 async function editTicket(ticket, req) {
-	const userVerification = (req.user.userType >= 2) ? "" : `AND Tickets.user_id =  ${ticket.userID}`;
+	const userVerification = (req.user.userType >= 2) ? "" : `AND Tickets.userID =  ${ticket.userID}`;
 
 	const result = await db.query(`
 	UPDATE Tickets
@@ -102,7 +102,7 @@ async function editTicket(ticket, req) {
 }
 
 async function editComment(ticket, req) {
-	const userVerification = (req.user.userType > 2) ? "" : `AND Ticket_comment.user_id =  ${ticket.userID}`;
+	const userVerification = (req.user.userType > 2) ? "" : `AND Ticket_comment.userID =  ${ticket.userID}`;
 	
 	const result = await db.query(`
 	UPDATE Ticket_comment

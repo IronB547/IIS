@@ -17,7 +17,7 @@ async function getMultiple(page = 1){
 	const offset = helper.getOffset(page, config.listPerPage);
 
 	const rows = await db.query(
-	  `SELECT id, username, password, user_type, email, phone_num
+	  `SELECT id, username, password, userType, email, phoneNum
 	  FROM Users LIMIT ${offset},${config.listPerPage}`
 	);
 
@@ -38,8 +38,8 @@ async function getAll(page = 1, params, query){
 	// console.debug(where);
 
 	const rows = await db.query(
-		`SELECT title, solution_state, description, city_manager_id, created_at FROM Service_request
-		 ORDER BY solution_state, created_at DESC LIMIT ${offset}, ${config.listPerTicketPage}
+		`SELECT title, solutionState, description, cityManagerID, createdAt FROM Service_request
+		 ORDER BY solutionState, createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}
 		 `
 	);
 	const data = helper.emptyOrRows(rows);
@@ -61,7 +61,7 @@ async function create(serviceRequests, userID){
 	serviceRequests = validationRes.value;	
 
 	const result = await db.query(
-		`INSERT INTO Service_request (ticket_id, city_manager_id, created_at, title, description)
+		`INSERT INTO Service_request (ticketId, cityManagerID, createdAt, title, description)
 		 VALUES (${serviceRequests.ticketID}, ?, '${moment().format("YYYY-MM-DD HH:mm:ss")}', ?, ?)`, 
 		[userID, serviceRequests.title, serviceRequests.description])  
 
@@ -85,10 +85,10 @@ async function getBySearch(page = 1, query) {
 
 async function getByID(requestID) {
 	const requests = await db.query(`SELECT * FROM Service_request WHERE id = ?`, [requestID]);
-	const comments = await db.query(`SELECT comment, created_at, user_id FROM Service_request_comment 
-	WHERE service_request_id = ?`, [requestID]);
-	const technicians = await db.query(`SELECT technician_id,name,surname,user_type,email,phone_num FROM Service_request_technician srt NATURAL JOIN Users u
-	WHERE u.id = srt.technician_id AND service_request_id = ?`, [requestID]);
+	const comments = await db.query(`SELECT comment, createdAt, userID FROM Service_request_comment 
+	WHERE serviceRequestID = ?`, [requestID]);
+	const technicians = await db.query(`SELECT technicianID,name,surname,userType,email,phoneNum FROM Service_request_technician srt NATURAL JOIN Users u
+	WHERE u.id = srt.technicianID AND serviceRequestID = ?`, [requestID]);
 
 	let request = requests[0];
 
@@ -102,7 +102,7 @@ async function getByID(requestID) {
 }
 
 async function editRequest(request, req) {
-	const userVerification = (req.user.userType > 2) ? "" : `AND Service_request.city_manager_id =  ${req.user.id}`;
+	const userVerification = (req.user.userType > 2) ? "" : `AND Service_request.cityManagerId =  ${req.user.id}`;
 
 	const result = await db.query(`
 	UPDATE Service_request

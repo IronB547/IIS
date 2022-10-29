@@ -60,7 +60,7 @@ router.put('/:requestID', async function(req, res, next) {
 				request.user = req.user.id;
 
 				const result = await serviceRequests.editRequest(request, req);
-				console.log(result)				
+				
 				if(result.affectedRows == 0 || result.error) {
 					res.status(400).send()
 				}

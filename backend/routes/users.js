@@ -63,7 +63,6 @@ router.post('/', async function(req, res, next) {
 					res.status(403).json({message: "Forbidden"});
 			}
 		}else{
-			console.log("No access token");
 			next();
 		}
 	} catch (err) {

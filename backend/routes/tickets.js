@@ -38,8 +38,8 @@ router.get('/search/:param?/:page?', async function(req, res, next) {
 
 router.get('/:id', async function(req, res, next) {
 	try {
-		const ticket_id = req.params.id;
-		const result = await tickets.getByID(ticket_id)
+		const ticketID = req.params.id;
+		const result = await tickets.getByID(ticketID)
 		if(result != null)
 			res.json(result);
 		else
@@ -71,14 +71,14 @@ router.post('/', async function(req, res, next) {
 	}
 });
 
-router.post('/:ticket_id/comments', async function(req, res, next) {
+router.post('/:ticketID/comments', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 0)) {
 			let comment = {};
 			comment.text = req.body.comment; 
-			comment.created_at = moment().format("YYYY-MM-DD HH:mm:ss");
-			comment.user_id = req.user.id;
-			comment.ticket_id = req.params.ticket_id;
+			comment.createdAt = moment().format("YYYY-MM-DD HH:mm:ss");
+			comment.userID = req.user.id;
+			comment.ticketID = req.params.ticketID;
 
 			const result = await tickets.addComment(comment);
 			if(result.error) {

@@ -16,12 +16,12 @@ class QueryParser {
         let where = "";
         let params = [
             "title",
-            "solution_state",
+            "solutionState",
             "description",
-            "city_manager_id",
-            "created_at",
+            "cityManagerID",
+            "createdAt",
             "assigned",
-            "ticket_id"
+            "ticketID"
         ]
 
         for (let key in this.query) {
