@@ -14,11 +14,12 @@ Authorization:
 Revoking acceess: https://supertokens.com/blog/revoking-access-with-a-jwt-blacklist
 
 ## TODO 
- - validating input (joi or something similar)
- - delete & put requests
- - PUT allowing to change photos
+ - validating input (joi or something similar) DONE (probably)
+ - delete & put requests DONE (edge cases required)
+ - PUT allowing to change photos (maybe in future)
  - optimization when building objects from multiple tables (connection pool?)
  - foreign key contraints fix in ticket photo and comments
+ - prevent edits on closed tickets
   
 This document describes the paths provided by our REST API
 
@@ -128,5 +129,14 @@ AUTHORIZATION: service technician, city manager
 ### DELETE /requests/:requestID
  - AUTH: city manager
 
+### POST /requests/:requestID/comments DONE
+ - AUTH: city manager
+
 ### PUT /requests/:requestID/comments DONE
  - AUTH: city manager, assigned technician
+
+### POST /requests/:requestID/technicians/:technicianID DONE
+ - AUTH: city manager
+
+### DELETE /requests/:requestID/technicians/:technicianID DONE
+ - AUTH: city manager

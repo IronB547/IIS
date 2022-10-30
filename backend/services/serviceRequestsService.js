@@ -101,21 +101,51 @@ async function getByID(requestID) {
 	return request;
 }
 
-async function editRequest(request, req) {
-	const userVerification = (req.user.userType >= 2) ? "" : `AND Service_request.cityManagerID =  ${req.user.id}`;
+async function editRequest(request, requestingUser) {
+	const userVerification = (requestingUser.userType >= 2) ? "" : 
+	`AND EXISTS (SELECT technicianID FROM Service_request_technician 
+		WHERE technicianID = ${requestingUser.id} AND serviceRequestID = ${request.requestID})`;
+	
+	if(userVerification){
+		//user is technician
+		
+		const validateRes = schema.editServiceRequestTechnician.validate(request)
 
-	const result = await db.query(`
-	UPDATE Service_request
-	SET title = ?,
-		description = ?
-	WHERE Service_request.id = ? ${userVerification}`, [request.title, request.description, request.requestID]);
+		if(validateRes.error){
+			return {error:validateRes.error}
+		}
+		return await db.query(`
+		UPDATE Service_request
+		SET solutionTime = ?,
+		solutionState = ?,
+		price = ?
+		WHERE Service_request.id = ? ${userVerification}`, [request.solutionTime, request.solutionState, request.price, request.requestID]);
+	}else{
+		//user is a city manager or admin
 
-	return result;
+		const validateRes = schema.editServiceRequest.validate(request)
+
+		if(validateRes.error){
+			return {error:validateRes.error}
+		}
+
+		return await db.query(`
+		UPDATE Service_request
+		SET title = ?,
+			description = ?,
+			solutionState = ?
+		WHERE Service_request.id = ?`, [request.title, request.description, request.solutionState, request.requestID]);
+	}
 }
 
-async function addRequestComment(comment) {
+async function addRequestComment(comment, requestingUser) {
+	const request = await db.query(`SELECT * FROM Service_request WHERE id = ? AND solutionState = 0`, [comment.requestID]);
+
+	if(!request[0])
+		return {error: "Request is already solved or does not exist."};
+
 	const result = await db.query(
-		`INSERT INTO Service_request_comment (comment, createdAt, ServiceRequestID, userID)
+		`INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID)
 		 VALUES (?, '${comment.createdAt}', ?, ?)`, 
 		[comment.text, comment.requestID, comment.userID])
 
@@ -153,6 +183,28 @@ async function deleteRequestComment(request, req) {
 	return result;
 }
 
+async function assignTechnician(technicianID, requestID) {
+	const toBeAssigned = await db.query(`SELECT * FROM Users WHERE id = ?`, [technicianID]);
+	
+	if(toBeAssigned[0]?.userType !== 1){
+		return {error: "User is not a technician"};
+	}
+	
+	const result = await db.query(`
+	INSERT IGNORE INTO Service_request_technician (technicianID, serviceRequestID)
+	VALUES (?, ?)`, [technicianID, requestID]);
+
+	return result;
+}
+
+async function unassignTechnician(technicianID, requestID) {
+	const result = await db.query(`
+	DELETE FROM Service_request_technician WHERE technicianID = ? AND serviceRequestID = ?`, 
+	[technicianID, requestID]);
+
+	return result;
+}
+
 module.exports = {
 	getMultiple,
 	getAll,
@@ -163,5 +215,7 @@ module.exports = {
 	editRequestComment,
 	deleteRequest,
 	deleteRequestComment,
+	assignTechnician,
+	unassignTechnician,
 	create,
 }

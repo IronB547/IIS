@@ -96,7 +96,7 @@ router.delete('/:id', async function(req, res, next) {
 		const result = await users.remove(req.user,req.params.id);
 
 		if(result.affectedRows === 0 || result.error)
-			res.status(404).json({message: "User not found"});
+			res.status(400).json(result.error);
 		else
 			res.status(204).json();
 	} catch (err) {

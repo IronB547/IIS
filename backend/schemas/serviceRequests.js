@@ -7,15 +7,28 @@ const createServiceRequest = Joi.object().keys({
     ticketID: Joi.number().required(),
 });
 
+const editServiceRequestTechnician = Joi.object().keys({
+    requestID: Joi.number().required(),
+    solutionState: Joi.number().min(0).max(1).required(),
+    solutionTime: Joi.string().max(255).required(),
+    price: Joi.string().max(255).required(),
+}).unknown();
+
 const editServiceRequest = Joi.object().keys({
-    title: Joi.string().min(2).max(255).required(),
+    requestID: Joi.number().required(),
     description: Joi.string().min(2).max(1023).required(),
-});
+    title: Joi.string().min(2).max(255).required(),
+    solutionState: Joi.number().min(0).max(1).required(),
+    solutionTime: Joi.string().max(255).required(),
+    price: Joi.string().max(255).required(),
+}).unknown();
 
 const changeState = Joi.object().keys({
     state: Joi.number().required().min(0).max(1),
 });
 
 module.exports = {
-    createServiceRequest
+    createServiceRequest,
+    editServiceRequestTechnician,
+    editServiceRequest,
 };

@@ -80,7 +80,7 @@ router.post('/:ticketID/comments', async function(req, res, next) {
 			comment.userID = req.user.id;
 			comment.ticketID = req.params.ticketID;
 
-			const result = await tickets.addComment(comment);
+			const result = await tickets.addComment(comment, req.user);
 			if(result.error) {
 				res.status(400).send(result.error)
 			}
@@ -90,8 +90,8 @@ router.post('/:ticketID/comments', async function(req, res, next) {
 		}
 		
 	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
-		res.status(400).send()
+		console.error(`Error while creating ticket comment `, err.message);
+		res.status(500).send()
 	}
 });
 
@@ -121,17 +121,14 @@ router.post('/:ticketID/photo', async function(req, res, next) {
 	}
 });
 
-router.put('/:ticketID', async function(req, res, next) {
+router.put('/:ticketID?', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 0)) {
 			let ticket = {};
-				ticket.title = req.body.title;
-				ticket.location = req.body.location;
-				ticket.description = req.body.description
-				ticket.ticketID = req.params.ticketID;
-				ticket.userID = req.user.id;
+				ticket = req.body;
+				ticket.ticketID = req.params.ticketID || ticket.ticketID;
 
-				const result = await tickets.editTicket(ticket, req);
+				const result = await tickets.editTicket(ticket, req.user);
 				
 				if(result.affectedRows == 0 || result.error) {
 					res.status(403).send(result.error)
@@ -150,28 +147,27 @@ router.put('/:ticketID', async function(req, res, next) {
 	}
 });
 
-router.put('/comments/:commentID', async function(req, res, next) {
+router.put('/:ticketID/comments/:commentID', async function(req, res, next) {
 	try {
-		if(users.authorize(req, res, 0)) {
-			let ticket = {};
-				ticket.comment = req.body.comment;
-				ticket.commentID = req.params.commentID;
-				ticket.userID = req.user.id;
+		if(!users.authorize(req, res, 0, true))
+			return;
+		
+		let comment = {};
+		comment.comment = req.body.comment;
+		comment.id = req.params.commentID;
+		comment.ticketID = req.params.ticketID;
 
-				const result = await tickets.editComment(ticket, req);
-				if(result.affectedRows == 0 || result.error) {
-					res.status(403).send(result.error)
-				}
-				else {
-					res.status(204).json(result)
-				}
+		const result = await tickets.editComment(comment, req.user);
+		if(result.affectedRows == 0 || result.error) {
+			res.status(403).send(result.error)
 		}
 		else {
-			res.status(401).send()
+			res.status(204).json(result)
 		}
+
 	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
-		res.status(400).send()
+		console.error(`Error while editing ticket comments `, err.message);
+		res.status(500).send()
 	}
 });
 

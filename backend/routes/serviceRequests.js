@@ -68,7 +68,7 @@ router.post('/:requestID/comments', async function(req, res, next) {
 			comment.userID = req.user.id;
 			comment.requestID = req.params.requestID;
 
-			const result = await serviceRequests.addRequestComment(comment);
+			const result = await serviceRequests.addRequestComment(comment, req.user);
 			if(result.error) {
 				res.status(400).send(result.error)
 			}
@@ -80,24 +80,21 @@ router.post('/:requestID/comments', async function(req, res, next) {
 				res.status(403).json({message: "Forbidden"});
 		}
 	} catch (err) {
-		console.error(`Error while posting servicer requests `, err.message);
+		console.error(`Error while posting comment to service requests `, err.message);
 		res.status(500).send()
 	}
 });
 
 router.put('/:requestID', async function(req, res, next) {
 	try {
-		if(users.authorize(req, res, 2)) {
-			let request = {};
-				request.title = req.body.title;
-				request.description = req.body.description
-				request.requestID = req.params.requestID;
-				request.user = req.user.id;
+		if(users.authorize(req, res, 1)) {
+				let request = req.body;
+				request.requestID = req.params.requestID || request.id;
 
-				const result = await serviceRequests.editRequest(request, req);
+				const result = await serviceRequests.editRequest(request, req.user);
 				
 				if(result.affectedRows == 0 || result.error) {
-					res.status(403).send()
+					res.status(403).send(result.error)
 				}
 				else {
 					res.status(204).json(result)
@@ -137,6 +134,30 @@ router.put('/comments/:commentID', async function(req, res, next) {
 		res.status(500).send()
 	}
 });
+
+router.post("/:requestID/technicians/:technicianID", async function(req, res) {
+	
+	try {
+		if(!users.authorize(req, res, 2, true))
+			return;
+
+		const requestID = req.params.requestID;
+		const technicianID = req.params.technicianID;
+
+		const result = await serviceRequests.assignTechnician(technicianID, requestID);
+		if(result.affectedRows == 0 || result.error) {
+			res.status(400).send(result.error)
+			return;
+		}
+		
+		res.status(204).json(result)
+
+	} catch (err) {
+		console.error(`Error while editing requests `, err.message);
+		res.status(500).send()
+	}
+
+})
 
 router.delete('/:requestID', async function(req, res, next) {
 	try {
@@ -185,5 +206,29 @@ router.delete('/comments/:commentID', async function(req, res, next) {
 		res.status(400).send()
 	}
 });
+
+router.delete("/:requestID/technicians/:technicianID", async function(req, res) {
+	
+	try {
+		if(!users.authorize(req, res, 2, true))
+			return;
+
+		const requestID = req.params.requestID;
+		const technicianID = req.params.technicianID;
+
+		const result = await serviceRequests.unassignTechnician(technicianID, requestID);
+		if(result.affectedRows == 0 || result.error) {
+			res.status(400).send(result.error)
+			return;
+		}
+		
+		res.status(204).json(result)
+
+	} catch (err) {
+		console.error(`Error while editing requests `, err.message);
+		res.status(500).send()
+	}
+
+})
 
 module.exports = router;

@@ -84,8 +84,8 @@ async function getByID(ticketID) {
 
 
 async function addPhoto(photo, req) {
-	const ticket = await db.query(`SELECT userID FROM Tickets WHERE Tickets.id = ${photo.ticketID}`);
-
+	const ticket = await db.query(`SELECT userID FROM Tickets WHERE Tickets.id = ${photo.ticketID} AND Tickets.status BETWEEN 0 AND 1`);
+	
 	if(ticket[0]?.userID == photo.userID || req.user.userType > 2) {
 		const result = await db.query(`INSERT INTO Ticket_photo (url, ticketID) VALUES (?, ${photo.ticketID})`, [photo.url]);
 		
@@ -113,32 +113,62 @@ async function deletePhoto(photo, req) {
 	}
 }
 
-async function addComment(comment) {
-	const result = await db.query(`INSERT INTO Ticket_comment (comment, createdAt, ticketID, userID) VALUES 
-	(?, '${comment.createdAt}', ${comment.ticketID}, ${comment.userID})`, [comment.text]);
-	return result;
+async function getOpenTicket(ticketID) {
+	const result = await db.query(`SELECT status FROM Tickets WHERE Tickets.id = ? AND Tickets.status BETWEEN 0 AND 1`, [ticketID]);
+
+	return result[0];
 }
 
-async function editTicket(ticket, req) {
-	const userVerification = (req.user.userType >= 2) ? "" : `AND Tickets.userID =  ${ticket.userID}`;
-
-	const result = await db.query(`
-	UPDATE Tickets
-	SET title = ?,
-		location = ?,
-		description = ?
-	WHERE Tickets.id = ? ${userVerification}`, [ticket.title, ticket.location, ticket.description, ticket.ticketID]);
-
-	return result;
+function canCommentInTicket(ticket, user) {
+	return (ticket.userID == user.userID || user.userType >= 2);
 }
 
-async function editComment(ticket, req) {
-	const userVerification = (req.user.userType > 2) ? "" : `AND Ticket_comment.userID =  ${ticket.userID}`;
+async function addComment(comment, requestingUser) {
 	
+	const ticket = await getOpenTicket(comment.ticketID);
+
+	if(!ticket)
+		return {error: "Forbidden"}
+
+	const result = await db.query(`INSERT INTO Ticket_comment (comment, createdAt, ticketID, userID) VALUES
+	(?, '${moment().format("YYYY-MM-DD HH:mm:ss")}', ?, ${comment.userID})`, [comment.text, comment.ticketID]);
+	
+	return result;
+}
+
+async function editTicket(ticket, user) {
+	if(user.userType >= 2 && ticket.status != undefined) {
+		return await db.query(`
+		UPDATE Tickets SET 
+		title = ?, 
+		location = ?, 
+		description = ?, 
+		status = ? 
+		WHERE Tickets.id = ?`, [ticket.title, ticket.location, ticket.description, ticket.status, ticket.ticketID]);
+	}else{
+		const userVerification = (user.userType >= 2) ? "" : `AND Tickets.userID =  ${ticket.userID}`;
+		return await db.query(`
+		UPDATE Tickets
+		SET title = ?,
+			location = ?,
+			description = ?
+		WHERE Tickets.id = ? ${userVerification}`, [ticket.title, ticket.location, ticket.description, ticket.ticketID]);
+	}
+}
+
+async function editComment(comment, requestingUser) {
+
+	const ticket = await getOpenTicket(comment.ticketID);
+	if(!ticket)
+		return {error: "Forbidden"}
+
+	const userVerification = (requestingUser.userType >= 2) ? "" : `AND Ticket_comment.userID = ${requestingUser.id}`;
+
 	const result = await db.query(`
 	UPDATE Ticket_comment
 	SET comment = ?
-	WHERE Ticket_comment.id = ? ${userVerification}`, [ticket.comment, ticket.commentID]);
+	WHERE Ticket_comment.id = ? 
+	${userVerification}`, [comment.comment, comment.id]);
 
 	return result;
 }
