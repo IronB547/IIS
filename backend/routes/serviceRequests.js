@@ -140,7 +140,7 @@ router.put('/comments/:commentID', async function(req, res, next) {
 
 router.delete('/:requestID', async function(req, res, next) {
 	try {
-		if(users.authorize(req, res, 0)) {
+		if(users.authorize(req, res, 1)) {
 			let request = {};
 				request.requestID = req.params.requestID;
 				request.userID = req.user.id;
@@ -164,7 +164,7 @@ router.delete('/:requestID', async function(req, res, next) {
 
 router.delete('/comments/:commentID', async function(req, res, next) {
 	try {
-		if(users.authorize(req, res, 0)) {
+		if(users.authorize(req, res, 1)) {
 			let request = {};
 				request.commentID = req.params.commentID;
 				request.userID = req.user.id;

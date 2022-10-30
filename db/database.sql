@@ -143,12 +143,7 @@ INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityMa
 INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Kontrola kabelů v lampě', 'Je potřeba rutinní prohlídka kabelů, zda li nejsou steřelé nebo vypadené', '0', '0', 5, 2, '2020-05-31 08:53:55');
 INSERT INTO Service_request (title, description, solutionState, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Výměna sloupu', 'Je potřeba vyměnit rezavý sloup', 1, '0', '0', 5, 2, '2019-08-20 15:23:14');
 
-SELECT title, solutionState, description, cityManagerID, createdAt FROM Service_request ORDER BY solutionState, createdAt DESC;
 INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (1, 3);
 INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (2, 4);
 
 INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Vyřešil jsem problém, žárovka svítí', '2020-05-31 19:51:12', 1, 3);
-
-
-
-DELETE FROM Users WHERE id = 2;

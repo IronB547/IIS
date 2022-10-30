@@ -75,6 +75,10 @@ async function getByID(ticketID) {
 	const comments = await db.query(`SELECT comment, createdAt, userID FROM Ticket_comment 
 	WHERE ticketID = ?`, [ticketID]);
 
+	if(tickets[0] == null) {
+		return null;
+	}
+
 	let ticket = tickets[0];
 	ticket.photos = photos;
 	ticket.comments = comments;
@@ -128,6 +132,8 @@ async function editTicket(ticket, req) {
 		location = ?,
 		description = ?
 	WHERE Tickets.id = ? ${userVerification}`, [ticket.title, ticket.location, ticket.description, ticket.ticketID]);
+
+	
 
 	return result;
 }
