@@ -153,6 +153,15 @@ async function addRequestComment(comment, requestingUser) {
 }
 
 async function editRequestComment(comment, req) {
+	const request = await db.query(`
+	SELECT * FROM Service_request_comment JOIN Service_request
+    ON Service_request_comment.serviceRequestID = Service_request.id
+	WHERE Service_request_comment.id = ? AND Service_request.solutionState = 0`, [comment.commentID]);
+	
+	console.log(request)
+	if(!request[0])
+		return {error: "Request is already solved or does not exist."};
+
 	const userVerification = (req.user.userType > 2) ? "" : `AND Service_request_comment.userID =  ${req.user.id}`;
 
 	const result = await db.query(`
@@ -163,8 +172,8 @@ async function editRequestComment(comment, req) {
 	return result;
 }
 
-async function deleteRequest(request, req) {
-	const userVerification = (req.user.userType >= 2) ? "" : `AND Service_request.userID =  ${request.userID}`;
+async function deleteRequest(request, req) {	
+	const userVerification = (req.user.userType >= 2) ? "" : `AND Service_request.cityManagerID =  ${request.userID}`;
 
 	const result = await db.query(`
 	DELETE FROM Service_request

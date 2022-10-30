@@ -179,7 +179,7 @@ router.delete('/:requestID', async function(req, res, next) {
 		}
 	} catch (err) {
 		console.error(`Error while getting requests `, err.message);
-		res.status(400).send()
+		res.status(500).send()
 	}
 });
 

@@ -219,11 +219,12 @@ router.delete('/comments/:commentID', async function(req, res, next) {
 	}
 });
 
-router.delete('/photo/:photoID', async function(req, res, next) {
+router.delete('/:ticketID/photo/:photoID', async function(req, res, next) {
 	try {
 		if(users.authorize(req, res, 0)) {
 			let photo = {};
 				photo.photoID = req.params.photoID;
+				photo.ticketID = req.params.ticketID;
 				photo.userID = req.user.id;
 
 			const result = await tickets.deletePhoto(photo, req);
