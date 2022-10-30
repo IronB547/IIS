@@ -75,6 +75,10 @@ async function getByID(ticketID) {
 	const comments = await db.query(`SELECT comment, createdAt, userID FROM Ticket_comment 
 	WHERE ticketID = ?`, [ticketID]);
 
+	if(tickets[0] == null) {
+		return null;
+	}
+
 	let ticket = tickets[0];
 	ticket.photos = photos;
 	ticket.comments = comments;
