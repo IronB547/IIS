@@ -42,7 +42,7 @@ CREATE TABLE Service_request (
     description VARCHAR(1023) NOT NULL,
     solutionTime VARCHAR(255) DEFAULT '0',
     solutionState INT NOT NULL DEFAULT 0,
-    timeSpent VARCHAR(255) DEFAULT '0',
+    price VARCHAR(255) DEFAULT 0,
     cityManagerID INT NOT NULL,
     createdAt DATETIME NOT NULL,
     PRIMARY KEY (id),
@@ -136,12 +136,12 @@ INSERT INTO Ticket_photo (url, ticketID) VALUES ('https://images.pexels.com/phot
 
 # SOLUTION_STATE: 0,1
 #                 'unsolved', 'solved'
-INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Title 1', 'Description 1', '0', '0', 5, 1, '2020-01-23 12:14:50');
-INSERT INTO Service_request (title, description, solutionState, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Title 2', 'Description 2', 1, '0', '0', 6, 1, '2021-01-01 00:00:00');
+INSERT INTO Service_request (title, description, solutionTime, cityManagerID, ticketID, createdAt) VALUES ('Title 1', 'Description 1', '0', 5, 1, '2020-01-23 12:14:50');
+INSERT INTO Service_request (title, description, solutionState, solutionTime, cityManagerID, ticketID, createdAt) VALUES ('Title 2', 'Description 2', 1, '0', 6, 1, '2021-01-01 00:00:00');
 
-INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Výměna žárovky v lampě', 'Nutná výměna žárovky v lampě', '0', '0', 6, 2, '2020-05-31 08:50:12');
-INSERT INTO Service_request (title, description, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Kontrola kabelů v lampě', 'Je potřeba rutinní prohlídka kabelů, zda li nejsou steřelé nebo vypadené', '0', '0', 5, 2, '2020-05-31 08:53:55');
-INSERT INTO Service_request (title, description, solutionState, solutionTime, timeSpent, cityManagerID, ticketID, createdAt) VALUES ('Výměna sloupu', 'Je potřeba vyměnit rezavý sloup', 1, '0', '0', 5, 2, '2019-08-20 15:23:14');
+INSERT INTO Service_request (title, description, solutionTime, cityManagerID, ticketID, createdAt) VALUES ('Výměna žárovky v lampě', 'Nutná výměna žárovky v lampě', '0', 6, 2, '2020-05-31 08:50:12');
+INSERT INTO Service_request (title, description, solutionTime, cityManagerID, ticketID, createdAt) VALUES ('Kontrola kabelů v lampě', 'Je potřeba rutinní prohlídka kabelů, zda li nejsou steřelé nebo vypadené', '0', 5, 2, '2020-05-31 08:53:55');
+INSERT INTO Service_request (title, description, solutionState, solutionTime, cityManagerID, ticketID, createdAt) VALUES ('Výměna sloupu', 'Je potřeba vyměnit rezavý sloup', 1, '0', 5, 2, '2019-08-20 15:23:14');
 
 INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (1, 3);
 INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (2, 4);
