@@ -1,0 +1,11 @@
+{
+  "name": "iis-smartcity-frontend",
+  "version": "1.0.0",
+  "description": "A smart city project for IIS @ FIT VUT.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tomáš Dvořák, Juraj Dedič",
+  "license": "ISC"
+}
