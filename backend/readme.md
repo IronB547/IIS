@@ -18,8 +18,8 @@ Revoking acceess: https://supertokens.com/blog/revoking-access-with-a-jwt-blackl
  - delete & put requests DONE (edge cases required)
  - PUT allowing to change photos (maybe in future)
  - optimization when building objects from multiple tables (connection pool?)
- - foreign key contraints fix in ticket photo and comments
- - prevent edits on closed tickets
+ - foreign key contraints fix in ticket photo and comments DONE (sorta, could do with some rework with JOIN)
+ - prevent edits on closed tickets DONE
   
 This document describes the paths provided by our REST API
 

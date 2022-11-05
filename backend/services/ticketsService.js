@@ -103,10 +103,10 @@ async function addPhoto(photo, req) {
 }
 
 async function deletePhoto(photo, req) {
-	const ticket = await db.query(`SELECT userID FROM Tickets WHERE Tickets.id = ${photo.photoID}`);
-	
+	const ticket = await db.query(`SELECT userID FROM Tickets WHERE Tickets.id = ${photo.ticketID}`);
+
 	if(ticket[0]?.userID == photo.userID || req.user.userType >= 2) {
-		const result = await db.query(`DELETE FROM Ticket_photo WHERE Ticket_photo.id = ? `, [photo.photoID]);
+		const result = await db.query(`DELETE FROM Ticket_photo WHERE Ticket_photo.id = ? AND Ticket_photo.ticketID = ?`, [photo.photoID, photo.ticketID]);
 		
 		return result;
 	}
@@ -150,7 +150,7 @@ async function editTicket(ticket, user) {
 		status = ? 
 		WHERE Tickets.id = ?`, [ticket.title, ticket.location, ticket.description, ticket.status, ticket.ticketID]);
 	}else{
-		const userVerification = (user.userType >= 2) ? "" : `AND Tickets.userID =  ${ticket.userID}`;
+		const userVerification = (user.userType >= 2) ? "" : `AND Tickets.userID =  ${user.id}`;
 		return await db.query(`
 		UPDATE Tickets
 		SET title = ?,
