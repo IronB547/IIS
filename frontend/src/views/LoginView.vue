@@ -18,7 +18,7 @@
 <script>
 
   import userService from '@/services/userService';
-import Button from 'primevue/button';
+  import Button from 'primevue/button';
   import InputText from 'primevue/inputtext';
   import Password from 'primevue/password';
   import mitt from 'mitt';

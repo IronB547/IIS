@@ -1,14 +1,16 @@
 <template>
   <main class="main">
     <ticket-header class="ticket-header">
-      <h2>Tickety</h2>
+      <h1 class="tickets">Tickety</h1>
       <span class="p-input-icon-left">
         <i class="pi pi-search" />
         <InputText type="text" class="p-inputtext-lg" v-model="value" placeholder="Hledat"/>
       </span>
-      <Button class="p-button-lg p-button-primary" style="color: white">
-        Vytvoř ticket
-      </Button>
+      <router-link :to="`tickets/newticket`">
+        <Button class="p-button-lg p-button-primary" style="color: white">
+          Vytvoř ticket
+        </Button>
+      </router-link>
     </ticket-header>
       <div class="tickets-list">
         <TicketItem v-for="ticket in tickets" v-bind:key="ticket.id" :ticket="ticket"/>
@@ -52,10 +54,18 @@
     max-width: 1450px;
     margin: 0 auto;
   }
+  .tickets{
+    color: white;
+    background-color: var(--indigo-700);
+    border-radius: 10px;
+    display: inline-block;
+    padding: 7px 20px;
+  }
   .ticket-header{
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 25px;
   }
   .tickets-list{
     display: grid;
