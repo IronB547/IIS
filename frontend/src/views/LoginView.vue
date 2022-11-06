@@ -1,24 +1,36 @@
 <template>
-  <h1>Log In</h1>
-  <Toast />
 
-  <form v-on:submit="logIn" class="login-form">
+  <div class="registration-container">
+    <main class="login container-item">
 
-    <InputText id="email" type="text" v-model="credentials.email" />
-    <br>
-    <br>
-    <Password v-model="credentials.password" :feedback="false" showIcon="pi pi-eye" hideIcon="pi pi-eye-slash"/>
-    <br>
-    <br>
-    <Button label="Log In" icon="pi pi-check" iconPos="right" @click="logIn"/>
-  
-  </form>
+    <h1>Log In</h1>
+    <Toast />
+
+    <form class="login-form" @submit.prevent="logIn">
+
+      <InputText id="email" type="text" v-model="credentials.email" class="p-inputtext-lg" required/>
+      <br>
+      <br>
+      <Password v-model="credentials.password" class="p-inputtext-lg" toggleMask required :feedback="false" />
+      <br>
+      <br>
+      <Button type="submit" label="Log In" icon="pi pi-check" iconPos="right" class="p-button-lg p-button-primary"/>
+
+    </form> 
+
+    </main>
+
+    <section class="register container-item">
+      <h2>Don't have an account?</h2>
+      <Button label="Register" class="p-button-secondary p-button-lg" @click="$router.push('register')"/>
+    </section>
+  </div>
 </template>
   
 <script>
 
   import userService from '@/services/userService';
-import Button from 'primevue/button';
+  import Button from 'primevue/button';
   import InputText from 'primevue/inputtext';
   import Password from 'primevue/password';
   import mitt from 'mitt';
@@ -27,7 +39,7 @@ import Button from 'primevue/button';
   // @ is an alias to /src
   
   export default {
-    name: "RequestsListView",
+    name: "LoginView",
     components: {
       Button,
       InputText,
@@ -62,13 +74,54 @@ import Button from 'primevue/button';
   };
 </script>
 
-<style lang="scss">
-.login-form{
-  // *{
-  //   width: 100%;
-  // }
-  // InputText{
-  //   width: 100%;
-  // }
+<style lang="scss" scoped>
+
+.p-button-label{
+  text-decoration: none;
 }
+
+main {  flex-grow: 2;}
+section{flex-grow: 1;}
+
+.login-form{
+  width: 400px;
+  margin: 0 auto;
+
+  
+  .p-password{
+    width: 100%;
+    .p-password-input{
+    width: 100%;
+    }
+  }
+
+  .p-inputtext{
+    width: 400px;
+  }
+}
+</style>
+
+
+<style lang="scss">
+$credentials-margin-bottom: (1.1em);
+.registration-container{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.p-password{
+    width: 100%;
+  .p-password-input{
+    width: 100%;
+  }
+  margin-bottom: $credentials-margin-bottom;
+}
+
+@media only screen and (max-width: 768px) {
+  .registration-container{
+    flex-direction: column-reverse;
+  }
+}
+
 </style>

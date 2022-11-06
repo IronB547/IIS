@@ -1,5 +1,8 @@
 # frontend
 
+## TODO
+- fix storing user info with reactiveness
+
 ## Project setup
 ```
 yarn install

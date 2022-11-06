@@ -1,22 +1,35 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link> |
-    <router-link to="/tickets">Tickets</router-link> |
-    <router-link to="/requests">Requests</router-link> |
-    <router-link to="/login">Login</router-link> |
-    <router-link to="/register">Register</router-link>
-  </nav>
+    <Menubar class="menu-bar" :model="navigation">
+      <template #start>
+        <h3 class="navbar-title">Smart City</h3>
+      </template>
+      <template #end>
+        <ul class="p-menubar-root-list">
+        <li v-if="isAuthenticated" class="p-menuitem" role="menuitem" aria-label="Log Out" aria-level="1" aria-setsize="6" aria-posinset="5">
+          <div class="p-menuitem-content">
+            <a href="#/login" @click="logOut" class="p-menuitem-link router-link-active router-link-active-exact" tabindex="-1" aria-hidden="true">
+              <span class="p-menuitem-icon pi pi-fw pi-sign-out"></span>
+              <span class="p-menuitem-text">Log Out</span>
+            </a>
+          </div><!---->
+        </li>
+        </ul>
+      </template>
+    </Menubar>
   <router-view />
 </template>
 
 <script>
 
 import mitt from 'mitt';
+import Menubar from 'primevue/menubar';
 
 const emitter = mitt();
 
 export default {
+  components: {
+    Menubar
+  },
   data() {
     return {
       name: 'Smart City',
@@ -24,14 +37,57 @@ export default {
         {email: "milda@gmail.com", login: "milda"},
         {email: "milda2@gmail.com", login: "milda2"},
       ],
-      user: {}
+      user: {},
+      navigation: [
+        {
+          label: 'Home',
+          icon: 'pi pi-fw pi-home',
+          to: '/'
+        },
+        {
+          label: 'About',
+          icon: 'pi pi-fw pi-info',
+          to: '/about'
+        },
+        {
+          label: 'Tickets',
+          icon: 'pi pi-fw pi-ticket',
+          to: '/tickets'
+        },
+        {
+          label: 'Requests',
+          icon: 'pi pi-fw pi-question',
+          to: '/requests'
+        },
+        {
+          label: 'Log In',
+          icon: 'pi pi-fw pi-sign-in',
+          to: '/login',
+          visible: () => !localStorage.getItem('token') 
+        },
+        {
+          label: 'Register',
+          icon: 'pi pi-fw pi-user-plus',
+          to: '/register',
+          visible: () => !localStorage.getItem('token')
+        },
+      ]
     }
   },
   methods: {
     addNew(){
       this.list.push({email: "email", login: this.name})
+    },
+    logOut(){
+      localStorage.removeItem('token')
+      this.$router.push({name: "login"})
     }
-  }
+  },
+  computed: {
+    isAuthenticated(){
+      return localStorage.getItem('token') != null
+    }
+  },
 }
 
 emitter.on('userLoggedIn', e => {
@@ -41,6 +97,18 @@ emitter.on('userLoggedIn', e => {
 </script>
 
 <style lang="scss" scope="global">
+.navbar-title {
+  margin: 0 0.2rem 0 0.4rem;
+  padding: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 0 2px #000;
+}
+.menu-bar
+{
+  margin-bottom: 2rem;
+}
 body{
   margin: 0;
   min-height: 100vh;

@@ -6,9 +6,10 @@ import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
 import Toast from "primevue/toast";
 import Card from "primevue/card";
-import Skeleton from "primevue/skeleton";
+import Skeleton from 'primevue/skeleton';
 
-import "primevue/resources/themes/lara-dark-indigo/theme.css"; //theme
+// import "primevue/resources/themes/vela-green/theme.css"; //theme
+import "primevue/resources/themes/lara-dark-indigo/theme.css"
 import "primevue/resources/primevue.min.css"; //core css
 import "primeicons/primeicons.css"; //icons
 

@@ -9,26 +9,31 @@ async function logIn(credentials){
     const data = await res.json()
     if(data.token){
         localStorage.setItem("token",data.token)
-        // this.$toast.add({
-        //     severity: "success",
-        //     summary: "Successfully logged in",
-        //     detail: "Message Content",
-        //     life: 3000,
-        // });
         console.log(data)
-    }else{
-        // this.$toast.add({
-        //     severity: "error",
-        //     summary: "Wrong credentials",
-        //     detail: "The email or password is incorrect",
-        //     life: 3000,
-        // });
-        console.log(data)
-        // this.response = data
     }
+    return data;
+}
+
+async function register(credentials){
+    
+    delete credentials.passwordRepeat
+    credentials.phoneNum = credentials.phoneNum.replace(/ /g,'') 
+
+    const res = await fetch(`${config.host}/users`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(credentials)
+    })
+    const data = await res.json()
+    if(data.token){
+        localStorage.setItem("token",data.token)
+        console.log(data)
+    }
+
     return data;
 }
 
 export default {
     logIn,
+    register,
 }
