@@ -18,17 +18,17 @@ app.use(
 	})
 );
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
 	console.log(req.query);
 
 	res.json({ message: "ok" });
 });
 
-app.use("/users", usersRouter);
+app.use("/api/users", usersRouter);
 
-app.use("/tickets", ticketsRouter);
+app.use("/api/tickets", ticketsRouter);
 
-app.use("/requests", serviceRequestsRouter);
+app.use("/api/requests", serviceRequestsRouter);
 
 /* Error handler middleware */
 app.use((err, req, res, next) => {

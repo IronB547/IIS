@@ -27,6 +27,7 @@ router.get('/all/:page?', async function(req, res, next) {
 
 router.post('/login', async function(req, res, next) {
 	try {
+		// console.debug(req)
 		const result = await users.login(req.body)
 		if(result.token != null)
 			res.status(200).json(result);

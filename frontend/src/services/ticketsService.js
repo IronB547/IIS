@@ -1,7 +1,7 @@
 import config from './config'
 
 async function getBySearch() {
-    const res = await fetch('http://localhost:10000/tickets/search', {
+    const res = await fetch(`${config.host}/tickets/search`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
