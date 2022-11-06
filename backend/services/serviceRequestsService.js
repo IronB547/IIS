@@ -1,7 +1,7 @@
 const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
-const QueryParser = require('./queryParser');
+const queryParserRequest = require('./queryParserRequest');
 
 const dotenv = require('dotenv');
 const schema = require('../schemas/serviceRequests');
@@ -12,45 +12,6 @@ dotenv.config();
 
 // access config var
 process.env.TOKEN_SECRET;
-
-async function getMultiple(page = 1){
-	const offset = helper.getOffset(page, config.listPerPage);
-
-	const rows = await db.query(
-	  `SELECT id, username, password, userType, email, phoneNum
-	  FROM Users LIMIT ${offset},${config.listPerPage}`
-	);
-
-	const data = helper.emptyOrRows(rows);
-	const meta = {page};
-
-	return {
-	  data,
-	  meta
-	}
-}
-
-async function getAll(page = 1, params, query){
-	const offset = helper.getOffset(page, config.listPerTicketPage);
-
-	// const where = helper.getWhereClause(query);
-	
-	// console.debug(where);
-
-	const rows = await db.query(
-		`SELECT title, solutionState, description, cityManagerID, createdAt FROM Service_request
-		 ORDER BY solutionState, createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}
-		 `
-	);
-	const data = helper.emptyOrRows(rows);
-
-	const meta = {page};
-
-	return {
-		data,
-		meta
-	}
-}
 
 async function create(serviceRequests, userID){
 	const validationRes = schema.createServiceRequest.validate(serviceRequests);
@@ -68,27 +29,38 @@ async function create(serviceRequests, userID){
 	return result;
 }
 
-async function getBySearch(page = 1, query) {
+async function getBySearch(page = 1, query, countOnly = false) {
 	const offset = helper.getOffset(page, config.listPerTicketPage);
 	
-	const parser = new QueryParser(query);
-	let where = parser.generateWhereClause()
+	const parser = new queryParserRequest(query);
+	let where = parser.getWhereClause();
+	let orderBy = parser.getOrderByClause();
 
 	where = where ? `WHERE ${where}` : "";
-	
-	const call = `SELECT * FROM Service_request ${where} LIMIT ${offset}, ${config.listPerTicketPage}`
-	const rows = await db.query(call);
-	const data = helper.emptyOrRows(rows);
+	orderBy = orderBy ? `ORDER BY ${orderBy}` : "";
 
-	return data;
+	if(countOnly){
+		const rows = await db.query(`SELECT COUNT(*) AS count FROM Service_request ${where}`);
+		return rows[0];
+	}else{
+		const call = `SELECT * FROM Service_request ${where} ${orderBy} LIMIT ${offset}, ${config.listPerTicketPage}`
+		const rows = await db.query(call);
+		const data = helper.emptyOrRows(rows);
+	
+		return data;
+	}
 }
 
 async function getByID(requestID) {
-	const requests = await db.query(`SELECT * FROM Service_request WHERE id = ?`, [requestID]);
-	const comments = await db.query(`SELECT comment, createdAt, userID FROM Service_request_comment 
+	const requests = await db.query(`SELECT Service_request.*, Users.name userName, Users.surname userSurname, Users.userType 
+	FROM Service_request JOIN Users ON Users.id = cityManagerID WHERE Service_request.id = ?`, [requestID]);
+
+	const comments = await db.query(`SELECT comment, createdAt, userID, Users.name userName, Users.surname userSurname, Users.userType
+	FROM Service_request_comment JOIN Users ON Users.id = userID 
 	WHERE serviceRequestID = ?`, [requestID]);
-	const technicians = await db.query(`SELECT technicianID,name,surname,userType,email,phoneNum FROM Service_request_technician srt NATURAL JOIN Users u
-	WHERE u.id = srt.technicianID AND serviceRequestID = ?`, [requestID]);
+	
+	const technicians = await db.query(`SELECT technicianID,name,surname,userType,email,phoneNum FROM Service_request_technician srt 
+	NATURAL JOIN Users u WHERE u.id = srt.technicianID AND serviceRequestID = ?`, [requestID]);
 
 	let request = requests[0];
 
@@ -215,8 +187,6 @@ async function unassignTechnician(technicianID, requestID) {
 }
 
 module.exports = {
-	getMultiple,
-	getAll,
 	getBySearch,
 	getByID,
 	editRequest,

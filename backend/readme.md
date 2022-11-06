@@ -14,12 +14,12 @@ Authorization:
 Revoking acceess: https://supertokens.com/blog/revoking-access-with-a-jwt-blacklist
 
 ## TODO 
+ - query parameters rework (also for tickets) DONE
+ - more user information for tickets, requests & comments DONE
  - validating input (joi or something similar) DONE (probably)
- - delete & put requests DONE (edge cases required)
  - PUT allowing to change photos (maybe in future)
  - optimization when building objects from multiple tables (connection pool?)
  - foreign key contraints fix in ticket photo and comments DONE (sorta, could do with some rework with JOIN)
- - prevent edits on closed tickets DONE
   
 This document describes the paths provided by our REST API
 

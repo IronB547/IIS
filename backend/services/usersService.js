@@ -2,7 +2,6 @@ const db = require('./db');
 const helper = require('../helper');
 const config = require('../config');
 const joi = require('joi');
-const { func } = require('joi');
 const crypto = require('crypto');
 const schema = require('../schemas/users');
 
@@ -15,24 +14,6 @@ dotenv.config();
 // access config var
 if(!process.env.TOKEN_SECRET)
 	console.error("TOKEN_SECRET not set");
-
-
-async function getMultiple(page = 1){
-	const offset = helper.getOffset(page, config.usersPerPage);
-
-	const rows = await db.query(
-	  `SELECT id, name, surname, password, userType, email, phoneNum
-	  FROM Users LIMIT ${offset},${config.listPerPage}`
-	);
-
-	const data = helper.emptyOrRows(rows);
-	const meta = {page};
-
-	return {
-	  data,
-	  meta
-	}
-}
 
 async function getAll(page = 1){
 	const offset = helper.getOffset(page, config.usersPerPage);
@@ -197,7 +178,6 @@ function authorize(req, res, userType = 0, sendForbidden = false){
 }
 
 module.exports = {
-	getMultiple,
 	getAll,
 	create,
 	remove,

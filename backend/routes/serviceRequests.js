@@ -21,6 +21,22 @@ router.get('/list/:page?', async function(req, res, next) {
 	}
 });
 
+router.get('/count/:page?', async function(req, res, next) {
+	try {
+		
+		if(!users.authorize(req, res, 1, true))
+			return;
+
+		const page = req.params.page;
+		const query = req.query;
+		
+		res.json(await serviceRequests.getBySearch(page, query, true));
+	} catch (err) {
+		console.error(`Error while getting service requests `, err.message);
+		res.status(500).send()
+	}
+});
+
 router.get('/:id', async function(req, res, next) {
 	try {
 		if(!users.authorize(req, res, 1, true))

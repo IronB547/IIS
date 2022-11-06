@@ -5,34 +5,26 @@ const users = require('../services/usersService');
 const tickets = require('../services/ticketsService');
 const moment = require("moment");
 
-router.get('/Solved/:page?', async function(req, res, next) {
+router.get('/list/:page?', async function(req, res) {
 	try {
 		const page = req.params.page;
-		res.json(await tickets.getSolved());
+		const query = req.query;
+		
+		res.json(await tickets.getBySearch(page, query));
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
-		res.status(400).json(err.message)
+		res.status(500).send()
 	}
 });
 
-router.get('/Unsolved/:page?', async function(req, res, next) {
+router.get('/count/:page?', async function(req, res) {
 	try {
-		const page = req.params.page;
-		res.json(await tickets.getUnsolved(page));
+		const query = req.query;
+		
+		res.json(await tickets.getBySearch(undefined, query, true));
 	} catch (err) {
 		console.error(`Error while getting tickets `, err.message);
-		res.status(400).json(err.message)
-	}
-});
-
-router.get('/search/:param?/:page?', async function(req, res, next) {
-	try {
-		const page = req.params.page;
-		const param = req.params.param ? req.params.param : "";
-		res.json(await tickets.getBySearch(param, page));
-	} catch (err) {
-		console.error(`Error while getting tickets `, err.message);
-		res.status(400).send()
+		res.status(500).send()
 	}
 });
 

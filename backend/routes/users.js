@@ -1,6 +1,4 @@
 const express = require('express');
-const Joi = require('joi');
-const { db } = require('../config');
 const router = express.Router();
 const users = require('../services/usersService');
 const ValidationError = require('../helper').ValidationError;

@@ -3,10 +3,8 @@ const helper = require('../helper');
 const config = require('../config');
 const joi = require('joi');
 const schema = require('../schemas/tickets')
-const { func, isSchema } = require('joi');
-const crypto = require('crypto');
+const QueryParserTicket = require('./queryParserTicket');
 
-const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const moment = require('moment');
 
@@ -15,21 +13,6 @@ dotenv.config();
 
 // access config var
 process.env.TOKEN_SECRET;
-
-async function getAll(page = 1){
-	const rows = await db.query(
-		`SELECT id, title, location, description, status, userId
-		FROM Tickets`
-	);
-
-	const data = helper.emptyOrRows(rows);
-	const meta = {page};
-
-	return {
-		data,
-		meta
-	}
-}
 
 async function create(ticket, userID){
 	const validationRes = schema.createTicketSchema.validate(ticket);
@@ -44,36 +27,33 @@ async function create(ticket, userID){
 	return result;
 }
 
-async function getSolved(page = 1) {
+async function getBySearch(page = 1, query, countOnly = false) {
 	const offset = helper.getOffset(page, config.listPerTicketPage);
-	const rows = await db.query(`SELECT * FROM Tickets WHERE status BETWEEN 2 AND 3 ORDER BY createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}`)
-	const data = helper.emptyOrRows(rows);
+	
+	const parser = new QueryParserTicket(query);
+	let where = parser.getWhereClause();
+	let orderBy = parser.getOrderByClause();
 
-	return data;
-}
+	where = where ? `WHERE ${where}` : "";
+	orderBy = orderBy ? `ORDER BY ${orderBy}` : "";
 
-async function getUnsolved(page = 1) {
-	const offset = helper.getOffset(page, config.listPerTicketPage);
-	const rows = await db.query(`SELECT * FROM Tickets WHERE status BETWEEN 0 AND 1 ORDER BY createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}`);
-	const data = helper.emptyOrRows(rows);
-
-	return data;
-}
-
-async function getBySearch(param, page = 1) {
-	const offset = helper.getOffset(page, config.listPerTicketPage);
-	const value = `%${param}%`;
-	const rows = await db.query(`SELECT * FROM Tickets WHERE title LIKE ? ORDER BY createdAt DESC LIMIT ${offset}, ${config.listPerTicketPage}`, [value]);
-	const data = helper.emptyOrRows(rows);
-
-	return data;
+	if(countOnly){
+		const rows = await db.query(`SELECT COUNT(*) AS count FROM Tickets ${where}`);
+		return rows[0];
+	}else{
+		const call = `SELECT * FROM Tickets ${where} ${orderBy} LIMIT ${offset}, ${config.listPerTicketPage}`
+		const rows = await db.query(call);
+		const data = helper.emptyOrRows(rows);
+	
+		return data;
+	}
 }
 
 async function getByID(ticketID) {
-	const tickets = await db.query(`SELECT * FROM Tickets WHERE Tickets.id = ?`, [ticketID]);
+	const tickets = await db.query(`SELECT Tickets.*, Users.name userName, Users.surname userSurname, Users.userType FROM Tickets JOIN Users ON userID = Users.id WHERE Tickets.id = ?`, [ticketID]);
 	const photos = await db.query(`SELECT url, id FROM Ticket_photo WHERE ticketID = ?`, [ticketID]);
-	const comments = await db.query(`SELECT comment, createdAt, userID FROM Ticket_comment 
-	WHERE ticketID = ?`, [ticketID]);
+	const comments = await db.query(`SELECT comment, createdAt, userID, Users.name userName, Users.surname userSurname, Users.userType FROM Ticket_comment 
+	JOIN Users ON Users.id = userID WHERE ticketID = ?`, [ticketID]);
 
 	if(tickets[0] == null) {
 		return null;
@@ -198,9 +178,6 @@ async function deleteTicketComment(ticket, req) {
 }
 
 module.exports = {
-	getAll,
-	getUnsolved,
-	getSolved,
 	getBySearch,
 	getByID,
 	addPhoto,
