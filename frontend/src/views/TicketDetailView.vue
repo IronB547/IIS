@@ -54,6 +54,18 @@
       </div>
     </div>
   </div> 
+
+  <Dialog v-model:visible="showCommentDialog">
+      <template #header>
+      <h3>Add a new comment</h3>
+    </template>
+    <Textarea v-model="commentText" rows="5" cols="30" />
+
+    <template #footer>
+      <Button label="Cancel" icon="pi pi-times" class="p-button-text" @click="showCommentDialog = false"/>
+      <Button label="Send" icon="pi pi-check" autofocus />
+    </template>
+  </Dialog>
 </template>
   
 <script>
@@ -62,12 +74,16 @@
   import Image from "primevue/image";
   import Galleria from "primevue/galleria";
   import Button from "primevue/button";
+  import Dialog from "primevue/dialog";
+  import Textarea from "primevue/textarea";
 
   export default {
     components: {
       Image,
       Galleria,
       Button, 
+      Dialog,
+      Textarea
     },
     name: "TicketDetailView",
     // props: {
@@ -77,6 +93,8 @@
       return {
         ticketId: this.$route.params.ticketId,
         ticket: {},
+        showCommentDialog: false,
+        commentText: "",
         responsiveOptions: [
 				{
             breakpoint: '1024px',
@@ -221,4 +239,12 @@
       }
     }
   }
+  .p-inputtextarea{
+    font-size: 1rem;
+    min-width: 300px;
+  }
+</style>
+
+<style scoped lang="scss">
+
 </style>
