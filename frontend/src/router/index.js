@@ -5,6 +5,7 @@ import RegisterView from "../views/RegisterView.vue";
 import TicketsListView from "../views/TicketsListView.vue";
 import TicketDetailView from "../views/TicketDetailView.vue";
 import RequestsListView from "../views/RequestsListView.vue";
+import RequestDetailView from "../views/RequestDetailView.vue";
 
 const routes = [
   {
@@ -44,6 +45,11 @@ const routes = [
     path: "/requests",
     name: "requests",
     component: RequestsListView,
+  },
+  {
+    path: "/requests/:requestID",
+    name: "requestsDetail",
+    component: RequestDetailView,
   },
 ];
 

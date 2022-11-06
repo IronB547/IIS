@@ -1,22 +1,20 @@
 <template>
-  <div class="ticket-item">
-    <div class="ticket-item-header">
-      <h4>{{limitLength(ticket.title,35)}}</h4>
-      <h3 class="ticket-status" :class="{
-      open : ticket?.status == 0,
-      waiting : ticket?.status == 1,
-      solved : ticket?.status == 2,
-      denied : ticket?.status == 3} ">{{getStatus(ticket.status)}}</h3>
+    <div class="request-item">
+      <div class="request-item-header">
+        <h4>{{limitLength(request.title,35)}}</h4>
+        <h3 class="request-status" :class="{
+            unsolved : request.solutionState == 0,
+            solved : request.solutionState == 1} ">{{getStatus(request.solutionState)}}</h3>
+      </div>
+      <p class="request-item-body">
+        {{limitLength(request.description)}}
+      </p>
+      <div class="request-item-footer">
+        <p>{{new Date(request.createdAt).toLocaleString("cs")}}</p>
+        <router-link :to="`requests/`+request.id"><Button style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Open</Button></router-link>
+      </div>
     </div>
-    <p class="ticket-item-body">
-      {{limitLength(ticket.description)}}
-    </p>
-    <div class="ticket-item-footer">
-      <p>{{new Date(ticket.createdAt).toLocaleString("cs")}}</p>
-      <router-link :to="`tickets/`+ticket.id"><Button style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Open</Button></router-link>
-    </div>
-  </div>
-</template>
+  </template>
 
 <script>
 // eslint-disable-next-line
@@ -26,28 +24,24 @@ export default {
   components: {
     Button
   },
-  name: "TicketItem",
+  name: "RequestItem",
   data() {
     return {
     };
   },
   props: {
-    ticket: Object,
+    request: Object,
   },
   computed: {
     
   },
   methods: {
-    getStatus(status){
-      switch(status){
+    getStatus(solutionState){
+      switch(solutionState){
         case 0:
-          return "Vytvořeno";
+          return "Nevyřešeno"
         case 1:
-          return "Čeká na schválení";
-        case 2:
-          return "Vyřešeno";
-        case 3:
-          return "Zamítnuto";
+          return "Vyřešeno"
       }
     },
     limitLength(text, lengthLimit = 100){
@@ -63,10 +57,9 @@ export default {
 };
 </script>
 
-
 <style lang="scss">
 
-.ticket-item{
+.request-item{
   width: 450px;
   margin: 0 auto;
   border: 1px solid rgb(255, 255, 255);
@@ -76,16 +69,16 @@ export default {
   flex-direction: column;
   justify-content: space-between;
 
-  .ticket-item-header{
+  .request-item-header{
     display: flex;
     justify-content: space-between;
   }
-  .ticket-item-body{
+  .request-item-body{
     text-align: left;
     margin-top: 10px;
     height: 100%;
   }
-  .ticket-item-footer{
+  .request-item-footer{
     display: flex;
     justify-content: space-between;
   }
