@@ -37,7 +37,9 @@
     <div class="ticket-comments">
       <div class="ticket-comments-header">
         <h3>Comments</h3>
-        <Button class="p-button-success" @click="showCommentDialog = true" style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Add New Comment</Button>
+        <Button class="p-button-success" @click="showCommentDialog = true" 
+        style="color: white; background-color: var(--green-600); border-color: var(--green-600);"
+        >Add New Comment</Button>
       </div>
       <div class="ticket-comments-body">
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">

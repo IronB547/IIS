@@ -3,15 +3,15 @@
       <div class="request-item-header">
         <h4>{{limitLength(request.title,35)}}</h4>
         <h3 class="request-status" :class="{
-            unsolved : request.solutionState == 0,
-            solved : request.solutionState == 1} ">{{getStatus(request.solutionState)}}</h3>
+            unsolved : request?.solutionState == 0,
+            solved : request?.solutionState == 1} ">{{getStatus(request.solutionState)}}</h3>
       </div>
       <p class="request-item-body">
         {{limitLength(request.description)}}
       </p>
       <div class="request-item-footer">
         <p>{{new Date(request.createdAt).toLocaleString("cs")}}</p>
-        <router-link :to="`requests/`+request.id"><Button style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Open</Button></router-link>
+        <router-link :to="`requests/`+request.id"><Button style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Detail</Button></router-link>
       </div>
     </div>
   </template>
@@ -58,6 +58,20 @@ export default {
 </script>
 
 <style lang="scss">
+.request-status{
+    color: white;
+    border-radius: 10px;
+    display: inline-block;
+    padding: 0px 20px;
+  }
+  .unsolved{
+    border: 1px var(--red-700) solid;
+    background-color: var(--red-700);
+  }
+  .solved{
+    border: 1px var(--green-600) solid;
+    background-color: var(--green-600);
+  }
 
 .request-item{
   width: 450px;

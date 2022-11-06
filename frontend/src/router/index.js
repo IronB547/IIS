@@ -4,6 +4,7 @@ import LoginView from "../views/LoginView.vue";
 import RegisterView from "../views/RegisterView.vue";
 import TicketsListView from "../views/TicketsListView.vue";
 import TicketDetailView from "../views/TicketDetailView.vue";
+import NewTicketView from "../views/NewTicketView.vue";
 import RequestsListView from "../views/RequestsListView.vue";
 import RequestDetailView from "../views/RequestDetailView.vue";
 
@@ -36,7 +37,8 @@ const routes = [
     path: "/tickets/:ticketId",
     name: "ticketsDetail",
     component: TicketDetailView,
-  },{
+  },
+  {
     path: "/tickets",
     name: "tickets",
     component: TicketsListView,
@@ -51,11 +53,16 @@ const routes = [
     name: "requestsDetail",
     component: RequestDetailView,
   },
+  {
+    path: "/tickets/newticket",
+    name: "newTicket",
+    component: NewTicketView,
+  }
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
-});
+})
 
 export default router;

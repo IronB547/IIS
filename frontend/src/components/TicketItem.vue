@@ -13,7 +13,7 @@
     </p>
     <div class="ticket-item-footer">
       <p>{{new Date(ticket.createdAt).toLocaleString("cs")}}</p>
-      <router-link :to="`tickets/`+ticket.id"><Button style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Open</Button></router-link>
+      <router-link :to="`tickets/`+ticket.id"><Button style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Detail</Button></router-link>
     </div>
   </div>
 </template>
