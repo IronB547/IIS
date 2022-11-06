@@ -23,14 +23,21 @@
       {{ticket?.description}}
     </div>
 
-    <div class="ticket-status">
-      <h3>Status: {{getStatus(ticket?.status)}}</h3>
+    <h3> Stav: </h3>
+    <div class="ticket-status" :class="{
+      open : ticket?.status == 0,
+      waiting : ticket?.status == 1,
+      solved : ticket?.status == 2,
+      denied : ticket?.status == 3}">
+      <h3>
+      {{getStatus(ticket?.status)}}
+      </h3>
     </div>
 
     <div class="ticket-comments">
       <div class="ticket-comments-header">
         <h3>Comments</h3>
-        <Button class="p-button-success" @click="showCommentDialog = true">Add New Comment</Button>
+        <Button class="p-button-success" @click="showCommentDialog = true" style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Add New Comment</Button>
       </div>
       <div class="ticket-comments-body">
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">
@@ -92,13 +99,13 @@
       getStatus(status) {
         switch (status) {
           case 0:
-            return "Open";
+            return "Vytvořeno";
           case 1:
-            return "Waiting";
+            return "Čeká na schválení";
           case 2:
-            return "Solved";
+            return "Vyřešeno";
           case 3:
-            return "Rejected";
+            return "Zamítnuto";
         }
       },
     },
@@ -107,6 +114,28 @@
 
 
 <style lang="scss">
+  .ticket-status{
+    color: white;
+    border-radius: 10px;
+    display: inline-block;
+    padding: 0px 20px;
+  }
+  .open{
+    border: 1px var(--blue-700) solid;
+    background-color: var(--blue-700);
+  }
+  .waiting{
+    border: 1px var(--orange-700) solid;
+    background-color: var(--orange-700);
+  }
+  .solved{
+    border: 1px var(--green-600) solid;
+    background-color: var(--green-600);
+  }
+  .denied{
+    border: 1px var(--red-700) solid;
+    background-color: var(--red-700);
+  }
   .image-container{
     width: 384px;
     height: 216px;

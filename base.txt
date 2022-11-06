@@ -1,5 +1,6 @@
 Hosting:
-eva/google
+database: eva/google
+backend: render.com
 
 front end:
 Vue

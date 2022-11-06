@@ -32,12 +32,12 @@
   };
 </script>
 
-<style lang="scss">
+<style  scoped lang="scss">
   .tickets-list{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 10px;
-    max-width: 1300px;
+    gap: 20px;
+    max-width: 1450px;
     margin: 0 auto;
 
   }

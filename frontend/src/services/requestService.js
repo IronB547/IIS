@@ -1,7 +1,7 @@
 import config from './config'
 
-async function getBySearch() {
-    const res = await fetch(`${config.host}/tickets/search`, {
+async function getAll() {
+    const res = await fetch(`${config.host}/requests/list`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -12,9 +12,8 @@ async function getBySearch() {
     return res.json()
 }
 
-async function getTicket(id) {
-    console.log(`${config.host}/tickets/${id}`)
-    const res = await fetch(`${config.host}/tickets/${id}`, {
+async function getServiceRequest(id) {
+    const res = await fetch(`${config.host}/requests/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -25,7 +24,8 @@ async function getTicket(id) {
     return res.json()
 }
 
+
 export default {
-    getBySearch,
-    getTicket
+    getAll,
+    getServiceRequest,
 }

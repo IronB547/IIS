@@ -146,4 +146,7 @@ INSERT INTO Service_request (title, description, solutionState, solutionTime, ci
 INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (1, 3);
 INSERT INTO Service_request_technician (serviceRequestID, technicianID) VALUES (2, 4);
 
-INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Vyřešil jsem problém, žárovka svítí', '2020-05-31 19:51:12', 1, 3);
+INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Vyřešil jsem problém, žárovka svítí', '2021-02-14 16:21:52', 3, 3);
+INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Dobrá práce stando :).', '2021-02-15 11:21:52', 3, 4);
+INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Stando, dneska se k tomu už nedostanu, mohl by si se na to kouknout?', '2022-01-03 10:32:42', 4, 4);
+INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Jo, určitě na to mrknu, jedu tam.', '2022-01-03 12:41:22', 4, 3);
