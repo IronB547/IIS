@@ -2,10 +2,10 @@
   <div class="ticket-detail">
     <div class="header">
       <div class="header-left">
-        <h3 class="title">Ticket Detail: {{ticket?.title}}</h3>
+        <h3 class="title">{{ticket?.title}}</h3>
         <p class="header-info">
           <span class="date">{{new Date(ticket?.createdAt).toLocaleString("cs")}}</span>
-          <span class="location">Location: {{ticket?.location}}</span>
+          <span class="location">Lokace: {{ticket?.location}}</span>
         </p>
       </div>
 
@@ -36,10 +36,10 @@
 
     <div class="ticket-comments">
       <div class="ticket-comments-header">
-        <h3>Comments</h3>
-        <Button class="p-button-success" @click="showCommentDialog = true" 
+        <h3>Komentáře</h3>
+        <Button class="p-button-success" @click="showCommentDialog = true"
         style="color: white; background-color: var(--green-600); border-color: var(--green-600);"
-        >Add New Comment</Button>
+        >Přidat komentář</Button>
       </div>
       <div class="ticket-comments-body">
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">

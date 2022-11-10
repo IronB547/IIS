@@ -1,25 +1,19 @@
 <template>
     <h1>New Ticket</h1>
-    
-    <span class="p-float-label">
-        <InputText type="text" v-model="value" />
-    <label for="username">Název</label>
-    </span>
-    <br>
-    <br>
-    <span class="p-float-label">
-       <InputText id="username" type="text" v-model="value" />
-        <label for="username">Lokace</label>
-    </span>
-    <br>
-    <br>
-
-    Popis:
-    
-    <br>
-    <Textarea class="p-inputtext-area" auto-resize="true">
-        hello
-    </Textarea>
+    <div class="container">
+        <label for="name">Název</label>
+        <InputText class="input" id="name" type="text" v-model="value" />
+      <br>
+      <br>
+        <label for="location">Lokace</label>
+        <InputText class="input" id="location" type="text" v-model="value" />
+      <br>
+      <br>
+        <label for="">Popis</label>
+        <br>
+          <Textarea class="p-inputtext-area" auto-resize="true" v-model="value">
+          </Textarea>
+    </div>
 </template>
     
   <script>
@@ -37,8 +31,17 @@
   </script>
 
 <style scoped lang="scss">
-  .Input{
-    display: inline-block;
+  .container input, .container textarea{
+    width: 40%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
   }
-
+  .input{
+    width: 700px;
+    padding-top: 20px;
+  }
+  .p-inputtext-area{
+    width: 700px;
+    padding-top: 25px;
+  }
 </style>

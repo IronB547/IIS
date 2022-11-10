@@ -2,7 +2,7 @@
   <div class="request-detail">
     <div class="header">
       <div class="header-left">
-        <h3 class="title">Request Detail: {{request?.title}}</h3>
+        <h3 class="title">{{request?.title}}</h3>
         <p class="header-info">
           <span class="date">{{new Date(request?.createdAt).toLocaleString("cs")}}</span>
           
@@ -23,8 +23,8 @@
 
     <div class="request-comments">
       <div class="request-comments-header">
-        <h3>Comments</h3>
-        <Button class="p-button-success" @click="showCommentDialog = true" style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Add New Comment</Button>
+        <h3>Komentáře</h3>
+        <Button class="p-button-success" @click="showCommentDialog = true" style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Přidat komentář</Button>
       </div>
       <div class="request-comments-body">
         <div class="request-comment" v-for="comment in request?.comments" :key="comment.id">
