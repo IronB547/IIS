@@ -1,11 +1,12 @@
 import config from './config'
 
+
 async function getAll() {
     const res = await fetch(`${config.host}/requests/list`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user")).token
         }
     })
 
@@ -17,7 +18,7 @@ async function getServiceRequest(id) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + localStorage.getItem("token")
+          'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user")).token
         }
     })
 

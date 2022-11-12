@@ -8,7 +8,7 @@ async function logIn(credentials){
     })
     const data = await res.json()
     if(data.token){
-        localStorage.setItem("token",data.token)
+        localStorage.setItem("user",JSON.stringify(data))
         console.log(data)
     }
     return data;
@@ -25,10 +25,10 @@ async function register(credentials){
       body: JSON.stringify(credentials)
     })
     const data = await res.json()
-    if(data.token){
-        localStorage.setItem("token",data.token)
-        console.log(data)
-    }
+    // if(data.token){
+    //     localStorage.setItem("token",{token: data.token})
+    //     console.log(data)
+    // }
 
     return data;
 }

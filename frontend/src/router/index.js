@@ -7,6 +7,10 @@ import TicketDetailView from "../views/TicketDetailView.vue";
 import NewTicketView from "../views/NewTicketView.vue";
 import RequestsListView from "../views/RequestsListView.vue";
 import RequestDetailView from "../views/RequestDetailView.vue";
+import { useAuthStore } from "@/stores/AuthStore";
+
+
+// const store = useAuthStore()
 
 const routes = [
   {
@@ -63,6 +67,21 @@ const routes = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
+})
+
+// router.beforeEach((to, from, next) => {
+//   // we wanted to use the store here
+//   if (store.isLoggedIn) next()
+//   else next('/login')
+// })
+
+router.beforeEach((to) => {
+  // ✅ This will work because the router starts its navigation after
+  // the router is installed and pinia will be installed too
+  // eslint-disable-next-line
+  const store = useAuthStore()
+
+  if (to.meta.requiresAuth && !store.isLoggedIn) return '/login'
 })
 
 export default router;

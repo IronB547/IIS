@@ -28,13 +28,34 @@
     // @ is an alias to /src
     import Textarea from 'primevue/textarea';
     import InputText from 'primevue/inputtext';
+    import Button from 'primevue/button';
+
+    import { useTicketsStore } from '@/stores/TicketsStore';
     
     export default {
       name: "NewTicketView",
       components: {
         Textarea,
-        InputText
+        InputText,
+        Button
       },
+      data() {
+        return {
+          ticket: {
+            title: "",
+            location: "",
+            description: ""
+          },
+          
+        }
+      },
+      methods: {
+        async createTicket() {
+          const ticketsStore = useTicketsStore();
+          const response = await ticketsStore.createTicket(this.ticket);
+          console.log(response);
+        }
+      }
     };
   </script>
 

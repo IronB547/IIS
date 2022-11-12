@@ -29,11 +29,12 @@
   
 <script>
 
-  import userService from '@/services/userService';
+  // import userService from '@/services/userService';
   import Button from 'primevue/button';
   import InputText from 'primevue/inputtext';
   import Password from 'primevue/password';
   import mitt from 'mitt';
+  import {useAuthStore} from '@/stores/AuthStore';
 
   const emitter = mitt();
   // @ is an alias to /src
@@ -55,7 +56,8 @@
     }},
     methods: {
       async logIn(){
-        const response = await userService.logIn(this.credentials)
+        const authStore = useAuthStore();
+        const response = await authStore.logIn(this.credentials)
         if(response.data){
           //emit to event bus
           // this.$eventBus.$emit('userLoggedIn', response.data)

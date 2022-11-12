@@ -4,8 +4,9 @@
         <h3 class="navbar-title">Smart City</h3>
       </template>
       <template #end>
+        <span></span>
         <ul class="p-menubar-root-list">
-        <li v-if="isAuthenticated" class="p-menuitem" role="menuitem" aria-label="Log Out" aria-level="1" aria-setsize="6" aria-posinset="5">
+        <li v-if="store.isLoggedIn" class="p-menuitem" role="menuitem" aria-label="Log Out" aria-level="1" aria-setsize="6" aria-posinset="5">
           <div class="p-menuitem-content">
             <a href="#/login" @click="logOut" class="p-menuitem-link router-link-active router-link-active-exact" tabindex="-1" aria-hidden="true">
               <span class="p-menuitem-icon pi pi-fw pi-sign-out"></span>
@@ -21,14 +22,23 @@
 
 <script>
 
-import mitt from 'mitt';
 import Menubar from 'primevue/menubar';
+// import {useAuthStore} from '@/stores/AuthStore.js';
 
-const emitter = mitt();
+// eslint-disable-next-line
+// const store = useAuthStore();
+
+import { useAuthStore } from '@/stores/AuthStore';
 
 export default {
   components: {
     Menubar
+  },
+  setup() {
+    const store = useAuthStore();
+    return {
+      store,
+    }
   },
   data() {
     return {
@@ -63,13 +73,13 @@ export default {
           label: 'Log In',
           icon: 'pi pi-fw pi-sign-in',
           to: '/login',
-          visible: () => !localStorage.getItem('token') 
+          visible: () => !this.store.isLoggedIn 
         },
         {
           label: 'Register',
           icon: 'pi pi-fw pi-user-plus',
           to: '/register',
-          visible: () => !localStorage.getItem('token')
+          visible: () => !this.store.isLoggedIn
         },
       ]
     }
@@ -79,20 +89,11 @@ export default {
       this.list.push({email: "email", login: this.name})
     },
     logOut(){
-      localStorage.removeItem('token')
+      this.store.logOut();
       this.$router.push({name: "login"})
     }
-  },
-  computed: {
-    isAuthenticated(){
-      return localStorage.getItem('token') != null
-    }
-  },
+  }
 }
-
-emitter.on('userLoggedIn', e => {
-  console.log('foo event fired', e); 
-})
 
 </script>
 
