@@ -11,7 +11,7 @@
               <span class="p-menuitem-icon pi pi-fw pi-sign-out"></span>
               <span class="p-menuitem-text">Log Out</span>
             </a>
-          </div><!---->
+          </div>
         </li>
         </ul>
       </template>

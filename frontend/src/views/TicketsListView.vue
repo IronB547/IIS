@@ -7,7 +7,7 @@
         <InputText type="text" class="p-inputtext-lg" v-model="value" placeholder="Hledat"/>
       </span>
       <router-link :to="`tickets/newticket`">
-        <Button class="p-button-lg p-button-primary" style="color: white">
+        <Button class="p-button-lg p-button-primary">
           Vytvoř ticket
         </Button>
       </router-link>
@@ -70,7 +70,7 @@
   .tickets-list{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 20px;
+    gap: 50px;
     max-width: 1450px;
     margin: 0 auto;
 

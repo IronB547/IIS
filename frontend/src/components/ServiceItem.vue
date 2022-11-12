@@ -11,7 +11,7 @@
       </p>
       <div class="request-item-footer">
         <p>{{new Date(request.createdAt).toLocaleString("cs")}}</p>
-        <router-link :to="`requests/`+request.id"><Button style="color: white; background-color: var(--green-600); border-color: var(--green-600);">Detail</Button></router-link>
+        <router-link :to="`requests/`+request.id"><Button class="p-button-primary">Detail</Button></router-link>
       </div>
     </div>
   </template>

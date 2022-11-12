@@ -20,6 +20,7 @@ const editServiceRequest = Joi.object().keys({
     title: Joi.string().min(2).max(255).required(),
     solutionState: Joi.number().min(0).max(1).required(),
     solutionTime: Joi.string().max(255).required(),
+    expectedTime: Joi.string().max(255).required(),
     price: Joi.string().max(255).required(),
 }).unknown();
 

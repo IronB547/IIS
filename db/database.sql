@@ -41,6 +41,7 @@ CREATE TABLE Service_request (
     title VARCHAR(255) NOT NULL,
     description VARCHAR(1023) NOT NULL,
     solutionTime VARCHAR(255) DEFAULT '0',
+    expectedTime VARCHAR(255) DEFAULT '0',
     solutionState INT NOT NULL DEFAULT 0,
     price VARCHAR(255) DEFAULT 0,
     cityManagerID INT NOT NULL,
