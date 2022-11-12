@@ -20,6 +20,8 @@
             <label class="labels" for="description">Foto</label>
             <br>
             <InputText class="input" id="location" type="text" v-model="value" />
+
+            <Button @click="createTicket"></Button>
         </div>
     </div>    
 </template>

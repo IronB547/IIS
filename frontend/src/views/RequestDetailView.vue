@@ -41,8 +41,8 @@
 
           </div>
         </div>
-        <div class="request-body-left-inputtext">
-          <InputText type="text" class="p-inputtext" v-model="value" placeholder="Přidat technika"/>
+        <div class="request-body-left-dropdown">
+          <Dropdown class="addtechnician" v-model="addTechnician" :options="technicians" optionLabel="name" placeholder="Přidat technika" />
         </div>
       </div>
 
@@ -127,6 +127,8 @@
         request: {},
         showCommentDialog: false,
         commentText: "",
+        addTechnician: null,
+        technicians: [{name: 'Technici TODO'}],
         changeState: null,
         states: [
           {name: 'Vyřešeno'},
@@ -217,7 +219,7 @@
   }
     .request-body-left {
       width: 100%;
-      .request-body-left-inputtext {
+      .request-body-left-dropdown{
         width: 100%;
       }
     }
