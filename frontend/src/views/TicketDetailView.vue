@@ -1,4 +1,5 @@
 <template>
+  <Toast/>
   <div class="ticket-detail">
     <div class="ticket-header">
       <div class="ticket-header-main">
@@ -79,7 +80,7 @@
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showCommentDialog = false"/>
-      <Button label="Odeslat" icon="pi pi-check" autofocus />
+      <Button label="Odeslat" icon="pi pi-check" autofocus @click="addComment"/>
     </template>
   </Dialog>
 </template>
@@ -93,6 +94,7 @@
   import Dialog from "primevue/dialog";
   import Textarea from "primevue/textarea";
   import Dropdown from 'primevue/dropdown';
+  import { useTicketsStore } from "@/stores/TicketsStore";
 
   export default {
     components: {
@@ -153,6 +155,20 @@
             return "Zamítnuto";
         }
       },
+      async addComment() {
+        const ticketsStore = useTicketsStore();
+        const response = await ticketsStore.addComment(this.ticketId, {comment: this.commentText});
+        if(response.error){
+          this.$toast.add({
+            severity: "error",
+            summary: "Error",
+            detail: response?.message || "Cannot add comment",
+            life: 3000,
+          })
+        }
+        this.ticket = await ticketsService.getTicket(this.ticketId);
+        this.showCommentDialog = false;
+      }
     },
   };
 </script>

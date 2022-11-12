@@ -5,7 +5,7 @@ async function getBySearch() {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user")).token
+            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
         }
     })
 
@@ -18,7 +18,7 @@ async function getTicket(id) {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user")).token
+          'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
         }
     })
 

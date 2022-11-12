@@ -1,42 +1,42 @@
 import { defineStore } from 'pinia'
 import config from '@/services/config'
 
-export const useTicketsStore = defineStore('tickets', {
+export const useRequestsStore = defineStore('requests', {
     state: () => ({
         // products: [ , , ],
-        tickets: [],
+        requests: [],
     }),
     getters: {   
     },
     actions: {
-        async createTicket(ticket) {
+        async createRequest(request) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to create a ticket"}
+                return {error: "You must be logged in to create a request"}
 
-            const res = await fetch(`${config.host}/tickets/`, {
+            const res = await fetch(`${config.host}/requests/`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                   'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
                 },
-                body: JSON.stringify(ticket)
+                body: JSON.stringify(request)
             })
 
             if(res.status === 201){
-                this.tickets.push(ticket)
-                return {message: "Ticket created successfully"}
+                this.requests.push(request)
+                return {message: "Request created successfully"}
             }else{
-                return {error: "Ticket creation failed"}
+                return {error: "Request creation failed"}
             }
 
 
         },
 
-        async addComment(ticketId, comment) {
+        async addComment(requestId, comment) {
             if(!localStorage.getItem("user"))
                 return {error: "You must be logged in to add a comment"}
 
-            const res = await fetch(`${config.host}/tickets/${ticketId}/comments`, {
+            const res = await fetch(`${config.host}/requests/${requestId}/comments`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',

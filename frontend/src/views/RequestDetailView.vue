@@ -94,7 +94,7 @@
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showCommentDialog = false"/>
-      <Button label="Odeslat" icon="pi pi-check" autofocus />
+      <Button label="Odeslat" icon="pi pi-check" autofocus @click="addComment" />
     </template>
   </Dialog>
 
@@ -103,6 +103,7 @@
 <script>
   // @ is an alias to /src
   import requestsService from "@/services/requestService.js";
+  import { useRequestsStore } from "@/stores/RequestsStore";
   import Button from "primevue/button";
   import Dropdown from 'primevue/dropdown';
   import Dialog from "primevue/dialog";
@@ -163,6 +164,15 @@
             return "Vyřešeno";
         }
       },
+      async addComment() {
+        const requestsStore = useRequestsStore();
+        const response = await requestsStore.addComment(this.requestID,{comment: this.commentText});
+        if(response.error){
+          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Cannot add comment", life: 3000});
+        }
+        this.request = await requestsService.getServiceRequest(this.requestID);
+        this.showCommentDialog = false;
+      }
     },
   };
 </script>

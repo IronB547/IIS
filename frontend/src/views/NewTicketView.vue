@@ -1,18 +1,19 @@
 <template>
     <h1>Nový Ticket</h1>
+    <Toast/>
     <div class="grid">
       <div class="text-container">
         <label class="labels" for="name">Název</label>
         <br>
-          <InputText class="input" id="name" type="text" v-model="value" />
+          <InputText class="input" id="name" type="text" v-model="ticket.title" />
         <br>
           <label class="labels" for="location">Lokace</label>
         <br>
-          <InputText class="input" id="location" type="text" v-model="value" />
+          <InputText class="input" id="location" type="text" v-model="ticket.location" />
         <br>
           <label class="labels" for="description">Popis</label>
         <br>
-          <Textarea class="p-inputtext-area" auto-resize="true" v-model="value">
+          <Textarea class="p-inputtext-area" auto-resize="true" v-model="ticket.description">
           </Textarea>
 
         </div>
@@ -21,7 +22,7 @@
             <br>
             <InputText class="input" id="location" type="text" v-model="value" />
 
-            <Button @click="createTicket"></Button>
+            <Button @click="createTicket">Create ticket</Button>
         </div>
     </div>    
 </template>
@@ -55,7 +56,21 @@
         async createTicket() {
           const ticketsStore = useTicketsStore();
           const response = await ticketsStore.createTicket(this.ticket);
-          console.log(response);
+          if(response.error){
+            this.$toast.add({
+              severity: "error",
+              summary: "Error",
+              detail: response?.error || "The ticket could not be created",
+              life: 3000,
+            })
+          }else{
+            this.$toast.add({
+              severity: "success",
+              summary: "Ticket created",
+              detail: response?.message || "A new ticket has been created",
+              life: 3000,
+            })
+          }
         }
       }
     };
