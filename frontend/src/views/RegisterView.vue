@@ -50,13 +50,12 @@
   
 <script>
 
-  import userService from '@/services/userService';
+
   import Button from 'primevue/button';
   import InputText from 'primevue/inputtext';
   import Password from 'primevue/password';
-  import mitt from 'mitt';
-
-  const emitter = mitt();
+  import {useAuthStore} from '@/stores/AuthStore';
+  
   // @ is an alias to /src
   export default {
     name: "RegisterView",
@@ -79,13 +78,12 @@
     }},
     methods: {
       async register(){
-        const response = await userService.register(this.credentials)
+        const authStore = useAuthStore();
+        const response = await authStore.register(this.credentials)
         console.log(response)
         if(response.affectedRows){
           //emit to event bus
           // this.$eventBus.$emit('userLoggedIn', response.data)
-          emitter.emit('userLoggedIn', response.data)
-          this.$router.push({name: "tickets"})
         }else{
           this.$toast.add({
             severity: "error",

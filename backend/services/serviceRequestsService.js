@@ -55,7 +55,7 @@ async function getByID(requestID) {
 	const requests = await db.query(`SELECT Service_request.*, Users.name userName, Users.surname userSurname, Users.userType 
 	FROM Service_request JOIN Users ON Users.id = cityManagerID WHERE Service_request.id = ?`, [requestID]);
 
-	const comments = await db.query(`SELECT comment, createdAt, userID, Users.name userName, Users.surname userSurname, Users.userType
+	const comments = await db.query(`SELECT Service_request_comment.id, comment, createdAt, userID, Users.name userName, Users.surname userSurname, Users.userType
 	FROM Service_request_comment JOIN Users ON Users.id = userID 
 	WHERE serviceRequestID = ?`, [requestID]);
 	
@@ -130,7 +130,6 @@ async function editRequestComment(comment, req) {
     ON Service_request_comment.serviceRequestID = Service_request.id
 	WHERE Service_request_comment.id = ? AND Service_request.solutionState = 0`, [comment.commentID]);
 	
-	console.log(request)
 	if(!request[0])
 		return {error: "Request is already solved or does not exist."};
 

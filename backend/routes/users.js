@@ -5,10 +5,10 @@ const ValidationError = require('../helper').ValidationError;
 
 router.get('/all/:page?', async function(req, res, next) {
 	try {
-		if(users.authorize(req, res, 3)) {
-			console.debug(req.params)
+		if(users.authorize(req, res, 2)) {
 			const page = req.params.page;
-			res.json(await users.getAll(page));
+			const userType = req.query.userType;
+			res.json(await users.getAll(page, userType));
 		}else{
 			if(!res.headersSent)
 				res.status(403).json({message: "Forbidden"});

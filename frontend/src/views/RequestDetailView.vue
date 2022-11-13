@@ -1,4 +1,5 @@
 <template>
+  <Toast/>
   <div class="request-detail">
     <div class="request-header">
       <div class="request-header-left">
@@ -13,7 +14,7 @@
             <span class="date">{{new Date(request?.createdAt).toLocaleString("cs")}}</span>
             </p>
           </div>
-            <Button class="p-button-primary" @click="$router.push(`/tickets/${request?.ticketID}`)">Otevřít ticket</Button>
+            <Button class="p-button-primary" @click="$router.push(`/tickets/${request?.ticketID}`)" :disabled="!request?.ticketID">Otevřít ticket</Button>
         </div>
       </div>
     </div>
@@ -34,33 +35,33 @@
     <h3> Přiřazení technici: </h3>
     <div class="request-body">
       <div class="request-body-left">
-        <div class="request-technicians" v-for="technician in request?.technicians" :key="technician.id">
+        <div class="request-technicians" v-for="technician in request?.technicians" :key="technician.technicianID">
           <div class="request-technicians-body">
             {{technician.name}} {{technician.surname}}
-            <Button icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" />
+            <Button icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" @click="removeTechnician(technician.technicianID)" />
 
           </div>
         </div>
         <div class="request-body-left-dropdown">
-          <Dropdown class="addtechnician" v-model="addTechnician" :options="technicians" optionLabel="name" placeholder="Přidat technika" />
+          <Dropdown  @change="technicianChange($event)" class="addtechnician" v-model="addTechnician" :options="technicians" :optionLabel="getTechnicianLabel" placeholder="Přidat technika" :loading="technicians.length == 0"/>
         </div>
       </div>
 
       <div class="request-body-right">
         <div class="request-body-right-inputtext">
-          <InputText type="text" class="p-inputtext" v-model="value" placeholder="Předpokládaný čas řešení"/>
+          <InputText type="text" class="p-inputtext"  placeholder="Předpokládaný čas řešení"/>
           <br>
           <small id="username1-help">Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
         </div>
 
         <div class="request-body-right-inputtext">
-          <InputText type="text" class="p-inputtext" v-model="value" placeholder="Vykázaný čas"/>
+          <InputText type="text" class="p-inputtext"  placeholder="Vykázaný čas"/>
           <br>
           <small id="username1-help">Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
         </div>
 
         <div class="request-body-right-inputtext">
-          <InputText type="text" class="p-inputtext" v-model="value" placeholder="Cena"/>
+          <InputText type="text" class="p-inputtext"  placeholder="Cena"/>
           <br>
           <small id="username1-help">Do pole vepište i měnu.</small>
         </div>
@@ -70,12 +71,13 @@
     <div class="request-comments">
       <div class="request-comments-header">
         <h3>Komentáře</h3>
-        <Button class="p-button-primary" @click="showCommentDialog = true">Přidat komentář</Button>
+        <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="request?.solutionState > 0">Přidat komentář</Button>
       </div>
       <div class="request-comments-body">
         <div class="request-comment" v-for="comment in request?.comments" :key="comment.id">
           <div class="request-comment-body">
-            {{comment.comment}}
+            <span>{{comment.comment}}</span>
+            <SplitButton label="Secondary" :model="commentButtonItems(comment)" class="p-button-rounded p-button-sm p-button-secondary mb-2"></SplitButton>
           </div>
           <div class="request-comment-footer">
             <span>{{comment.userName}} {{comment.userSurname}}</span>
@@ -98,17 +100,31 @@
     </template>
   </Dialog>
 
+  <Dialog v-model:visible="showEditCommentDialog">
+    <template #header>
+      <h3>Upravit komentář</h3>
+    </template>
+    <Textarea class="comment" auto-resize="true" v-model="commentText" rows="5" cols="30" />
+
+    <template #footer>
+      <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditCommentDialog = false"/>
+      <Button label="Odeslat" icon="pi pi-check" autofocus @click="editComment(editingComment)" />
+    </template>
+  </Dialog>
+
 </template>
 
 <script>
   // @ is an alias to /src
-  import requestsService from "@/services/requestService.js";
   import { useRequestsStore } from "@/stores/RequestsStore";
+  import { useUsersStore} from "@/stores/UsersStore";
+  // import { useAuthStore } from "@/stores/AuthStore";
   import Button from "primevue/button";
   import Dropdown from 'primevue/dropdown';
   import Dialog from "primevue/dialog";
   import Textarea from "primevue/textarea";
   import InputText from 'primevue/inputtext';
+  import SplitButton from 'primevue/splitbutton';
 
   export default {
     components: {
@@ -116,7 +132,8 @@
       Dropdown,
       Dialog,
       Textarea,
-      InputText
+      InputText,
+      SplitButton
     },
     name: "RequestDetailView",
     // props: {
@@ -129,7 +146,7 @@
         showCommentDialog: false,
         commentText: "",
         addTechnician: null,
-        technicians: [{name: 'Technici TODO'}],
+        technicians: [],
         changeState: null,
         states: [
           {name: 'Vyřešeno'},
@@ -148,14 +165,26 @@
             breakpoint: '560px',
             numVisible: 1
         }],
+        showEditCommentDialog: false,
+        editingComment: null
       };
     },
     async mounted() {
       this.requestID = this.$route.params.requestID
+
+      const requestsStore = useRequestsStore();
+      this.requestsStore = requestsStore;
       
-      this.request = await requestsService.getServiceRequest(this.requestID)
+      this.loadRequest();
+
+      const usersStore = useUsersStore();
+      this.technicians = await usersStore.getUsers(1);
+
     },
     methods: {
+      async loadRequest() {
+        this.request = await this.requestsStore.getServiceRequest(this.requestID)
+      },
       getStatus(solutionState) {
         switch (solutionState) {
           case 0:
@@ -164,16 +193,72 @@
             return "Vyřešeno";
         }
       },
+      getTechnicianLabel(technician) {
+        return technician?.name + " " + technician?.surname;
+      },
       async addComment() {
-        const requestsStore = useRequestsStore();
-        const response = await requestsStore.addComment(this.requestID,{comment: this.commentText});
+        const response = await this.requestsStore.addComment(this.requestID,{comment: this.commentText});
         if(response.error){
           this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Cannot add comment", life: 3000});
         }
-        this.request = await requestsService.getServiceRequest(this.requestID);
+        this.loadRequest();
         this.showCommentDialog = false;
-      }
+        this.commentText = "";
+      },
+      async technicianChange(event) {
+        const response = await this.requestsStore.addTechnician(this.requestID, event.value.id);
+        if(response.error){
+          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Cannot add technician", life: 3000});
+        }
+        this.loadRequest();
+        this.addTechnician = null;
+      },
+      async removeTechnician(technicianID) {
+        console.log("removing technician",technicianID);
+        const response = await this.requestsStore.removeTechnician(this.requestID,technicianID);
+        if(response.error){
+          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Cannot remove technician", life: 3000});
+        }
+        this.loadRequest();
+      },
+      commentButtonItems(comment) {
+        return [
+        {
+          label: 'Edit ',
+          icon: 'pi pi-file-edit',
+          command: () => {
+            this.commentText = comment.comment;
+            this.showEditCommentDialog = true;
+            this.editingComment = comment.id;
+          }
+        },
+        {
+          label: 'Delete',
+          icon: 'pi pi-times',
+          command: () => {
+            this.deleteComment(comment.id);
+          }
+        },
+        ]
+      },
+      async deleteComment(commentID) {
+        console.log("deleting comment",commentID);
+        await this.requestsStore.deleteComment(commentID);
+        this.loadRequest();
+      },
+      async editComment(commentID) {
+        console.log("editing comment",commentID);
+        await this.requestsStore.editComment(commentID,{comment: this.commentText});
+        this.loadRequest();
+        this.showEditCommentDialog = false;
+        this.commentText = "";
+      },
     },
+    computed: {
+      // techniciansLabels() {
+      //   return this.technicians.map(technician => ({name: technician.name + " " + technician.surname, id: technician.id}));
+      // }
+    }
   };
 </script>
 
@@ -289,6 +374,13 @@
     padding: 15px 20px;
     margin-top: 10px;
     border: 1px solid white;
+
+    .request-comment-body{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
   }
 
   .request-comment-footer{

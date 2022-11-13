@@ -1,30 +1,30 @@
 <template>
   <main class="main">
-    <ticket-header class="ticket-header">
+    <div class="ticket-header">
       <h1 class="tickets">Tickety</h1>
       <span class="p-input-icon-left">
         <i class="pi pi-search" />
-        <InputText type="text" class="p-inputtext-lg" v-model="value" placeholder="Hledat"/>
+        <InputText type="text" class="p-inputtext-lg" placeholder="Hledat"/>
       </span>
       <router-link :to="`tickets/newticket`">
         <Button class="p-button-lg p-button-primary">
           Vytvoř ticket
         </Button>
       </router-link>
-    </ticket-header>
-      <div class="tickets-list">
-        <TicketItem v-for="ticket in tickets" v-bind:key="ticket.id" :ticket="ticket"/>
+    </div>
+    <div class="tickets-list">
+      <TicketItem v-for="ticket in tickets" v-bind:key="ticket.id" :ticket="ticket"/>
     </div>
   </main>
 </template>
   
 <script>
   // @ is an alias to /src
-  import ticketsService from "@/services/ticketsService";
   import InputText from 'primevue/inputtext';
   import Button from 'primevue/button';
   import TicketItem from "@/components/TicketItem.vue";
 
+  import {useTicketsStore} from '@/stores/TicketsStore';
   
   export default {
     name: "TicketsListView",
@@ -40,7 +40,7 @@
       }
     },
     async mounted() {
-      this.tickets = await ticketsService.getBySearch()
+      this.tickets = await useTicketsStore().getBySearch();
     },
     methods: {
       

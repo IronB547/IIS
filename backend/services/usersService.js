@@ -15,21 +15,45 @@ dotenv.config();
 if(!process.env.TOKEN_SECRET)
 	console.error("TOKEN_SECRET not set");
 
-async function getAll(page = 1){
+async function getAll(page = 1, userType = undefined){
 	const offset = helper.getOffset(page, config.usersPerPage);
 
-	const rows = await db.query(
-		`SELECT id, name, surname, password, userType, email, phoneNum
-		FROM Users LIMIT ${offset}, ${config.listPerTicketPage}`
-	);
+	const rows = [];
+	if(userType == undefined){
+		const rows = await db.query(
+			`SELECT id, name, surname, password, userType, email, phoneNum
+			FROM Users LIMIT ${offset}, ${config.listPerTicketPage}`
+		);
+		let data = helper.emptyOrRows(rows);
+		data = data.map( (user) => {
+			delete user.password;
+			return user;
+		})
+		const meta = {page};
+		return {
+			data,
+			meta
+		}
+	}else{
+		//TODO: add pagination
+		const rows = await db.query(
+			`SELECT id, name, surname, password, userType, email, phoneNum
+			FROM Users WHERE userType = ?`, [userType]
+		);
 
-	const data = helper.emptyOrRows(rows);
-	const meta = {page};
-
-	return {
-		data,
-		meta
+		let data = helper.emptyOrRows(rows);
+		data = data.map( (user) => {
+			delete user.password;
+			return user;
+		})
+		const meta = {page};
+		return {
+			data,
+			meta
+		}
 	}
+
+
 }
 
 async function getOne(id){

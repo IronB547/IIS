@@ -32,7 +32,7 @@
     </div>
 
     <h3> Stav: </h3>
-    <flexbox>
+    <div class="ticket-status-container">
       <div class="ticket-status" :class="{
         open : ticket?.status == 0,
         waiting : ticket?.status == 1,
@@ -43,7 +43,7 @@
         </h3>
       </div>
       <Dropdown class="changestate" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
-    </flexbox>
+    </div>
 
     <div class="ticket-comments">
       <div class="ticket-comments-header">
@@ -54,14 +54,15 @@
           </Button>
         </router-link>
 
-        <Button class="p-button-primary" @click="showCommentDialog = true">
+        <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="ticket?.status > 2">
           Přidat komentář
         </Button>
       </div>
       <div class="ticket-comments-body">
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">
           <div class="ticket-comment-body">
-            {{comment.comment}}
+            <span>{{comment.comment}}</span>
+            <SplitButton label="Secondary" :model="commentButtonItems(comment)" class="p-button-rounded p-button-sm p-button-secondary mb-2"></SplitButton>
           </div>
           <div class="ticket-comment-footer">
             <span>{{comment.userName}} {{comment.userSurname}}</span>
@@ -83,11 +84,23 @@
       <Button label="Odeslat" icon="pi pi-check" autofocus @click="addComment"/>
     </template>
   </Dialog>
+
+  <Dialog v-model:visible="showEditCommentDialog">
+    <template #header>
+      <h3>Upravit komentář</h3>
+    </template>
+    <Textarea class="comment" auto-resize="true" v-model="commentText" rows="5" cols="30" />
+
+    <template #footer>
+      <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditCommentDialog = false"/>
+      <Button label="Odeslat" icon="pi pi-check" autofocus @click="editComment(editingComment)" />
+    </template>
+  </Dialog>
+
 </template>
   
 <script>
   // @ is an alias to /src
-  import ticketsService from "@/services/ticketsService.js";
   import Image from "primevue/image";
   import Galleria from "primevue/galleria";
   import Button from "primevue/button";
@@ -95,6 +108,7 @@
   import Textarea from "primevue/textarea";
   import Dropdown from 'primevue/dropdown';
   import { useTicketsStore } from "@/stores/TicketsStore";
+  import SplitButton from 'primevue/splitbutton';
 
   export default {
     components: {
@@ -103,7 +117,8 @@
       Button, 
       Dialog,
       Dropdown,
-      Textarea
+      Textarea,
+      SplitButton
     },
     name: "TicketDetailView",
     // props: {
@@ -135,14 +150,23 @@
             breakpoint: '560px',
             numVisible: 1
         }],
+
+        showEditCommentDialog: false,
+        editingComment: null
       };
     },
     async mounted() {
       this.ticketId = this.$route.params.ticketId
+
+      const ticketsStore = useTicketsStore();
+      this.ticketsStore = ticketsStore;
       
-      this.ticket = await ticketsService.getTicket(this.ticketId)
+      this.loadTicket();
     },
     methods: {
+      async loadTicket() {
+        this.ticket = await this.ticketsStore.getTicket(this.ticketId)
+      },
       getStatus(status) {
         switch (status) {
           case 0:
@@ -166,9 +190,57 @@
             life: 3000,
           })
         }
-        this.ticket = await ticketsService.getTicket(this.ticketId);
+        this.loadTicket();
         this.showCommentDialog = false;
-      }
+      },
+      commentButtonItems(comment) {
+        return [
+        {
+          label: 'Edit ',
+          icon: 'pi pi-file-edit',
+          command: () => {
+            this.commentText = comment.comment;
+            this.showEditCommentDialog = true;
+            this.editingComment = comment.id;
+          }
+        },
+        {
+          label: 'Delete',
+          icon: 'pi pi-times',
+          command: () => {
+            this.deleteComment(comment.id);
+          }
+        },
+        ]
+      },
+      async editComment(commentId) {
+        const ticketsStore = useTicketsStore();
+        const response = await ticketsStore.editComment(this.ticketId, commentId, {comment: this.commentText});
+        if(response.error){
+          this.$toast.add({
+            severity: "error",
+            summary: "Error",
+            detail: response?.message || "Cannot edit comment",
+            life: 3000,
+          })
+        }
+        this.loadTicket();
+        this.showEditCommentDialog = false;
+      },
+      async deleteComment(commentId) {
+        console.log("deleting comment",commentId);
+        const ticketsStore = useTicketsStore();
+        const response = await ticketsStore.deleteComment(commentId);
+        if(response.error){
+          this.$toast.add({
+            severity: "error",
+            summary: "Error",
+            detail: response?.message || "Cannot delete comment",
+            life: 3000,
+          })
+        }
+        this.loadTicket();
+      },
     },
   };
 </script>
@@ -295,6 +367,12 @@
     padding: 15px 20px;
     margin-top: 10px;
     border: 1px solid white;
+    .ticket-comment-body{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
   }
   .ticket-comment-footer{
     display: flex;
@@ -307,7 +385,7 @@
     min-width: 300px;
   }
 
-  flexbox{
+  .ticket-status-container{
     display: flex;
     justify-content: space-between;
     align-items: center;

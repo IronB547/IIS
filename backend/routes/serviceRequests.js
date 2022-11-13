@@ -70,7 +70,7 @@ router.post('/', async function(req, res, next) {
 				res.status(403).json({message: "Forbidden"});
 		}
 	} catch (err) {
-		console.error(`Error while posting servicer requests `, err.message);
+		console.error(`Error while posting service requests `, err.message);
 		res.status(500).send()
 	}
 });

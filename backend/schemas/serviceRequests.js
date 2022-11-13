@@ -4,7 +4,8 @@ const Joi = require('joi');
 const createServiceRequest = Joi.object().keys({
     title: Joi.string().min(2).max(255).required(),
     description: Joi.string().min(2).max(1023).required(),
-    ticketID: Joi.number().required(),
+    ticketID: Joi.number().default(null),
+    solutionState: Joi.number().min(0).max(1).default(0),
 });
 
 const editServiceRequestTechnician = Joi.object().keys({

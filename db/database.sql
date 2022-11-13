@@ -47,7 +47,7 @@ CREATE TABLE Service_request (
     cityManagerID INT NOT NULL,
     createdAt DATETIME NOT NULL,
     PRIMARY KEY (id),
-    ticketID INT,
+    ticketID INT DEFAULT NULL,
     FOREIGN KEY (ticketID) REFERENCES Tickets(id) ON DELETE CASCADE
 );
 

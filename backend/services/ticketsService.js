@@ -52,7 +52,7 @@ async function getBySearch(page = 1, query, countOnly = false) {
 async function getByID(ticketID) {
 	const tickets = await db.query(`SELECT Tickets.*, Users.name userName, Users.surname userSurname, Users.userType FROM Tickets JOIN Users ON userID = Users.id WHERE Tickets.id = ?`, [ticketID]);
 	const photos = await db.query(`SELECT url, id FROM Ticket_photo WHERE ticketID = ?`, [ticketID]);
-	const comments = await db.query(`SELECT comment, createdAt, userID, Users.name userName, Users.surname userSurname, Users.userType FROM Ticket_comment 
+	const comments = await db.query(`SELECT Ticket_comment.id, comment, createdAt, userID, Users.name userName, Users.surname userSurname, Users.userType FROM Ticket_comment 
 	JOIN Users ON Users.id = userID WHERE ticketID = ?`, [ticketID]);
 
 	if(tickets[0] == null) {

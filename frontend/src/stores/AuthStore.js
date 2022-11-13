@@ -20,10 +20,13 @@ export const useAuthStore = defineStore('auth', {
             this.user = await userService.logIn(credentials)
             return this.user
         },
-        // register(credentials) {
-        //     this.user = {loading: true}
-        //     this.user = userService.register(credentials)
-        // },
+        async register(credentials) {
+            this.user = {loading: true}
+            const res = await userService.register(credentials)
+            if(res.status === 201)
+                this.user = await this.logIn({email: credentials.email,password: credentials.password})
+            return res
+        },
         logOut() {
             localStorage.removeItem("user")
             this.user = null
