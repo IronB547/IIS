@@ -62,7 +62,10 @@
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">
           <div class="ticket-comment-body">
             <span>{{comment.comment}}</span>
-            <SplitButton label="Nastavení" :model="commentButtonItems(comment)" class="p-button-rounded p-button-sm p-button-secondary mb-2"></SplitButton>
+            <div class="ticket-comment-body-buttons">
+              <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
+              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
+            </div>
           </div>
           <div class="ticket-comment-footer">
             <span>{{comment.userName}} {{comment.userSurname}}</span>
@@ -108,7 +111,6 @@
   import Textarea from "primevue/textarea";
   import Dropdown from 'primevue/dropdown';
   import { useTicketsStore } from "@/stores/TicketsStore";
-  import SplitButton from 'primevue/splitbutton';
 
   export default {
     components: {
@@ -117,8 +119,7 @@
       Button, 
       Dialog,
       Dropdown,
-      Textarea,
-      SplitButton
+      Textarea
     },
     name: "TicketDetailView",
     // props: {
@@ -166,6 +167,7 @@
     methods: {
       async loadTicket() {
         this.ticket = await this.ticketsStore.getTicket(this.ticketId)
+        this.ticket.comments = this.ticket.comments.sort((objA, objB) => Number(new Date(objB.createdAt)) - Number(new Date(objA.createdAt)))
       },
       getStatus(status) {
         switch (status) {
@@ -372,6 +374,12 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
+
+      .ticket-comment-body-buttons{
+        .p-button-rounded {
+          margin-right: 10px;
+        }
+      }
     }
   }
   .ticket-comment-footer{

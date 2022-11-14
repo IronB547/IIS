@@ -77,7 +77,11 @@
         <div class="request-comment" v-for="comment in request?.comments" :key="comment.id">
           <div class="request-comment-body">
             <span>{{comment.comment}}</span>
-            <SplitButton label="Secondary" :model="commentButtonItems(comment)" class="p-button-rounded p-button-sm p-button-secondary mb-2"></SplitButton>
+
+            <div class="request-comment-body-buttons">
+              <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
+              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
+            </div>
           </div>
           <div class="request-comment-footer">
             <span>{{comment.userName}} {{comment.userSurname}}</span>
@@ -124,7 +128,6 @@
   import Dialog from "primevue/dialog";
   import Textarea from "primevue/textarea";
   import InputText from 'primevue/inputtext';
-  import SplitButton from 'primevue/splitbutton';
 
   export default {
     components: {
@@ -132,8 +135,7 @@
       Dropdown,
       Dialog,
       Textarea,
-      InputText,
-      SplitButton
+      InputText
     },
     name: "RequestDetailView",
     // props: {
@@ -162,15 +164,20 @@
       const requestsStore = useRequestsStore();
       this.requestsStore = requestsStore;
       
-      this.loadRequest();
-
-      const usersStore = useUsersStore();
-      this.technicians = await usersStore.getUsers(1);
-
+      await this.loadRequest();
     },
     methods: {
       async loadRequest() {
         this.request = await this.requestsStore.getServiceRequest(this.requestID)
+        
+        //console.log(this.request.comments.sort((objA, objB) => Number(objB.createdAt) - Number(objA.createdAt)))
+        this.request.comments = this.request.comments.sort((objA, objB) => Number(new Date(objB.createdAt)) - Number(new Date(objA.createdAt)))
+        
+        //console.log(this.request.comments.sort(function(a, b){return new Date(b) - new Date(a)}))
+
+        const usersStore = useUsersStore();
+        this.technicians = await usersStore.getUsers(1);
+        this.technicians = this.technicians.filter(tech => !this.request.technicians.find(t => tech.id == t.technicianID))
       },
       getStatus(solutionState) {
         switch (solutionState) {
@@ -181,12 +188,7 @@
         }
       },
       getTechnicianLabel(technician) {
-        // If technician is already in the table, do not display
-        const free_technic = this.technicians.filter(tech => !this.request.technicians.find(t => tech.id == t.technicianID))
-        
-        // If the technic is in the free_technic array, display his name
-        if((free_technic.find(tech => tech == technician)) != null)
-          return technician?.name + " " + technician?.surname; 
+        return technician?.name + " " + technician?.surname; 
           
       },
       async addComment() {
@@ -376,6 +378,12 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
+
+      .request-comment-body-buttons {
+        .p-button-rounded{
+          margin-right: 10px;
+        }
+      }
     }
   }
 
