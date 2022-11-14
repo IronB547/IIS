@@ -3,7 +3,7 @@
   <div class="request-detail">
     <div class="request-header">
       <div class="request-header-left">
-        <h3 class="title">{{request?.title}}</h3>
+        <h1 class="title">{{request?.title}}</h1>
 
         <div class="flexbox-date-and-creator">
           <div>
@@ -51,19 +51,19 @@
         <div class="request-body-right-inputtext">
           <InputText type="text" class="p-inputtext"  placeholder="Předpokládaný čas řešení"/>
           <br>
-          <small id="username1-help">Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
+          <small>Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
+          
         </div>
-
         <div class="request-body-right-inputtext">
           <InputText type="text" class="p-inputtext"  placeholder="Vykázaný čas"/>
           <br>
-          <small id="username1-help">Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
+          <small >Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
         </div>
 
         <div class="request-body-right-inputtext">
           <InputText type="text" class="p-inputtext"  placeholder="Cena"/>
           <br>
-          <small id="username1-help">Do pole vepište i měnu.</small>
+          <small>Do pole vepište i měnu.</small>
         </div>
       </div>
     </div>
@@ -152,19 +152,6 @@
           {name: 'Vyřešeno'},
           {name: 'Nevyřešeno'}
         ],
-        responsiveOptions: [
-        {
-            breakpoint: '1024px',
-            numVisible: 5
-        },
-        {
-            breakpoint: '768px',
-            numVisible: 3
-        },
-        {
-            breakpoint: '560px',
-            numVisible: 1
-        }],
         showEditCommentDialog: false,
         editingComment: null
       };
@@ -194,12 +181,18 @@
         }
       },
       getTechnicianLabel(technician) {
-        return technician?.name + " " + technician?.surname;
+        // If technician is already in the table, do not display
+        const free_technic = this.technicians.filter(tech => !this.request.technicians.find(t => tech.id == t.technicianID))
+        
+        // If the technic is in the free_technic array, display his name
+        if((free_technic.find(tech => tech == technician)) != null)
+          return technician?.name + " " + technician?.surname; 
+          
       },
       async addComment() {
         const response = await this.requestsStore.addComment(this.requestID,{comment: this.commentText});
         if(response.error){
-          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Cannot add comment", life: 3000});
+          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Nelze přidat komentář", life: 3000});
         }
         this.loadRequest();
         this.showCommentDialog = false;
@@ -208,7 +201,7 @@
       async technicianChange(event) {
         const response = await this.requestsStore.addTechnician(this.requestID, event.value.id);
         if(response.error){
-          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Cannot add technician", life: 3000});
+          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Nelze přidat technika", life: 3000});
         }
         this.loadRequest();
         this.addTechnician = null;
@@ -217,14 +210,14 @@
         console.log("removing technician",technicianID);
         const response = await this.requestsStore.removeTechnician(this.requestID,technicianID);
         if(response.error){
-          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Cannot remove technician", life: 3000});
+          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Nelze odebrat technika", life: 3000});
         }
         this.loadRequest();
       },
       commentButtonItems(comment) {
         return [
         {
-          label: 'Edit ',
+          label: 'Editovat',
           icon: 'pi pi-file-edit',
           command: () => {
             this.commentText = comment.comment;
@@ -233,7 +226,7 @@
           }
         },
         {
-          label: 'Delete',
+          label: 'Smazat',
           icon: 'pi pi-times',
           command: () => {
             this.deleteComment(comment.id);
@@ -294,6 +287,25 @@
     display: inline-flex;
     width: 100%;
 
+    .request-body-left {
+      width: 50%;
+      .request-body-left-dropdown{
+        width: 100%;
+      }
+    }
+    .request-body-right{
+      
+      width: 50%;
+      margin-bottom: 20px;
+
+      .request-body-right-inputtext{
+        .p-inputtext{
+          width: 250px;
+        }
+        margin-bottom: 20px;
+      }
+    }
+
     .request-technicians{
     display: inline-flex;
     margin-bottom: 10px;
@@ -312,22 +324,6 @@
       min-width: 225px;
       padding: 5px 10px 5px 10px;
   }
-    .request-body-left {
-      width: 100%;
-      .request-body-left-dropdown{
-        width: 100%;
-      }
-    }
-    .request-body-right{
-      display: inline-flex;
-      width: 100%;
-      margin-bottom: 20px;
-
-      .request-body-right-inputtext{
-        display: inline-flex;
-        margin-bottom: 20px;
-      }
-    }
   }
   }
   

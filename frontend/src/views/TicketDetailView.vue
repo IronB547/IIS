@@ -62,7 +62,7 @@
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">
           <div class="ticket-comment-body">
             <span>{{comment.comment}}</span>
-            <SplitButton label="Secondary" :model="commentButtonItems(comment)" class="p-button-rounded p-button-sm p-button-secondary mb-2"></SplitButton>
+            <SplitButton label="Nastavení" :model="commentButtonItems(comment)" class="p-button-rounded p-button-sm p-button-secondary mb-2"></SplitButton>
           </div>
           <div class="ticket-comment-footer">
             <span>{{comment.userName}} {{comment.userSurname}}</span>
@@ -219,8 +219,8 @@
         if(response.error){
           this.$toast.add({
             severity: "error",
-            summary: "Error",
-            detail: response?.message || "Cannot edit comment",
+            summary: "Chyba",
+            detail: response?.message || "Nelze editovat komentář",
             life: 3000,
           })
         }
@@ -234,8 +234,8 @@
         if(response.error){
           this.$toast.add({
             severity: "error",
-            summary: "Error",
-            detail: response?.message || "Cannot delete comment",
+            summary: "Chyba",
+            detail: response?.message || "Nelze smazat komentář",
             life: 3000,
           })
         }
