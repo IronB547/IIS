@@ -8,6 +8,7 @@ import NewTicketView from "../views/NewTicketView.vue";
 import RequestsListView from "../views/RequestsListView.vue";
 import RequestDetailView from "../views/RequestDetailView.vue";
 import NewRequestView from "../views/NewRequestView.vue";
+import UsersListView from "../views/UsersListView.vue";
 import { useAuthStore } from "@/stores/AuthStore";
 
 
@@ -67,6 +68,11 @@ const routes = [
     path: "/requests/newrequest",
     name: "newRequest",
     component: NewRequestView,
+  },
+  {
+    path: "/users",
+    name: "users",
+    component: UsersListView,
   }
 ];
 

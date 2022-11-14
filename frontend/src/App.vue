@@ -1,22 +1,27 @@
 <template>
-    <Menubar class="menu-bar" :model="navigation">
-      <template #start>
-        <h3 class="navbar-title">Smart City</h3>
-      </template>
-      <template #end>
-        <span></span>
-        <ul class="p-menubar-root-list">
-        <li v-if="store.isLoggedIn" class="p-menuitem" role="menuitem" aria-label="Log Out" aria-level="1" aria-setsize="6" aria-posinset="5">
-          <div class="p-menuitem-content">
-            <a href="#/login" @click="logOut" class="p-menuitem-link router-link-active router-link-active-exact" tabindex="-1" aria-hidden="true">
-              <span class="p-menuitem-icon pi pi-fw pi-sign-out"></span>
-              <span class="p-menuitem-text">Log Out</span>
-            </a>
-          </div>
-        </li>
-        </ul>
-      </template>
-    </Menubar>
+  <Menubar class="menu-bar" :model="navigation">
+    <template #start>
+      <h3 class="navbar-title">Smart City</h3>
+    </template>
+    <!-- <template #item="{item}">
+        <router-link :to="item.to" custom v-slot="{href, route, navigate, isActive, isExactActive}">
+            <a :href="href" @click="navigate" :class="{'active-link': isActive, 'active-link-exact': isExactActive}">{{route.fullPath}}</a>
+        </router-link>
+    </template> -->
+    <template #end>
+      <span></span>
+      <ul class="p-menubar-root-list">
+      <li v-if="store.isLoggedIn" class="p-menuitem" role="menuitem" aria-label="Log Out" aria-level="1" aria-setsize="6" aria-posinset="5">
+        <div class="p-menuitem-content">
+          <a href="#/login" @click="logOut" class="p-menuitem-link router-link-active router-link-active-exact" tabindex="-1" aria-hidden="true">
+            <span class="p-menuitem-icon pi pi-fw pi-sign-out"></span>
+            <span class="p-menuitem-text">Log Out</span>
+          </a>
+        </div>
+      </li>
+      </ul>
+    </template>
+  </Menubar>
   <router-view />
 </template>
 
@@ -67,7 +72,14 @@ export default {
         {
           label: 'Requests',
           icon: 'pi pi-fw pi-question',
-          to: '/requests'
+          to: '/requests',
+          visible: () => this.store.hasRole(1)
+        },
+        {
+          label: 'Users',
+          icon: 'pi pi-fw pi-users',
+          to: '/users',
+          visible: () => this.store.hasRole(2)
         },
         {
           label: 'Log In',
@@ -92,17 +104,19 @@ export default {
       this.store.logOut();
       this.$router.push({name: "login"})
     }
+  },
+  computed: {
   }
 }
 
 </script>
 
-<style lang="scss" scope="global">
+<style lang="scss">
 .navbar-title {
-  margin: 0 0.2rem 0 0.4rem;
+  margin: 0 1rem 0 0.4rem;
   padding: 0;
   font-size: 1.2rem;
-  font-weight: 500;
+  font-weight: 700;
   color: #fff;
   text-shadow: 0 0 2px #000;
 }
@@ -124,33 +138,7 @@ body{
   color: white;
   margin: 0;
 }
+</style>
 
-.list{
-  width: 800px;
-  margin: 0 auto;
-
-  
-  .list-item{
-    
-    display: flex;
-    justify-content: space-around;
-  }
-}
-
-
-
-
-
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #485e74;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
+<style>
 </style>

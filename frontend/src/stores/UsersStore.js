@@ -11,7 +11,7 @@ export const useUsersStore = defineStore('user', {
     },
     actions: {
         async getUsers(userType = null, page = 1) {
-            const res = await fetch(`${config.host}/users/all/${page}?userType=${userType}`, {
+            const res = await fetch(`${config.host}/users/all/${page}${userType ? "?userType="+userType: ""}`, {
                 method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
@@ -24,6 +24,40 @@ export const useUsersStore = defineStore('user', {
                 return users.data
             }else{
                 return {error: "Failed to get users"}
+            }
+        },
+
+        async createUser(user) {
+            const res = await fetch(`${config.host}/users`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+                body: JSON.stringify(user)
+            })
+
+            if(res.status === 201){
+                const user = await res.json()
+                return user
+            }else{
+                return {error: "Failed to create user"}
+            }
+        },
+
+        async removeUser(id) {
+            const res = await fetch(`${config.host}/users/${id}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+            })
+
+            if(res.status === 204){
+                return {success: "User deleted"}
+            }else{
+                return {error: "Failed to delete user"}
             }
         }
     }

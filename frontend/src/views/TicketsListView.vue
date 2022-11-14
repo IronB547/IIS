@@ -71,11 +71,18 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 50px;
-    max-width: 1450px;
+    max-width: calc(100% - 40px);
+    // max-width: 1450px;
     margin: 0 auto;
-
+    margin-bottom: 1rem;
   }
   .tickets-list > div{
     box-sizing : border-box;
+  }
+
+  @media screen and (max-width: 768px) {
+    .tickets-list{
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
   }
 </style>
