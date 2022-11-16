@@ -25,7 +25,6 @@ async function getServiceRequest(id) {
     return res.json()
 }
 
-
 export default {
     getAll,
     getServiceRequest,

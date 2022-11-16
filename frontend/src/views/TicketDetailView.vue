@@ -7,17 +7,7 @@
           <h3 class="title">{{ticket?.title}}</h3>
           <Button class="p-button-primary p-button-sm p-button-title">Upravit ticket</Button>
 
-        </div>
-        <div class="ticket-header-main-bottom">
-          <p class="header-info">
-            <span class="date">{{new Date(ticket?.createdAt).toLocaleString("cs")}}</span>
-            <span class="location">Lokace: {{ticket?.location}}</span>
-          </p>
-          <span class="creator"> Vytvořil: {{ticket?.userName}} {{ticket?.userSurname}} </span>
-        </div>
-      </div>
-
-      <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
+          <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
           :showItemNavigators="true" :showThumbnails="false">
           <template #item="slotProps">
             <div class="image-container">
@@ -25,7 +15,18 @@
               </Image>
             </div>
             </template>
-      </Galleria>
+          </Galleria>
+        </div>
+        <div class="ticket-header-main-bottom">
+          <span class="location">Lokace: {{ticket?.location}}</span>
+
+          <p class="header-info">
+          <span class="creator"> Vytvořil: {{ticket?.userName}} {{ticket?.userSurname}} </span>
+          <br>
+          <span class="date">{{new Date(ticket?.createdAt).toLocaleString("cs")}}</span>
+        </p>
+        </div>
+      </div>
     </div>
     <div class="ticket-description">
       {{ticket?.description}}
@@ -42,14 +43,15 @@
         {{getStatus(ticket?.status)}}
         </h3>
       </div>
-      <Dropdown class="changestate" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
+      <Dropdown @change="stateChange($event)" class="changestate" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
     </div>
 
     <div class="ticket-comments">
       <div class="ticket-comments-header">
         <h3>Komentáře</h3>
-        <router-link :to="`/requests`">
-          <Button class="p-button-primary">
+
+        <router-link :to="`/requests/list/${ticket.id}`">
+          <Button class="p-button-primary" @click="showRequests(ticket.id)">
             Servisní požadavky
           </Button>
         </router-link>
@@ -68,8 +70,8 @@
             </div>
           </div>
           <div class="ticket-comment-footer">
-            <span>{{comment.userName}} {{comment.userSurname}}</span>
-            <span>{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
+            <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
+            <span class="date">{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
           </div>
         </div>
       </div>
@@ -169,6 +171,19 @@
         this.ticket = await this.ticketsStore.getTicket(this.ticketId)
         this.ticket.comments = this.ticket.comments.sort((objA, objB) => Number(new Date(objB.createdAt)) - Number(new Date(objA.createdAt)))
       },
+      async showRequests(ticketID){
+        const ticketsStore = useTicketsStore();
+        const response = await ticketsStore.showRequests(ticketID);
+
+        if(response.error) {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Chyba při načítání požadavků",
+            life: 3000,
+          })
+        }
+      },
       getStatus(status) {
         switch (status) {
           case 0:
@@ -181,6 +196,52 @@
             return "Zamítnuto";
         }
       },
+      async stateChange(event){
+        const ticketsStore = useTicketsStore();
+        var state = 0
+
+        switch(event.value.name) {
+          case "Vytvořeno":
+            state = 0
+            break
+          case "Čeká na schválení":
+            state = 1
+            break
+          case "Vyřešeno":
+            state = 2
+            break
+          case "Zamítnuto":
+            state = 3
+            break
+        }
+
+        const response = await ticketsStore.changeState(this.ticket, state);
+        if(response.warn){
+          this.$toast.add({
+            severity: "warn",
+            summary: "Pozor",
+            detail: response?.warn || "Stav je již nastaven",
+            life: 3000,
+          })
+        }
+        else if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Úspěšně změněn stav ticketu",
+            life: 3000,
+          })
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Chyba při zmeně stavu",
+            life: 3000,
+          })
+        }
+        this.loadTicket();
+      },
       async addComment() {
         const ticketsStore = useTicketsStore();
         const response = await ticketsStore.addComment(this.ticketId, {comment: this.commentText});
@@ -188,7 +249,7 @@
           this.$toast.add({
             severity: "error",
             summary: "Error",
-            detail: response?.message || "Cannot add comment",
+            detail: response?.message || "Nelze přidat komentář",
             life: 3000,
           })
         }
@@ -304,10 +365,6 @@
     align-items: center;
   }
   
-  .date{
-    margin-right: 30px;
-  }
-
   .ticket-detail{
     width: 900px;
     margin: 0 auto;
@@ -319,15 +376,10 @@
       align-items: center;
       width: 100%;
 
-      .creator{
-        min-width: 200px;
-        text-align: right;
-      }
       .ticket-header-main{
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        margin-right: 20px;
       }
       .ticket-header-main-top {
         width: 100%;
@@ -335,23 +387,41 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
+       
+        .p-button-primary{
+          margin-right: 20px;
+          margin-left: 20px;
+          min-width: 123px;
+        }
+        .title{
+          max-width: 750px;
+          font-size: 2rem;
+          word-wrap: anywhere;
+          margin: 0px 0px;
+        }
+        .ticket-image{
+            width: 300px;
+        }
       }
       .ticket-header-main-bottom {
         width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        p{
-          margin: 0px 0px;
+        .header-info{
+          text-align: right;
+          min-width: 200px;
+          max-width: 300px;
+          .date{
+            min-width: 160px;
+          }
+          .location{
+            max-width: 575px;
+          }
         }
-      }
-      .title{
-        font-size: 2rem;
-        word-wrap: anywhere;
-        margin: 0px 0px;
-      }
-      .ticket-image{
-        width: 300px;
+        p{
+          margin: 0px 0px;          
+        }
       }
     }
     .ticket-description{
@@ -374,19 +444,31 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-
+      span{
+        max-width: 731.5px;
+      }
       .ticket-comment-body-buttons{
-        .p-button-rounded {
+        max-height: 48px;
+        min-width: 160px;
+        text-align: right;
+        .p-button-primary {
           margin-right: 10px;
         }
       }
     }
+    .ticket-comment-footer{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+
+      .date{
+        min-width: 160px;
+      }
+      span{
+        max-width: 687.5px;
+      }
   }
-  .ticket-comment-footer{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
   }
   .p-inputtextarea{
     font-size: 1rem;

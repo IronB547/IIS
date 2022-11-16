@@ -1,28 +1,41 @@
 <template>
-    <div class="request-item">
+  <Card class="request-item">
+    <template #title>
       <div class="request-item-header">
         <h4>{{limitLength(request.title,35)}}</h4>
-        <h3 class="request-status" :class="{
-            unsolved : request?.solutionState == 0,
-            solved : request?.solutionState == 1} ">{{getStatus(request.solutionState)}}</h3>
+        <Badge :severity="severity" size="large">
+          {{getStatus(request?.solutionState)}}
+        </Badge>
+        
       </div>
+    </template>
+
+    <template #content>
       <p class="request-item-body">
         {{limitLength(request.description)}}
       </p>
-      <div class="request-item-footer">
+      
+      </template>
+      <template #footer>
+        <div class="request-item-footer">
         <p>{{new Date(request.createdAt).toLocaleString("cs")}}</p>
         <router-link :to="`requests/`+request.id"><Button class="p-button-primary">Detail</Button></router-link>
       </div>
-    </div>
+      </template>
+  </Card>
   </template>
 
 <script>
 // eslint-disable-next-line
 import Button from 'primevue/button';
+import Badge from 'primevue/badge';
+import Card from 'primevue/card';
 
 export default {
   components: {
-    Button
+    Button,
+    Badge,
+    Card
   },
   name: "RequestItem",
   data() {
@@ -33,7 +46,16 @@ export default {
     request: Object,
   },
   computed: {
-    
+    severity() {
+      switch (this.request.solutionState) {
+        case 0:
+          return "danger";
+        case 1:
+          return "success";
+        default:
+          return "danger";
+      }
+    },
   },
   methods: {
     getStatus(solutionState){
@@ -58,6 +80,41 @@ export default {
 </script>
 
 <style lang="scss">
+.p-card-body{
+  height: 100%;
+}
+
+.p-card-content {
+  height: 140px;
+}
+
+.request-item{
+  width: 100%;
+  margin: 0 auto;
+  .request-item-header{
+    display: flex;
+    justify-content: space-between;
+
+    h4{
+      min-height: 54px;
+      margin: 0;
+      font-size: 1.3rem;
+      text-align: left;
+    }
+    .p-badge{
+      min-width: 116px;
+    }
+  }
+  .request-item-body{
+    text-align: left;
+    height: 100%;
+  }
+  .request-item-footer{
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
 .request-status{
     color: white;
     border-radius: 10px;
@@ -73,28 +130,4 @@ export default {
     background-color: var(--green-600);
   }
 
-.request-item{
-  width: 450px;
-  margin: 0 auto;
-  border: 1px solid rgb(255, 255, 255);
-  padding: 10px;
-  margin-bottom: 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  .request-item-header{
-    display: flex;
-    justify-content: space-between;
-  }
-  .request-item-body{
-    text-align: left;
-    margin-top: 10px;
-    height: 100%;
-  }
-  .request-item-footer{
-    display: flex;
-    justify-content: space-between;
-  }
-}
 </style>

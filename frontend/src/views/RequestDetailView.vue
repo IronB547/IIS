@@ -29,7 +29,7 @@
         solved : request?.solutionState == 1}">
         <h3>{{getStatus(request?.solutionState)}}</h3>
       </div>
-      <Dropdown class="changestate" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
+      <Dropdown class="changestate" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
     </div>
 
     <h3> Přiřazení technici: </h3>
@@ -84,7 +84,7 @@
             </div>
           </div>
           <div class="request-comment-footer">
-            <span>{{comment.userName}} {{comment.userSurname}}</span>
+            <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
             <span>{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
           </div>
         </div>
@@ -151,8 +151,8 @@
         technicians: [],
         changeState: null,
         states: [
-          {name: 'Vyřešeno'},
-          {name: 'Nevyřešeno'}
+        {name: 'Nevyřešeno'},
+          {name: 'Vyřešeno'}
         ],
         showEditCommentDialog: false,
         editingComment: null
@@ -190,6 +190,47 @@
       getTechnicianLabel(technician) {
         return technician?.name + " " + technician?.surname; 
           
+      },
+      async stateChange(event){
+        const requestsStore = useRequestsStore();
+        var state = 0
+
+        switch(event.value.name) {
+          case "Nevyřešeno":
+            state = 0
+            break
+          case "Vyřešeno":
+            state = 1
+            break
+        }
+
+        const response = await requestsStore.changeState(this.request, state)
+        
+        if(response.warn){
+          this.$toast.add({
+            severity: "warn",
+            summary: "Pozor",
+            detail: response?.warn || "Stav je již nastaven",
+            life: 3000,
+          })
+        }
+        else if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Úspěšně změněn stav ticketu",
+            life: 3000,
+          })
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Chyba při zmeně stavu",
+            life: 3000,
+          })
+        }
+        this.loadRequest();
       },
       async addComment() {
         const response = await this.requestsStore.addComment(this.requestID,{comment: this.commentText});
@@ -372,26 +413,36 @@
     padding: 15px 20px;
     margin-top: 10px;
     border: 1px solid white;
-
     .request-comment-body{
       display: flex;
       justify-content: space-between;
       align-items: center;
       width: 100%;
-
-      .request-comment-body-buttons {
-        .p-button-rounded{
+      span{
+        max-width: 731.5px;
+      }
+      .request-comment-body-buttons{
+        max-height: 48px;
+        min-width: 160px;
+        text-align: right;
+        .p-button-primary {
           margin-right: 10px;
         }
       }
     }
-  }
+    .request-comment-footer{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
 
-  .request-comment-footer{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
+      .date{
+        min-width: 160px;
+      }
+      span{
+        max-width: 687.5px;
+      }
+  }
   }
   .changestate {
     width: 200px;

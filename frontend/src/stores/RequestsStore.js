@@ -19,6 +19,31 @@ export const useRequestsStore = defineStore('requests', {
             return requestsService.getServiceRequest(id)
         },
 
+        async changeState(request, state) {
+            if(request.solutionState == state)
+                return {warn: "Stav je již nastaven"}
+            
+            request.solutionState = state
+
+            const res = await fetch(`${config.host}/requests/${request.id}/`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+                body: JSON.stringify(request)
+            })
+
+            if(res.status === 204){
+                this.requests.push(request)
+                return {message: "Úspěšně změněn stav ticketu"}
+            }else if(res.status === 403) {
+                return {error: "Nemůžete změnit stav ticketu"}
+            }else{
+                return {error: "Změna stavu ticketu selhala"}
+            }
+        },
+
         async createRequest(request) {
             if(!localStorage.getItem("user"))
                 return {error: "You must be logged in to create a request"}

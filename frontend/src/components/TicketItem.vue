@@ -18,9 +18,10 @@
     </template> -->
     <template #content>
       <p class="ticket-item-body">
-        {{limitLength(ticket.description)}}
+        {{limitLength(ticket.description, 200)}}
       </p>
     </template>
+
     <template #footer>
       <div class="ticket-item-footer">
         <p>{{new Date(ticket.createdAt).toLocaleString("cs")}}</p>
@@ -82,7 +83,7 @@ export default {
           return "Zamítnuto";
       }
     },
-    limitLength(text, lengthLimit = 30){
+    limitLength(text, lengthLimit){
       let numUpper = text.length - text.replace(/[A-Z]/g, '').length;  
       if(numUpper > lengthLimit/2){
         return text.substring(0, Math.round(lengthLimit/1.5)-3) + "..."
@@ -97,29 +98,34 @@ export default {
 
 
 <style lang="scss">
+.p-card-body{
+  height: 100%;
+}
+
+.p-card-content {
+  height: 140px;
+}
+</style>
+
+<style scoped lang="scss">
 
 .ticket-item{
   width: 100%;
   margin: 0 auto;
-  // border: 1px solid rgb(255, 255, 255);
-  // display: flex;
-  // flex-direction: column;
-  // justify-content: space-between;
-
   .ticket-item-header{
     display: flex;
     justify-content: space-between;
-    align-items: center;
 
     h4{
       margin: 0;
       font-size: 1.3rem;
+      text-align: left;
     }
   }
   .ticket-item-body{
     text-align: left;
-    margin-top: 10px;
     height: 100%;
+    margin-top: 0px;
   }
   .ticket-item-footer{
     display: flex;
