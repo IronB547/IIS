@@ -36,11 +36,18 @@
     <div class="request-body">
       <div class="request-body-left">
         <div class="request-technicians" v-for="technician in request?.technicians" :key="technician.technicianID">
-          <div class="request-technicians-body">
-            {{technician.name}} {{technician.surname}}
-            <Button icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" @click="removeTechnician(technician.technicianID)" />
-
-          </div>
+          <Card>
+            <template #header>
+              <div class="request-technicians-body">
+                <span>
+                  {{technician.name}} {{technician.surname}}
+                </span>
+                <div class="request-technicians-body-button">
+                  <Button icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" @click="removeTechnician(technician.technicianID)" />
+                </div>
+              </div>
+              </template>
+          </Card>
         </div>
         <div class="request-body-left-dropdown">
           <Dropdown  @change="technicianChange($event)" class="addtechnician" v-model="addTechnician" :options="technicians" :optionLabel="getTechnicianLabel" placeholder="Přidat technika" :loading="technicians.length == 0"/>
@@ -48,23 +55,30 @@
       </div>
 
       <div class="request-body-right">
-        <div class="request-body-right-inputtext">
-          <InputText type="text" class="p-inputtext"  placeholder="Předpokládaný čas řešení"/>
-          <br>
-          <small>Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
-          
-        </div>
-        <div class="request-body-right-inputtext">
-          <InputText type="text" class="p-inputtext"  placeholder="Vykázaný čas"/>
-          <br>
-          <small >Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
-        </div>
+        Předpokládaný čas řešení:
+        <br>
+        <Card class="request-body-right-card">
+          <template #header>
+            {{request?.expectedTime}}
+          </template>
+        </Card>
 
-        <div class="request-body-right-inputtext">
-          <InputText type="text" class="p-inputtext"  placeholder="Cena"/>
+        Vykázaný čas
+        <br>
+        <Card class="request-body-right-card">
+          <template #header>
+            {{request?.solutionTime}}
+          </template>
+        </Card>
+          Cena:
           <br>
-          <small>Do pole vepište i měnu.</small>
-        </div>
+        <Card class="request-body-right-card">
+          <template #header>
+            {{request?.price}}
+          </template>
+        </Card>
+
+        <Button class="p-button-primary" @click="showEditRequestData = true" :disabled="request?.solutionState > 0">Upravit hodnoty</Button>
       </div>
     </div>
 
@@ -91,6 +105,35 @@
       </div>
     </div>
   </div> 
+
+  <Dialog class="edit-request" v-model:visible="showEditRequestData">
+    <template #header>
+      <h3>Upravit hodnoty</h3>
+    </template>
+
+    <div class="edit-request-inputtext">
+      <InputText type="text" class="p-inputtext"  placeholder="Předpokládaný čas řešení"/>
+      <br>
+      <small>Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
+      
+    </div>
+    <div class="edit-request-inputtext">
+      <InputText type="text" class="p-inputtext"  placeholder="Vykázaný čas"/>
+      <br>
+      <small >Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
+    </div>
+
+    <div class="edit-request-inputtext">
+      <InputText type="text" class="p-inputtext"  placeholder="Cena"/>
+      <br>
+      <small>Do pole vepište i měnu.</small>
+    </div>
+
+    <template #footer>
+      <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditRequestData = false"/>
+      <Button label="Upravit" icon="pi pi-check" autofocus @click="editRequestData" />
+    </template>
+  </Dialog>
 
   <Dialog v-model:visible="showCommentDialog">
     <template #header>
@@ -128,6 +171,8 @@
   import Dialog from "primevue/dialog";
   import Textarea from "primevue/textarea";
   import InputText from 'primevue/inputtext';
+  import Card from 'primevue/card';
+  //import Badge from 'primevue/badge';
 
   export default {
     components: {
@@ -135,7 +180,8 @@
       Dropdown,
       Dialog,
       Textarea,
-      InputText
+      InputText,
+      Card
     },
     name: "RequestDetailView",
     // props: {
@@ -146,6 +192,7 @@
         requestID: this.$route.params.requestID,
         request: {},
         showCommentDialog: false,
+        showEditRequestData: false,
         commentText: "",
         addTechnician: null,
         technicians: [],
@@ -298,12 +345,54 @@
   };
 </script>
 
-
 <style lang="scss">
 
+.request-technicians{
+  .p-card{
+    max-width: 80%;
+  }
+}
+
+.request-body-right {
+  .p-card {
+    max-width: 225px;
+  }
+}
+
+.request-body-right-card {
+  .p-card-header{
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  max-width: 50%;
+  }
+}
+  .edit-request{
+    min-width: 500px;
+
+    .edit-request-inputtext {
+      width: 100%;
+      margin-bottom: 20px;
+
+      .p-inputtext {
+        width: 100%;
+      }
+    }
+  }
 </style>
 
 <style scoped lang="scss">
+
+.p-card{
+  margin-bottom: 15px;
+  margin-top: 5px;
+:deep(.p-card-body){
+  all: unset;
+}
+:deep(.p-card-content){
+   all: unset;
+  }
+}
 .changeState{
   margin-left: 200px;
 }
@@ -342,16 +431,12 @@
       margin-bottom: 20px;
 
       .request-body-right-inputtext{
-        .p-inputtext{
-          width: 250px;
-        }
         margin-bottom: 20px;
       }
     }
 
     .request-technicians{
     display: inline-flex;
-    margin-bottom: 10px;
     width: 100%;
     .request-technicians-body {
       :deep(.cross-button) {
@@ -363,9 +448,8 @@
       justify-content: space-between;
       align-items: flex-end;
       font-size: 1.2rem;
-      border: 1px solid white;
       min-width: 225px;
-      padding: 5px 10px 5px 10px;
+      padding: 10px 10px 10px 10px;
   }
   }
   }
