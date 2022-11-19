@@ -343,14 +343,24 @@
       async editComment(commentId) {
         const ticketsStore = useTicketsStore();
         const response = await ticketsStore.editComment(this.ticketID, commentId, {comment: this.commentText});
-        if(response.error){
+
+        if(response.message){
           this.$toast.add({
-            severity: "error",
-            summary: "Chyba",
-            detail: response?.message || "Nelze editovat komentář",
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Komentář úspěšně editován",
             life: 3000,
           })
+          }
+          else {
+            this.$toast.add({
+              severity: "error",
+              summary: "Chyba",
+              detail: response?.error || "Editace komentáře selhala",
+              life: 3000,
+            })
         }
+
         this.loadTicket();
         this.showEditCommentDialog = false;
       },
@@ -382,7 +392,6 @@
                       life: 3000,
                     })
                   }
-
                  this.loadTicket();
                 },
                 reject: () => {},

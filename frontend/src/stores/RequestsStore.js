@@ -58,7 +58,7 @@ export const useRequestsStore = defineStore('requests', {
 
         async createRequest(request) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to create a request"}
+                return {error: "Musíte být přihlášení pro vytvoření požadavku"}
 
             const res = await fetch(`${config.host}/requests/`, {
                 method: 'POST',
@@ -71,9 +71,9 @@ export const useRequestsStore = defineStore('requests', {
 
             if(res.status === 201){
                 this.requests.push(request)
-                return {message: "Request created successfully"}
+                return {message: "Požadavek úspěšně vytvořen"}
             }else{
-                return {error: "Request creation failed"}
+                return {error: "Vytvoření požadavku selhalo"}
             }
 
 
@@ -81,7 +81,7 @@ export const useRequestsStore = defineStore('requests', {
 
         async addComment(requestId, comment) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to add a comment"}
+                return {error: "Musíte být přihlášení abyste mohli přidat komentář"}
 
             const res = await fetch(`${config.host}/requests/${requestId}/comments`, {
                 method: 'POST',
@@ -93,16 +93,16 @@ export const useRequestsStore = defineStore('requests', {
             })
 
             if(res.status === 201){
-                return {message: "Comment added successfully"}
+                return {message: "Komentář byl úspěšně přidán"}
             }else{
-                return {error: "Comment addition failed"}
+                return {error: "Přidání komentáře selhalo"}
             }
 
         },
 
         async addTechnician(requestId, technicianId) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to assign a technician"}
+                return {error: "Musíte být přihlášení abyste mohli odebrat technika"}
 
             const res = await fetch(`${config.host}/requests/${requestId}/technicians/${technicianId}`, {
                 method: 'POST',
@@ -113,15 +113,17 @@ export const useRequestsStore = defineStore('requests', {
             })
 
             if(res.status === 204){
-                return {message: "Technician assigned successfully"}
+                return {message: "Technik byl úspěšně přiřazen"}
+            }else if(res.status === 403) {
+                return {error: "Přiřazení technika selhalo"}
             }else{
-                return {error: "Technician assignment failed"}
+                return {error: "Přiřazení technika selhalo"}
             }
 
         },
         async removeTechnician(requestId, technicianId) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to remove a technician"}
+                return {error: "Musíte být přihlášení abyste mohli odebrat technika"}
             
             const res = await fetch(`${config.host}/requests/${requestId}/technicians/${technicianId}`, {
                 method: 'DELETE',
@@ -140,7 +142,7 @@ export const useRequestsStore = defineStore('requests', {
 
         async deleteRequest(requestID) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to delete a comment"}
+                return {error: "Musíte být přihlášení abyste mohli smazat požadavek"}
 
             const res = await fetch(`${config.host}/requests/${requestID}`, {
                 method: 'DELETE',
@@ -161,7 +163,7 @@ export const useRequestsStore = defineStore('requests', {
 
         async deleteComment(commentId) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to delete a comment"}
+                return {error: "Musíte být přihlášení abyste mohli smazat komentář"}
 
             const res = await fetch(`${config.host}/requests/comments/${commentId}`, {
                 method: 'DELETE',
@@ -182,7 +184,7 @@ export const useRequestsStore = defineStore('requests', {
 
         async editComment(commentId, comment) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to edit a comment"}
+                return {error: "Musíte být přihlášení abyste mohli editovat komentář"}
 
             const res = await fetch(`${config.host}/requests/comments/${commentId}`, {
                 method: 'PUT',
@@ -194,9 +196,11 @@ export const useRequestsStore = defineStore('requests', {
             })
 
             if(res.status === 204){
-                return {message: "Comment edited successfully"}
+                return {message: "Komentář úspěšně změněn"}
+            }else if(res.status === 403){
+                return {message: "Nemůžete editovat komentář"}
             }else{
-                return {error: "Comment edition failed"}
+                return {error: "Editace komentáře selhala"}
             }
         },
     }

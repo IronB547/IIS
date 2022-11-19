@@ -75,7 +75,7 @@ export const useTicketsStore = defineStore('tickets', {
 
         async createTicket(ticket) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to create a ticket"}
+                return {error: "Musíte být přihlášení abyste mohli vytvořit ticket"}
 
             const res = await fetch(`${config.host}/tickets/`, {
                 method: 'POST',
@@ -88,15 +88,15 @@ export const useTicketsStore = defineStore('tickets', {
 
             if(res.status === 201){
                 this.tickets.push(ticket)
-                return {message: "Ticket created successfully"}
+                return {message: "Ticket úspěšně vytvořen"}
             }else{
-                return {error: "Ticket creation failed"}
+                return {error: "Vytvoření ticketu selhalo"}
             }
         },
 
         async addComment(ticketId, comment) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to add a comment"}
+                return {error: "Musíte být přihlášení abystě mohli přidat komentář"}
 
             const res = await fetch(`${config.host}/tickets/${ticketId}/comments`, {
                 method: 'POST',
@@ -108,16 +108,16 @@ export const useTicketsStore = defineStore('tickets', {
             })
 
             if(res.status === 201){
-                return {message: "Comment added successfully"}
+                return {message: "Komentář úspěšně přidán"}
             }else{
-                return {error: "Comment addition failed"}
+                return {error: "Přidání komentáře selhalo"}
             }
 
         },
 
         async editComment(ticketId, commentId, comment) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to edit a comment"}
+                return {error: "Musíte být přihlášení pro editaci komentářů"}
 
             const res = await fetch(`${config.host}/tickets/${ticketId}/comments/${commentId}`, {
                 method: 'PUT',
@@ -129,16 +129,18 @@ export const useTicketsStore = defineStore('tickets', {
             })
 
             if(res.status === 204){
-                return {message: "Comment edited successfully"}
+                return {message: "Komentář úspěšně změněn"}
+            }else if(res.status === 403){
+                return {message: "Nemůžete editovat komentář"}
             }else{
-                return {error: "Comment edition failed"}
+                return {error: "Editace komentáře selhala"}
             }
 
         },
 
         async deleteTicket(ticketID) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to edit a comment"}
+                return {error: "Musíte být přihlášení abyste mohli smazat ticket"}
 
             const res = await fetch(`${config.host}/tickets/${ticketID}`, {
                 method: 'DELETE',
@@ -160,7 +162,7 @@ export const useTicketsStore = defineStore('tickets', {
 
         async deleteComment(commentId) {
             if(!localStorage.getItem("user"))
-                return {error: "You must be logged in to delete a comment"}
+                return {error: "Musíte být přihlášení abyste mohli smazat komentář"}
 
             const res = await fetch(`${config.host}/tickets/comments/${commentId}`, {
                 method: 'DELETE',

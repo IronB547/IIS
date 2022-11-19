@@ -455,7 +455,24 @@
             });
       },
       async editComment(commentID) {
-        await this.requestsStore.editComment(commentID,{comment: this.commentText});
+        const response = await this.requestsStore.editComment(commentID,{comment: this.commentText});
+        if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Komentář byl úspěšně změněn",
+            life: 3000,
+          })
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Chyba při editaci komentáře",
+            life: 3000,
+          })
+        }
+
         this.loadRequest();
         this.showEditCommentDialog = false;
         this.commentText = "";
