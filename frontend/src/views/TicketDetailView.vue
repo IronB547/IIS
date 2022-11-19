@@ -5,7 +5,7 @@
       <div class="ticket-header-main">
         <div class="ticket-header-main-top">
           <h3 class="title" v-if="!editMode">{{ticket?.title}}</h3>
-          <Textarea auto-resize="true" v-if="editMode" v-model="ticket.title"/>
+          <Textarea :autoResize="true" v-if="editMode" v-model="ticket.title"/>
           <Button class="p-button-primary p-button-sm p-button-title" v-if="!editMode" @click="editMode = !editMode">Upravit ticket</Button>
           
           <div class="edit-buttons" v-if="editMode">
@@ -28,7 +28,7 @@
         </div>
         <div class="ticket-header-main-bottom">
           <span class="location" v-if="!editMode">Lokace: {{ticket?.location}}</span>
-          <Textarea auto-resize="true" v-if="editMode" v-model="ticket.location"/>
+          <Textarea :autoResize="true" v-if="editMode" v-model="ticket.location"/>
 
           <p class="header-info">
           <span class="creator"> Vytvořil: {{ticket?.userName}} {{ticket?.userSurname}} </span>
@@ -43,7 +43,7 @@
         {{ticket?.description}}
       </div>
 
-      <Textarea auto-resize="true" v-if="editMode" v-model="ticket.description"/>
+      <Textarea :autoResize="true" v-if="editMode" v-model="ticket.description"/>
     </div>
 
     <h3> Stav: </h3>
@@ -95,7 +95,7 @@
 
             <template #footer>
               <div class="ticket-comment-footer">
-                <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
+                <span @click="displayCommentUserInfo(comment)" v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'">Napsal: {{comment.userName}} {{comment.userSurname}}</span>
                 <span class="date">{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
               </div>
             </template>
@@ -109,7 +109,7 @@
       <template #header>
       <h3>Přidat komentář</h3>
     </template>
-    <Textarea class="comment" auto-resize="true" v-model="commentText" rows="5" cols="30" />
+    <Textarea class="comment" :autoResize="true" v-model="commentText" rows="5" cols="30" />
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showCommentDialog = false"/>
@@ -121,7 +121,7 @@
     <template #header>
       <h3>Upravit komentář</h3>
     </template>
-    <Textarea class="comment" auto-resize="true" v-model="commentText" rows="5" cols="30" />
+    <Textarea class="comment" :autoResize="true" v-model="commentText" rows="5" cols="30" />
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditCommentDialog = false"/>
@@ -129,9 +129,15 @@
     </template>
   </Dialog>
 
+  <UserInfoDialogVue :user="selectedUser" :showUserInfo="isUserInfoVisible" @closeUserInfo="isUserInfoVisible = false">
+    
+  </UserInfoDialogVue>
+
 </template>
   
 <script>
+  import UserInfoDialogVue from "@/components/UserInfoDialog.vue";
+
   // @ is an alias to /src
   import Image from "primevue/image";
   import Galleria from "primevue/galleria";
@@ -150,7 +156,8 @@
       Dialog,
       Dropdown,
       Textarea,
-      ConfirmPopup
+      ConfirmPopup,
+      UserInfoDialogVue
     },
     name: "TicketDetailView",
     // props: {
@@ -162,6 +169,8 @@
         ticket: {},
         editMode: false,
         showCommentDialog: false,
+        selectedUser: null,
+        isUserInfoVisible: false,
         commentText: "",
         changeState: null,
         states: [
@@ -200,6 +209,13 @@
       async loadTicket() {
         this.ticket = await this.ticketsStore.getTicket(this.ticketID)
         this.ticket.comments = this.ticket.comments.sort((objA, objB) => Number(new Date(objB.createdAt)) - Number(new Date(objA.createdAt)))
+      },
+      getUserFromComment(comment){
+        return {id: comment.userID, name: comment.userName, surname: comment.userSurname, userType: comment.userType}
+      },
+      displayCommentUserInfo(comment){
+        this.selectedUser = this.getUserFromComment(comment);
+        this.isUserInfoVisible = true;
       },
       async showRequests(ticketID){
         const ticketsStore = useTicketsStore();
@@ -513,6 +529,7 @@
           .p-button-danger:nth-child(3){
             margin-top: 20px;
           }
+
         }
         .p-button-primary{
           margin-right: 20px;
@@ -601,6 +618,7 @@
         min-width: 160px;
       }
       span{
+        cursor: pointer;
         max-width: 687.5px;
       }
   }

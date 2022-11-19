@@ -17,11 +17,11 @@
           <td>Příjmení:</td>
           <td>{{user.surname}}</td>
         </tr>
-        <tr>
+        <tr v-if="user.email">
           <td>E-mail:</td>
           <td>{{user.email}}</td>
         </tr>
-        <tr>
+        <tr v-if="user.email">
           <td>Telefonní číslo:</td>
           <td>{{user.phoneNum}}</td>
         </tr>

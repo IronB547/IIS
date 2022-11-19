@@ -4,7 +4,7 @@
     <div class="request-header">
       <div class="request-header-top">
         <h1 class="title" v-if="!editMode">{{request?.title}}</h1>
-        <Textarea auto-resize="true" v-if="editMode" v-model="request.title"/>
+        <Textarea :autoResize="true" v-if="editMode" v-model="request.title"/>
 
         <div class="request-header-bottom">
           <div class="request-header-bottom-left">
@@ -36,7 +36,7 @@
       {{request?.description}}
       </div>
 
-      <Textarea auto-resize="true" v-if="editMode" v-model="request.description"/>
+      <Textarea :autoResize="true" v-if="editMode" v-model="request.description"/>
     </div>
 
     <h3>Stav: </h3>
@@ -56,7 +56,7 @@
           <Card class="user-info">
             <template #header>
               <div class="request-technicians-body">
-                <span @click="displayUserInfo(technician)" v-tooltip.top="'Klikněte na jméno pro více informací'">
+                <span @click="displayUserInfo(technician)" v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'">
                   {{technician.name}} {{technician.surname}}
                 </span>
                 <div class="request-technicians-body-button">
@@ -123,7 +123,7 @@
 
               <template #footer>
                 <div class="request-comment-footer">
-                  <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
+                  <span @click="displayCommentUserInfo(comment)" v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'">Napsal: {{comment.userName}} {{comment.userSurname}}</span>
                   <span>{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
                 </div>
               </template>
@@ -166,7 +166,7 @@
     <template #header>
       <h3>Přidat komentář</h3>
     </template>
-    <Textarea class="comment" auto-resize="true" v-model="commentText" rows="5" cols="30" />
+    <Textarea class="comment" :autoResize="true" v-model="commentText" rows="5" cols="30" />
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showCommentDialog = false"/>
@@ -178,7 +178,7 @@
     <template #header>
       <h3>Upravit komentář</h3>
     </template>
-    <Textarea class="comment" auto-resize="true" v-model="commentText" rows="5" cols="30" />
+    <Textarea class="comment" :autoResize="true" v-model="commentText" rows="5" cols="30" />
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditCommentDialog = false"/>
@@ -274,6 +274,13 @@
         }
         else
           this.technicians = [];
+      },
+      getUserFromComment(comment){
+        return {id: comment.userID, name: comment.userName, surname: comment.userSurname, userType: comment.userType}
+      },
+      displayCommentUserInfo(comment){
+        this.selectedUser = this.getUserFromComment(comment);
+        this.isUserInfoVisible = true;
       },
       displayUserInfo(technician){
         this.selectedUser = technician;
@@ -728,6 +735,10 @@
       justify-content: space-between;
       align-items: center;
       margin-top: 10px;
+
+      span{
+        cursor: pointer;
+      }
 
       .date{
         min-width: 160px;
