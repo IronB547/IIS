@@ -94,6 +94,27 @@ export const useTicketsStore = defineStore('tickets', {
             }
         },
 
+        async updateTicket(ticket) {
+            const res = await fetch(`${config.host}/tickets/${ticket.id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+                body: JSON.stringify(ticket)
+            })
+
+            if(res.status === 204){
+                this.tickets.push(ticket)
+                return {message: "Ticket úspěšně upraven"}
+            }if(res.status === 403){
+                return {error: "Nemůžete upravit ticket"}
+            }
+            else{
+                return {error: "Upravení ticketu selhalo"}
+            }
+        },
+
         async addComment(ticketId, comment) {
             if(!localStorage.getItem("user"))
                 return {error: "Musíte být přihlášení abystě mohli přidat komentář"}
@@ -180,6 +201,48 @@ export const useTicketsStore = defineStore('tickets', {
                 return {error: "Smazání komentáře selhalo"}
             }
 
-        }
+        },
+
+        async addPhoto(ticketId, photo) {
+            if(!localStorage.getItem("user"))
+                return {error: "Musíte být přihlášení abyste mohli přidat fotku"}
+
+            const res = await fetch(`${config.host}/tickets/${ticketId}/photo`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+                body: JSON.stringify({url: photo})
+            })
+
+            if(res.status === 201){
+                return {message: "Fotka úspěšně přidána"}
+            }else if(res.status == 403){
+                return {error: "Nemůžete přidat fotku"}
+            }else{
+                return {error: "Přidání fotky selhalo"}
+            }
+        },
+
+        async removePhoto(ticketId, photoId) {
+            if(!localStorage.getItem("user"))
+                return {error: "Musíte být přihlášení abyste mohli smazat fotku"}
+
+            const res = await fetch(`${config.host}/tickets/${ticketId}/photo/${photoId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+            })
+            if(res.status === 204){
+                return {message: "Fotka úspěšně smazána"}
+            }else if(res.status === 403){
+                return {error: "Nemůžete smazat fotku"}
+            }else{
+                return {error: "Smazání fotky selhalo"}
+            }
+        },
     }
 })

@@ -5,7 +5,10 @@
     <h3>{{store.getUser}}</h3>
 
     <br>
-    <button @click="$router.push({ name: 'about', query: {id: '123'} })"></button>
+    <button 
+    @click="$router.push({ name: 'about', query: {id: '123'} });"></button>
+
+    <button @click="itIsWhatItIs">It is what it is</button>
 
     {{$route.query}}
 
@@ -26,6 +29,11 @@ export default {
       store,
     }
   },
+  methods:{
+    itIsWhatItIs(){
+      new Audio('https://www.myinstants.com/media/sounds/savetweetvid_tadwtrm1nizoqxxv.mp3').play()
+    }
+  }
 }
 
 </script>

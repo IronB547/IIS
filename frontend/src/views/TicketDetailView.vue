@@ -8,20 +8,33 @@
           <Textarea :autoResize="true" v-if="editMode" v-model="ticket.title"/>
           <Button class="p-button-primary p-button-sm p-button-title" v-if="!editMode" @click="editMode = !editMode">Upravit ticket</Button>
           
-          <div class="edit-buttons" v-if="editMode">
+          <div class="edit-buttons" :class="{'edit-buttons-image': ticket?.photos?.length}" v-if="editMode">
             <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode"/>
-            <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="ticketTitle = ticket.title"/>
+            <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editTicket"/>
             
             <ConfirmPopup/> 
             <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="deleteTicket(this.ticket.id)">Smazat ticket</Button>
+
+            <Button class="p-button-secondary p-button-sm" v-if="editMode" @click="openAddPhoto">Přidat fotku</Button>
+            <ConfirmPopup group="addPhoto">
+                <template #message="slotProps">
+                    <div class="add-photo-content">
+                      <h3>Zadejte URL fotky:</h3>
+                      <InputText type="url" v-model="newPhotoUrl"/>
+                      <i :class="slotProps.message.icon" style="font-size: 1.5rem"></i>
+                      <p class="pl-2">{{slotProps.message.message}}</p>
+                    </div>
+                </template>
+            </ConfirmPopup>
           </div>
 
           <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
           :showItemNavigators="true" :showThumbnails="false">
           <template #item="slotProps">
             <div class="image-container">
-              <Image class="ticket-image" :src="slotProps.item.url" alt="Image Text" preview>
+              <Image :activeIndex="galleriaIndex" class="ticket-image" :src="slotProps.item?.url" alt="Image Text" preview>
               </Image>
+              <Button v-if="editMode" class="image-delete-button p-button-danger p-button-rounded" @click="removePhoto(slotProps.item?.id)" icon="pi pi-trash" />
             </div>
             </template>
           </Galleria>
@@ -147,6 +160,7 @@
   import Dropdown from 'primevue/dropdown';
   import { useTicketsStore } from "@/stores/TicketsStore";
   import ConfirmPopup from 'primevue/confirmpopup';
+  import InputText from "primevue/inputtext";
 
   export default {
     components: {
@@ -157,7 +171,8 @@
       Dropdown,
       Textarea,
       ConfirmPopup,
-      UserInfoDialogVue
+      UserInfoDialogVue,
+      InputText
     },
     name: "TicketDetailView",
     // props: {
@@ -173,12 +188,14 @@
         isUserInfoVisible: false,
         commentText: "",
         changeState: null,
+        newPhotoUrl: "",
         states: [
           {name: 'Vytvořeno'},
           {name: 'Čeká na schválení'},
           {name: 'Vyřešeno'},
           {name: 'Zamítnuto'}
         ],
+        galleriaIndex: 0,
         responsiveOptions: [
 				{
             breakpoint: '1024px',
@@ -429,6 +446,96 @@
             });
         this.loadTicket();
       },
+      openAddPhoto(){
+        this.$confirm.require({
+          target: event.currentTarget,
+          group: 'addPhoto',
+          // icon: 'pi pi-exclamation-triangle',
+          acceptLabel: 'Potvrdit',
+          rejectLabel: 'Zrušit',
+          acceptIcon: 'pi pi-check',
+          rejectIcon: 'pi pi-times',
+          accept: async () => {
+            const response = await this.ticketsStore.addPhoto(this.ticketID,this.newPhotoUrl);
+            if(response.message){
+              this.$toast.add({
+                severity: "success",
+                summary: "Úspěch",
+                detail: response?.message || "Fotka úspěšně přidána",
+                life: 3000,
+              })
+            }
+            else {
+              this.$toast.add({
+                severity: "error",
+                summary: "Chyba",
+                detail: response?.error || "Přidání fotky selhalo",
+                life: 3000,
+              })
+            }
+            this.loadTicket();
+          },
+          reject: () => {},
+          onShow: () => {},
+          onHide: () => {}
+        });
+      },
+      removePhoto(photoId){
+        this.$confirm.require({
+          target: event.currentTarget,
+          message: 'Opravdu chcete smazat fotku?',
+          icon: 'pi pi-exclamation-triangle',
+          acceptLabel: 'Potvrdit',
+          rejectLabel: 'Zrušit',
+          acceptIcon: 'pi pi-check',
+          rejectIcon: 'pi pi-times',
+          accept: async () => {
+            const response = await this.ticketsStore.removePhoto(this.ticketID,photoId);
+            if(response.message){
+              this.$toast.add({
+                severity: "success",
+                summary: "Úspěch",
+                detail: response?.message || "Fotka úspěšně smazána",
+                life: 3000,
+              })
+              this.galleriaIndex = 0;
+            }
+            else {
+              this.$toast.add({
+                severity: "error",
+                summary: "Chyba",
+                detail: response?.error || "Smazání fotky selhalo",
+                life: 3000,
+              })
+            }
+            this.loadTicket();
+          },
+          reject: () => {},
+          onShow: () => {},
+          onHide: () => {}
+        });
+      },
+      async editTicket(){
+        const response = await this.ticketsStore.updateTicket(this.ticket);
+        if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Tiket úspěšně upraven",
+            life: 3000,
+          })
+          this.editMode = false;
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Úprava tiketu selhala",
+            life: 3000,
+          })
+        }
+        this.loadTicket();
+      },
     },
   };
 </script>
@@ -488,8 +595,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    :deep(.image-delete-button){
+      position: absolute;
+      bottom: 0;
+      left: calc(50% - 24px);
+      z-index: 1;
+    }
   }
   
+  .p-confirm-popup .add-photo-content{
+    margin: 20px;
+  }
+
   .ticket-detail{
     width: 900px;
     margin: 0 auto;
@@ -520,16 +637,22 @@
         }
         .edit-buttons{
           display: inline-flex;
-          justify-content: space-evenly;
+          justify-content: flex-end;
           margin-right: 20px;
           margin-left: 20px;
           min-width: 123px;
           flex-wrap: wrap;
+          align-items: baseline;
+          .p-button-secondary{
+            min-width: 120px;
+          }
 
           .p-button-danger:nth-child(3){
             margin-top: 20px;
           }
-
+        }
+        .edit-buttons-image{
+          justify-content: space-evenly;
         }
         .p-button-primary{
           margin-right: 20px;
