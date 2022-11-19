@@ -136,9 +136,9 @@ export const useTicketsStore = defineStore('tickets', {
             })
 
             if(res.status === 204){
-                return {message: "Comment deleted successfully"}
+                return {message: "Komentář úspěšně smazán"}
             }else{
-                return {error: "Comment deletion failed"}
+                return {error: "Smazání komentáře selhalo"}
             }
 
         }

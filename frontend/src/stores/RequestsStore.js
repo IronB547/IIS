@@ -120,9 +120,9 @@ export const useRequestsStore = defineStore('requests', {
             })
 
             if(res.status === 204){
-                return {message: "Technician removed successfully"}
+                return {message: "Smazání technika bylo úspěšné"}
             }else{
-                return {error: "Technician removal failed"}
+                return {error: "Nemůžete smazat technika"}
             }
         },
 
@@ -139,9 +139,11 @@ export const useRequestsStore = defineStore('requests', {
             })
 
             if(res.status === 204){
-                return {message: "Comment deleted successfully"}
+                return {message: "Komentář úspěšně smazán"}
+            }else if(res.status === 403) {
+                return {error: "Nemůžete smazat cizí komentář"}
             }else{
-                return {error: "Comment deletion failed"}
+                return {error: "Smazání komentáře selhalo"}
             }
         },
 

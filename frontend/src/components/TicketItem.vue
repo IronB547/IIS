@@ -98,16 +98,15 @@ export default {
 
 
 <style lang="scss">
-.p-card-body{
-  height: 100%;
-}
 
-.p-card-content {
-  height: 140px;
-}
 </style>
 
 <style scoped lang="scss">
+.p-card{
+  :deep(.p-card-content) {
+  height: 140px;
+  }
+}
 
 .ticket-item{
   width: 100%;

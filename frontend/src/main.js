@@ -7,6 +7,7 @@ import ToastService from 'primevue/toastservice';
 import Toast from "primevue/toast";
 import Card from "primevue/card";
 import { createPinia } from 'pinia'
+import ConfirmationService from 'primevue/confirmationservice';
 
 // import "primevue/resources/themes/vela-green/theme.css"; //theme
 import "primevue/resources/themes/lara-dark-indigo/theme.css"
@@ -20,6 +21,7 @@ app.use(pinia)
 app.use(router)
 app.use(PrimeVue, {ripple: true})
 app.use(ToastService)
+app.use(ConfirmationService)
 
 // eslint-disable-next-line
 app.component("Toast", Toast)

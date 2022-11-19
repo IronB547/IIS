@@ -79,13 +79,15 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 .p-card-body{
   height: 100%;
 }
 
-.p-card-content {
+.p-card{
+  :deep(.p-card-content) {
   height: 140px;
+  }
 }
 
 .request-item{

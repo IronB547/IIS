@@ -4,8 +4,17 @@
     <div class="ticket-header">
       <div class="ticket-header-main">
         <div class="ticket-header-main-top">
-          <h3 class="title">{{ticket?.title}}</h3>
-          <Button class="p-button-primary p-button-sm p-button-title">Upravit ticket</Button>
+          <h3 class="title" v-if="!editMode">{{ticket?.title}}</h3>
+          <Textarea auto-resize="true" v-if="editMode" v-model="ticket.title"/>
+          <Button class="p-button-primary p-button-sm p-button-title" v-if="!editMode" @click="editMode = !editMode">Upravit ticket</Button>
+          
+          <div class="edit-buttons" v-if="editMode">
+            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode"/>
+            <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="ticketTitle = ticket.title"/>
+            
+            <ConfirmPopup/> 
+            <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="editMode = !editMode">Smazat ticket</Button>
+          </div>
 
           <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
           :showItemNavigators="true" :showThumbnails="false">
@@ -18,7 +27,8 @@
           </Galleria>
         </div>
         <div class="ticket-header-main-bottom">
-          <span class="location">Lokace: {{ticket?.location}}</span>
+          <span class="location" v-if="!editMode">Lokace: {{ticket?.location}}</span>
+          <Textarea auto-resize="true" v-if="editMode" v-model="ticket.location"/>
 
           <p class="header-info">
           <span class="creator"> Vytvořil: {{ticket?.userName}} {{ticket?.userSurname}} </span>
@@ -29,7 +39,11 @@
       </div>
     </div>
     <div class="ticket-description">
-      {{ticket?.description}}
+      <div class="ticket-description-view" v-if="!editMode">
+        {{ticket?.description}}
+      </div>
+
+      <Textarea auto-resize="true" v-if="editMode" v-model="ticket.description"/>
     </div>
 
     <h3> Stav: </h3>
@@ -62,17 +76,25 @@
       </div>
       <div class="ticket-comments-body">
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">
-          <div class="ticket-comment-body">
-            <span>{{comment.comment}}</span>
-            <div class="ticket-comment-body-buttons">
-              <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
-              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
-            </div>
-          </div>
-          <div class="ticket-comment-footer">
-            <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
-            <span class="date">{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
-          </div>
+          <Card>
+            <template #content>
+              <div class="ticket-comment-body">
+                  <span>{{comment.comment}}</span>
+                  <div class="ticket-comment-body-buttons">
+                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
+                    <ConfirmPopup/>
+                    <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
+                  </div>
+              </div>
+            </template>
+
+            <template #footer>
+              <div class="ticket-comment-footer">
+                <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
+                <span class="date">{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
+              </div>
+            </template>
+          </Card>
         </div>
       </div>
     </div>
@@ -113,6 +135,7 @@
   import Textarea from "primevue/textarea";
   import Dropdown from 'primevue/dropdown';
   import { useTicketsStore } from "@/stores/TicketsStore";
+  import ConfirmPopup from 'primevue/confirmpopup';
 
   export default {
     components: {
@@ -121,7 +144,8 @@
       Button, 
       Dialog,
       Dropdown,
-      Textarea
+      Textarea,
+      ConfirmPopup
     },
     name: "TicketDetailView",
     // props: {
@@ -131,6 +155,7 @@
       return {
         ticketId: this.$route.params.ticketId,
         ticket: {},
+        editMode: false,
         showCommentDialog: false,
         commentText: "",
         changeState: null,
@@ -183,6 +208,43 @@
             life: 3000,
           })
         }
+      },
+      async deleteTicket() {
+
+        this.$confirm.require({
+                target: event.currentTarget,
+                message: 'Opravdu chcete smazat ticket?',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Potvrdit',
+                rejectLabel: 'Zrušit',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
+                accept: async () => {
+                  const response = await this.ticketsStore.deleteTicket();
+
+                  if(response.message){
+                  this.$toast.add({
+                    severity: "success",
+                    summary: "Úspěch",
+                    detail: response?.message || "Ticket úspěšně smazán",
+                    life: 3000,
+                  })
+                  }
+                  else {
+                    this.$toast.add({
+                      severity: "error",
+                      summary: "Chyba",
+                      detail: response?.error || "Smazání ticketu selhalo",
+                      life: 3000,
+                    })
+                  }
+
+                 this.loadRequest();
+                },
+                reject: () => {},
+                onShow: () => {},
+                onHide: () => {}
+            });
       },
       getStatus(status) {
         switch (status) {
@@ -248,7 +310,7 @@
         if(response.error){
           this.$toast.add({
             severity: "error",
-            summary: "Error",
+            summary: "Chyba",
             detail: response?.message || "Nelze přidat komentář",
             life: 3000,
           })
@@ -290,18 +352,41 @@
         this.loadTicket();
         this.showEditCommentDialog = false;
       },
-      async deleteComment(commentId) {
-        console.log("deleting comment",commentId);
-        const ticketsStore = useTicketsStore();
-        const response = await ticketsStore.deleteComment(commentId);
-        if(response.error){
-          this.$toast.add({
-            severity: "error",
-            summary: "Chyba",
-            detail: response?.message || "Nelze smazat komentář",
-            life: 3000,
-          })
-        }
+      async deleteComment(commentId) {        
+        this.$confirm.require({
+                target: event.currentTarget,
+                message: 'Opravdu chcete smazat komentář?',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Potvrdit',
+                rejectLabel: 'Zrušit',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
+                accept: async () => {
+                  const response = await this.ticketsStore.deleteComment(commentId);
+
+                  if(response.message){
+                  this.$toast.add({
+                    severity: "success",
+                    summary: "Úspěch",
+                    detail: response?.message || "Komentář úspěšně smazán",
+                    life: 3000,
+                  })
+                  }
+                  else {
+                    this.$toast.add({
+                      severity: "error",
+                      summary: "Chyba",
+                      detail: response?.error || "Smazání komentáře selhalo",
+                      life: 3000,
+                    })
+                  }
+
+                 this.loadTicket();
+                },
+                reject: () => {},
+                onShow: () => {},
+                onHide: () => {}
+            });
         this.loadTicket();
       },
     },
@@ -387,7 +472,24 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
-       
+        .p-inputtextarea{
+          width: 100%;
+          font-size: 2rem;
+          font-family: Avenir, Helvetica, Arial, sans-serif;
+          font-weight: 700;
+        }
+        .edit-buttons{
+          display: inline-flex;
+          justify-content: space-evenly;
+          margin-right: 20px;
+          margin-left: 20px;
+          min-width: 123px;
+          flex-wrap: wrap;
+
+          .p-button-danger:nth-child(3){
+            margin-top: 20px;
+          }
+        }
         .p-button-primary{
           margin-right: 20px;
           margin-left: 20px;
@@ -408,6 +510,12 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
+
+        .p-inputtextarea{
+          font-size: 1rem;
+          width: 100%;
+        }
+
         .header-info{
           text-align: right;
           min-width: 200px;
@@ -427,6 +535,10 @@
     .ticket-description{
       margin-top: 40px;
       line-height: 1.6em;
+      .p-inputtextarea{
+          line-height: 1.6em;
+          width: 100%;
+        }
     } 
   }
   .ticket-comments-header{
@@ -436,13 +548,12 @@
     margin-top: 40px;
   }
   .ticket-comment{
-    padding: 15px 20px;
-    margin-top: 10px;
-    border: 1px solid white;
+    margin-top: 20px;
+    margin-bottom: 30px;
     .ticket-comment-body{
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
       span{
         max-width: 731.5px;
@@ -470,11 +581,7 @@
       }
   }
   }
-  .p-inputtextarea{
-    font-size: 1rem;
-    min-width: 300px;
-  }
-
+  
   .ticket-status-container{
     display: flex;
     justify-content: space-between;

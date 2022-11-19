@@ -2,24 +2,42 @@
   <Toast/>
   <div class="request-detail">
     <div class="request-header">
-      <div class="request-header-left">
-        <h1 class="title">{{request?.title}}</h1>
+      <div class="request-header-top">
+        <h1 class="title" v-if="!editMode">{{request?.title}}</h1>
+        <Textarea auto-resize="true" v-if="editMode" v-model="request.title"/>
 
-        <div class="flexbox-date-and-creator">
-          <div>
-            <div class="ticket-id">
+        <div class="request-header-bottom">
+          <div class="request-header-bottom-left">
+            <div class="request-creator">
               <h4>Vytvořil: {{request?.userName}} {{request?.userSurname}}</h4>
             </div>
             <p class="header-info">
             <span class="date">{{new Date(request?.createdAt).toLocaleString("cs")}}</span>
             </p>
           </div>
+
+          <div class="request-header-bottom-buttons">
+            <Button class="p-button-danger  p-button-title" v-if="editMode" @click="editMode = !editMode">Smazat požadavek</Button>
+
             <Button class="p-button-primary" @click="$router.push(`/tickets/${request?.ticketID}`)" :disabled="!request?.ticketID">Otevřít ticket</Button>
+            <Button class="p-button-primary" v-if="!editMode" @click="editMode = !editMode">Upravit požadavek</Button>
+            
+            <div class="edit-buttons" v-if="editMode">
+              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode"/>
+              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="ticketTitle = ticket.title"/>
+            </div>
+
+          </div>
+
         </div>
       </div>
     </div>
-    <div class="request-description">
+    <div class="request-description" >
+      <div class="review-description-view" v-if="!editMode">
       {{request?.description}}
+      </div>
+
+      <Textarea auto-resize="true" v-if="editMode" v-model="request.description"/>
     </div>
 
     <h3>Stav: </h3>
@@ -32,14 +50,14 @@
       <Dropdown class="changestate" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
     </div>
 
-    <h3> Přiřazení technici: </h3>
     <div class="request-body">
       <div class="request-body-left">
+        <h3> Přiřazení technici: </h3>
         <div class="request-technicians" v-for="technician in request?.technicians" :key="technician.technicianID">
-          <Card>
+          <Card class="user-info">
             <template #header>
               <div class="request-technicians-body">
-                <span>
+                <span @click="displayUserInfo(technician)">
                   {{technician.name}} {{technician.surname}}
                 </span>
                 <div class="request-technicians-body-button">
@@ -55,26 +73,28 @@
       </div>
 
       <div class="request-body-right">
-        Předpokládaný čas řešení:
-        <br>
+        <h3> Dodatečné informace: </h3>
         <Card class="request-body-right-card">
           <template #header>
-            {{request?.expectedTime}}
+            Předpokládaný čas řešení:
+            <br>
+            {{request?.expectedTime || "Nezadáno"}}
           </template>
         </Card>
 
-        Vykázaný čas
-        <br>
         <Card class="request-body-right-card">
           <template #header>
-            {{request?.solutionTime}}
+            Vykázaný čas
+            <br>
+            {{request?.solutionTime || "Nezadáno"}}
           </template>
         </Card>
-          Cena:
-          <br>
+        
         <Card class="request-body-right-card">
           <template #header>
-            {{request?.price}}
+            Cena:
+            <br>
+            {{request?.price || "Nezadáno"}}
           </template>
         </Card>
 
@@ -88,19 +108,27 @@
         <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="request?.solutionState > 0">Přidat komentář</Button>
       </div>
       <div class="request-comments-body">
-        <div class="request-comment" v-for="comment in request?.comments" :key="comment.id">
-          <div class="request-comment-body">
-            <span>{{comment.comment}}</span>
+          <div class="request-comment" v-for="comment in request?.comments" :key="comment.id">
+            <Card>
+              <template #content>
+                <div class="request-comment-body"> 
+                  <span>{{comment.comment}}</span>
 
-            <div class="request-comment-body-buttons">
-              <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
-              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
-            </div>
-          </div>
-          <div class="request-comment-footer">
-            <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
-            <span>{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
-          </div>
+                  <div class="request-comment-body-buttons">
+                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
+                    <ConfirmPopup/> 
+                    <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
+                  </div>
+                </div>
+              </template>
+
+              <template #footer>
+                <div class="request-comment-footer">
+                  <span>Napsal: {{comment.userName}} {{comment.userSurname}}</span>
+                  <span>{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
+                </div>
+              </template>
+          </Card>
         </div>
       </div>
     </div>
@@ -114,19 +142,19 @@
     <div class="edit-request-inputtext">
       <InputText type="text" class="p-inputtext"  placeholder="Předpokládaný čas řešení"/>
       <br>
-      <small>Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
+      <small>Do pole vepisujte ve formátu: XX<b>h</b> XX<b>m</b></small>
       
     </div>
     <div class="edit-request-inputtext">
       <InputText type="text" class="p-inputtext"  placeholder="Vykázaný čas"/>
       <br>
-      <small >Do pole vepisujte ve formátu: XX<b> h</b> XX<b> m</b></small>
+      <small >Do pole vepisujte ve formátu: XX<b>h</b> XX<b>m</b></small>
     </div>
 
     <div class="edit-request-inputtext">
       <InputText type="text" class="p-inputtext"  placeholder="Cena"/>
       <br>
-      <small>Do pole vepište i měnu.</small>
+      <small>Do pole vepište částku i měnu: 1000 CZK, 50 €, 100 $</small>
     </div>
 
     <template #footer>
@@ -159,10 +187,16 @@
     </template>
   </Dialog>
 
+  <UserInfoDialogVue :user="technicians" :showUserInfo="isUserInfoVisible" @closeUserInfo="isUserInfoVisible = false">
+    
+  </UserInfoDialogVue>
+
 </template>
 
 <script>
   // @ is an alias to /src
+  import UserInfoDialogVue from "@/components/UserInfoDialog.vue";
+
   import { useRequestsStore } from "@/stores/RequestsStore";
   import { useUsersStore} from "@/stores/UsersStore";
   // import { useAuthStore } from "@/stores/AuthStore";
@@ -172,6 +206,7 @@
   import Textarea from "primevue/textarea";
   import InputText from 'primevue/inputtext';
   import Card from 'primevue/card';
+  import ConfirmPopup from 'primevue/confirmpopup';
   //import Badge from 'primevue/badge';
 
   export default {
@@ -181,7 +216,9 @@
       Dialog,
       Textarea,
       InputText,
-      Card
+      Card,
+      UserInfoDialogVue,
+      ConfirmPopup
     },
     name: "RequestDetailView",
     // props: {
@@ -193,6 +230,11 @@
         request: {},
         showCommentDialog: false,
         showEditRequestData: false,
+
+        selectedUser: {},
+        isUserInfoVisible: false,
+
+        editMode: false,
         commentText: "",
         addTechnician: null,
         technicians: [],
@@ -222,9 +264,23 @@
         
         //console.log(this.request.comments.sort(function(a, b){return new Date(b) - new Date(a)}))
 
+        this.loadTechnicians();
+      },
+      async loadTechnicians() {
         const usersStore = useUsersStore();
-        this.technicians = await usersStore.getUsers(1);
-        this.technicians = this.technicians.filter(tech => !this.request.technicians.find(t => tech.id == t.technicianID))
+
+        let technicians = await usersStore.getUsers(1);
+        if(!technicians.error){
+          this.technicians = technicians.filter(tech => !this.request.technicians.find(t => tech.id == t.technicianID))
+        }
+        else
+          this.technicians = [];
+      },
+      displayUserInfo(technician){
+        this.selectedUser = technician;
+        this.isUserInfoVisible = true;
+
+        
       },
       getStatus(solutionState) {
         switch (solutionState) {
@@ -325,12 +381,42 @@
         ]
       },
       async deleteComment(commentID) {
-        console.log("deleting comment",commentID);
-        await this.requestsStore.deleteComment(commentID);
-        this.loadRequest();
+        this.$confirm.require({
+                target: event.currentTarget,
+                message: 'Opravdu chcete smazat komentář?',
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Potvrdit',
+                rejectLabel: 'Zrušit',
+                acceptIcon: 'pi pi-check',
+                rejectIcon: 'pi pi-times',
+                accept: async () => {
+                  const response = await this.requestsStore.deleteComment(commentID);
+
+                  if(response.message){
+                  this.$toast.add({
+                    severity: "success",
+                    summary: "Úspěch",
+                    detail: response?.message || "Komentář úspěšně smazán",
+                    life: 3000,
+                  })
+                  }
+                  else {
+                    this.$toast.add({
+                      severity: "error",
+                      summary: "Chyba",
+                      detail: response?.error || "Smazání komentáře selhalo",
+                      life: 3000,
+                    })
+                  }
+
+                 this.loadRequest();
+                },
+                reject: () => {},
+                onShow: () => {},
+                onHide: () => {}
+            });
       },
       async editComment(commentID) {
-        console.log("editing comment",commentID);
         await this.requestsStore.editComment(commentID,{comment: this.commentText});
         this.loadRequest();
         this.showEditCommentDialog = false;
@@ -364,7 +450,6 @@
   padding-top: 10px;
   padding-bottom: 10px;
   padding-left: 10px;
-  max-width: 50%;
   }
 }
   .edit-request{
@@ -383,14 +468,21 @@
 
 <style scoped lang="scss">
 
-.p-card{
-  margin-bottom: 15px;
-  margin-top: 5px;
-:deep(.p-card-body){
-  all: unset;
+.user-info{
+  span{
+    cursor: pointer;
+  }
 }
-:deep(.p-card-content){
-   all: unset;
+
+.request-body{
+  .p-card{
+    margin-bottom: 20px;
+  :deep(.p-card-body){
+    all: unset;
+  }
+    :deep(.p-card-content){
+      all: unset;
+    }
   }
 }
 .changeState{
@@ -464,14 +556,36 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
+      .p-inputtextarea{
+        width: 100%;
+        font-size: 2rem;
+        font-family: Avenir, Helvetica, Arial, sans-serif;
+        font-weight: 700;
+      }
 
-      .flexbox-date-and-creator{
+      .request-header-bottom{
         display: flex;
         justify-content: space-between;
         align-items: center;
         width: 100%;
+
+        .request-header-bottom-left{
+          max-width: 40%;
+        }
+        .request-header-bottom-buttons{
+          .edit-buttons{
+          display: inline-flex;
+          justify-content: space-evenly;
+          margin-right: 20px;
+          margin-left: 20px;
+          min-width: 123px;
+        }
+          .p-button{
+            margin-left: 20px;
+          }
+        }
       }
-      .request-header-left {
+      .request-header-top {
         width: 100%;
       }
       .request-title{
@@ -483,6 +597,10 @@
     .request-description{
       margin-top: 40px;
       line-height: 1.6em;
+      .p-inputtextarea{
+          line-height: 1.6em;
+          width: 100%;
+        }
     } 
   }
   
@@ -494,13 +612,12 @@
   }
 
   .request-comment{
-    padding: 15px 20px;
-    margin-top: 10px;
-    border: 1px solid white;
+    margin-top: 20px;
+    margin-bottom: 30px;
     .request-comment-body{
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
       span{
         max-width: 731.5px;
