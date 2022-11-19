@@ -186,7 +186,7 @@
     </template>
   </Dialog>
 
-  <UserInfoDialogVue :user="technicians" :showUserInfo="isUserInfoVisible" @closeUserInfo="isUserInfoVisible = false">
+  <UserInfoDialogVue :user="selectedUser" :showUserInfo="isUserInfoVisible" @closeUserInfo="isUserInfoVisible = false">
     
   </UserInfoDialogVue>
 
@@ -278,8 +278,6 @@
       displayUserInfo(technician){
         this.selectedUser = technician;
         this.isUserInfoVisible = true;
-
-        
       },
       getStatus(solutionState) {
         switch (solutionState) {

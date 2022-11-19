@@ -64,11 +64,16 @@
       <div class="ticket-comments-header">
         <h3>Komentáře</h3>
 
-        <router-link :to="`/requests/list/${ticket.id}`">
-          <Button class="p-button-primary" @click="showRequests(ticket.id)">
-            Servisní požadavky
-          </Button>
-        </router-link>
+        <Button 
+          class="p-button-primary" 
+          @click="$router.push({
+            name:'requests',
+            query: {
+              ticketID: ticket.id,
+            }
+          })">
+          Servisní požadavky
+        </Button>
 
         <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="ticket?.status > 2">
           Přidat komentář

@@ -2,7 +2,7 @@
   <section class="requests-list-header">
     <Toolbar class="toolbar">
         <template #start>
-          <h1 class="tickets">Servisní požadavky</h1>
+          <h1 class="tickets">Servisní požadavky {{ $route.query.ticketID ? ` (pro ticket s ID ${$route.query.ticketID})`:"" }}</h1>
           <div class="grid p-fluid tickets-toolbox">
             <div class="col-12 md:col-4">
                 <div class="p-inputgroup">

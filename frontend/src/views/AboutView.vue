@@ -8,6 +8,8 @@
     <button @click="$router.push({ name: 'about', query: {id: '123'} })"></button>
 
     {{$route.query}}
+
+    Plenus venter non studet libenter
   </div>
 </template>
 

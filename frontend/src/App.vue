@@ -117,7 +117,7 @@ export default {
   padding: 0;
   font-size: 1.2rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-color);
   text-shadow: 0 0 2px #000;
 }
 .menu-bar
@@ -127,7 +127,9 @@ export default {
 body{
   margin: 0;
   min-height: 100vh;
-  background-color: #1d1d1d;
+  // background-color: #1d1d1d;
+  background-color: var(--surface-ground);
+  
 }
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

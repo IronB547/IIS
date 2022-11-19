@@ -21,7 +21,11 @@
             <Column field="id" header="ID" :sortable="true"></Column>
             <Column field="name" header="Name" :sortable="true"></Column>
             <Column field="surname" header="Surname" :sortable="true"></Column>
-            <Column field="userType" header="User Type" :sortable="true"></Column>
+            <Column field="userType" header="User Type" :sortable="true">
+                <template #body="{data}">
+                    <UserTypeBadge :userType="data.userType"></UserTypeBadge>
+                </template>
+            </Column>
             <Column field="email" header="E-mail" :sortable="true"></Column>
             <Column field="phoneNum" header="Telefonní číslo" :sortable="true"></Column>
             <Column header="Action" :sortable="false">
@@ -88,6 +92,7 @@ import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Dropdown from 'primevue/dropdown';
+import UserTypeBadge from '@/components/UserTypeBadge.vue';
 // import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
 // import Row from 'primevue/row';                     //optional for row
 
@@ -141,7 +146,8 @@ export default {
         Dialog,
         InputText,
         Password,
-        Dropdown
+        Dropdown,
+        UserTypeBadge
     },
     async mounted(){
         this.load();
