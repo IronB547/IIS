@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import config from '@/services/config'
 import requestsService from '@/services/requestService'
+import QueryString from 'query-string'
 
 export const useRequestsStore = defineStore('requests', {
     state: () => ({
@@ -11,8 +12,19 @@ export const useRequestsStore = defineStore('requests', {
     },
     actions: {
 
-        async getBySearch(){
-            return requestsService.getAll()
+        async getBySearch(page = 1,query, onlyCount = false){
+            let queryStr = QueryString.stringify(query)
+
+            let mode = onlyCount ? "count" : "list"
+            const res = await fetch(`${config.host}/requests/${mode}/${page}?orderBy=createdAt&order=DESC&${queryStr}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user")).token
+                }
+            })
+        
+            return res.json()
         },
 
         async getServiceRequest(id){

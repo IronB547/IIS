@@ -1,20 +1,30 @@
 <template>
   <main class="main">
     <div class="ticket-header">
-      <h1 class="tickets">Tickety</h1>
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" />
-        <InputText type="text" class="p-inputtext-lg" placeholder="Hledat"/>
-      </span>
-      <router-link :to="`tickets/newticket`">
-        <Button class="p-button-lg p-button-primary">
-          Vytvoř ticket
-        </Button>
-      </router-link>
+      <Toolbar class="toolbar">
+        <template #start>
+          <h1 class="tickets">Tickety</h1>
+          <div class="grid p-fluid tickets-toolbox">
+            <div class="col-12 md:col-4">
+                <div class="p-inputgroup">
+                    <Button label="Vyhledat" @click="search"/>
+                    <InputText placeholder="Název" v-model="searchParams.title"/>
+                    <Dropdown @change="stateChange()" :options="states" optionLabel="label" placeholder="Vyberte stav" v-model="selectedStatus"/>
+                </div>
+            </div>
+        </div>
+          <router-link :to="`newticket`">
+            <Button class="p-button-lg p-button-primary">
+              Vytvoř ticket
+            </Button>
+          </router-link>
+        </template>
+      </Toolbar>
     </div>
     <div class="tickets-list">
       <TicketItem v-for="ticket in tickets" v-bind:key="ticket.id" :ticket="ticket"/>
     </div>
+    <Paginator :rows="9" :totalRecords="totalItemsCount" @page="onPage($event)"></Paginator>
   </main>
 </template>
   
@@ -23,6 +33,11 @@
   import InputText from 'primevue/inputtext';
   import Button from 'primevue/button';
   import TicketItem from "@/components/TicketItem.vue";
+  import Toolbar from 'primevue/toolbar';
+  import Dropdown from 'primevue/dropdown';
+  import QueryString from 'query-string';
+  import Paginator from 'primevue/paginator';
+
 
   import {useTicketsStore} from '@/stores/TicketsStore';
   
@@ -31,19 +46,62 @@
     components: {
       TicketItem,
       InputText,
-      Button
+      Button,
+      Toolbar,
+      Dropdown,
+      Paginator,
     },
     data() {
       return {
         tickets: [],
-        
+        states: [
+          {label: 'Všechny', value: undefined},
+          {label: 'Vytvořeno', value: 0},
+          {label: 'Čeká na schválení', value: 1},
+          {label: 'Vyřešeno', value: 2},
+          {label: 'Zamítnuto', value: 3},
+        ],
+        searchParams: {
+          title: '',
+          status: undefined
+        },
+        selectedStatus: undefined,
+        totalItemsCount: 0,
       }
     },
     async mounted() {
-      this.tickets = await useTicketsStore().getBySearch();
+      this.loadTickets();
     },
     methods: {
-      
+      async loadTickets() {
+        let page = Number(this.$route.params.page) || 1;
+        this.tickets = await useTicketsStore().getBySearch(page,this.$route.query);
+        let totalItemsCount = await useTicketsStore().getBySearch(this.page,this.$route.query, true);
+        this.totalItemsCount = totalItemsCount.count || this.tickets.length;
+      },
+      async search() {
+        let queryStr = QueryString.stringify(this.searchParams);
+        await this.$router.push(`${this.$route.path}?${queryStr}`);
+        this.loadTickets();
+      },
+      stateChange() {
+        this.searchParams.status = this.selectedStatus.value;
+        this.search();
+      },
+
+      async onPage(event) {
+        await this.$router.push({
+          name: this.$route.name,
+          query: {
+            ...this.$route.query,
+          },
+          params: {
+            ...this.$route.params,
+            page: event.page + 1,
+          }
+        });
+        this.loadTickets();
+      }
     },
     
   };
@@ -53,6 +111,29 @@
   main{
     max-width: 1450px;
     margin: 0 auto;
+  }
+
+  .toolbar{
+    width: 100%;
+    h1{
+      margin: 0;
+    }
+    :deep(.p-toolbar-group-left){
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+  .tickets-toolbox{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    > div{
+      flex-basis: 1;
+    }
   }
   .tickets{
     color: white;

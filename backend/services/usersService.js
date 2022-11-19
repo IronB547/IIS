@@ -17,12 +17,12 @@ if(!process.env.TOKEN_SECRET)
 
 async function getAll(page = 1, userType = undefined){
 	const offset = helper.getOffset(page, config.usersPerPage);
-
+	//TODO: add pagination
 	const rows = [];
 	if(userType == undefined){
 		const rows = await db.query(
 			`SELECT id, name, surname, password, userType, email, phoneNum
-			FROM Users LIMIT ${offset}, ${config.listPerTicketPage}`
+			FROM Users `//LIMIT ${offset}, ${config.listPerTicketPage}`
 		);
 		let data = helper.emptyOrRows(rows);
 		data = data.map( (user) => {
@@ -35,7 +35,6 @@ async function getAll(page = 1, userType = undefined){
 			meta
 		}
 	}else{
-		//TODO: add pagination
 		const rows = await db.query(
 			`SELECT id, name, surname, password, userType, email, phoneNum
 			FROM Users WHERE userType = ?`, [userType]

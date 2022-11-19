@@ -19,7 +19,13 @@
       <template #footer>
         <div class="request-item-footer">
         <p>{{new Date(request.createdAt).toLocaleString("cs")}}</p>
-        <router-link :to="`requests/`+request.id"><Button class="p-button-primary">Detail</Button></router-link>
+        <Button class="p-button-primary" @click="$router.push({
+          name: 'requestsDetail',
+          params: {
+            requestID: request.id,
+          }
+        })">
+          Detail</Button>
       </div>
       </template>
   </Card>

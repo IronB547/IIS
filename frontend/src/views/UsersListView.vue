@@ -18,10 +18,12 @@
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
+            <Column field="id" header="ID" :sortable="true"></Column>
             <Column field="name" header="Name" :sortable="true"></Column>
             <Column field="surname" header="Surname" :sortable="true"></Column>
             <Column field="userType" header="User Type" :sortable="true"></Column>
             <Column field="email" header="E-mail" :sortable="true"></Column>
+            <Column field="phoneNum" header="Telefonní číslo" :sortable="true"></Column>
             <Column header="Action" :sortable="false">
                 <template #body="{data}">
                     <Button class="p-button-danger" @click="removeUser(data.id)">Remove</Button>
@@ -117,6 +119,9 @@ export default {
     methods: {
         async load(){
             this.users = await this.store.getUsers();
+            if (!this.users.length){
+                this.users = [];
+            }
         },
         async createUser() {
             await this.store.createUser(this.newUser);

@@ -26,9 +26,15 @@
       <div class="ticket-item-footer">
         <p>{{new Date(ticket.createdAt).toLocaleString("cs")}}</p>
         
-        <router-link :to="`tickets/`+ticket.id">
-          <Button class="p-button-primary">Detail</Button>
-        </router-link>
+        <Button class="p-button-primary" 
+        @click="$router.push({
+          name: 'ticketsDetail',
+          params: {
+            ticketID: ticket.id,
+          }
+        })"
+        >Detail</Button>
+      
       </div>
     </template>
   </Card>

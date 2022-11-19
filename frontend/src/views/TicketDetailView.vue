@@ -149,11 +149,11 @@
     },
     name: "TicketDetailView",
     // props: {
-    //   ticketId: Number
+    //   ticketID: Number
     // },
     data() {
       return {
-        ticketId: this.$route.params.ticketId,
+        ticketID: this.$route.params.ticketID,
         ticket: {},
         editMode: false,
         showCommentDialog: false,
@@ -184,7 +184,7 @@
       };
     },
     async mounted() {
-      this.ticketId = this.$route.params.ticketId
+      this.ticketID = this.$route.params.ticketID
 
       const ticketsStore = useTicketsStore();
       this.ticketsStore = ticketsStore;
@@ -193,7 +193,7 @@
     },
     methods: {
       async loadTicket() {
-        this.ticket = await this.ticketsStore.getTicket(this.ticketId)
+        this.ticket = await this.ticketsStore.getTicket(this.ticketID)
         this.ticket.comments = this.ticket.comments.sort((objA, objB) => Number(new Date(objB.createdAt)) - Number(new Date(objA.createdAt)))
       },
       async showRequests(ticketID){
@@ -306,7 +306,7 @@
       },
       async addComment() {
         const ticketsStore = useTicketsStore();
-        const response = await ticketsStore.addComment(this.ticketId, {comment: this.commentText});
+        const response = await ticketsStore.addComment(this.ticketID, {comment: this.commentText});
         if(response.error){
           this.$toast.add({
             severity: "error",
@@ -340,7 +340,7 @@
       },
       async editComment(commentId) {
         const ticketsStore = useTicketsStore();
-        const response = await ticketsStore.editComment(this.ticketId, commentId, {comment: this.commentText});
+        const response = await ticketsStore.editComment(this.ticketID, commentId, {comment: this.commentText});
         if(response.error){
           this.$toast.add({
             severity: "error",

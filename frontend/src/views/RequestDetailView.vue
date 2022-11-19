@@ -19,7 +19,7 @@
           <div class="request-header-bottom-buttons">
             <Button class="p-button-danger  p-button-title" v-if="editMode" @click="editMode = !editMode">Smazat požadavek</Button>
 
-            <Button class="p-button-primary" @click="$router.push(`/tickets/${request?.ticketID}`)" :disabled="!request?.ticketID">Otevřít ticket</Button>
+            <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID">Otevřít ticket</Button>
             <Button class="p-button-primary" v-if="!editMode" @click="editMode = !editMode">Upravit požadavek</Button>
             
             <div class="edit-buttons" v-if="editMode">
@@ -159,7 +159,7 @@
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditRequestData = false"/>
-      <Button label="Upravit" icon="pi pi-check" autofocus @click="editRequestData" />
+      <Button label="Upravit" icon="pi pi-check" autofocus/>
     </template>
   </Dialog>
 

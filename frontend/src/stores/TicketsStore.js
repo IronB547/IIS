@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import config from '@/services/config'
 import ticketsService from '@/services/ticketsService'
+import queryString from 'query-string'
 
 export const useTicketsStore = defineStore('tickets', {
     state: () => ({
@@ -15,8 +16,20 @@ export const useTicketsStore = defineStore('tickets', {
             return ticketsService.getTicket(ticketId)
         },
 
-        async getBySearch(){
-            return ticketsService.getBySearch()
+        async getBySearch(page = 1, query, onlyCount = false){
+            let queryStr = queryString.stringify(query)
+
+            let mode = onlyCount ? "count" : "list"
+
+            const res = await fetch(`${config.host}/tickets/${mode}/${page}?orderBy=createdAt&order=DESC&${queryStr}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                }
+            })
+        
+            return res.json()
         },
 
         async showRequests(ticketID){

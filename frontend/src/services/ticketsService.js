@@ -1,15 +1,7 @@
 import config from './config'
 
 async function getBySearch() {
-    const res = await fetch(`${config.host}/tickets/list?orderBy=createdAt&order=DESC`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
-        }
-    })
 
-    return res.json()
 }
 
 async function getTicket(id) {

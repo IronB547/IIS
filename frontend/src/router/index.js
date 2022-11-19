@@ -40,32 +40,32 @@ const routes = [
     component: RegisterView,
   },
   {
-    path: "/tickets/:ticketId",
+    path: "/tickets-detail/:ticketID",
     name: "ticketsDetail",
     component: TicketDetailView,
   },
   {
-    path: "/tickets",
+    path: "/tickets/:page?",
     name: "tickets",
     component: TicketsListView,
   },
   {
-    path: "/requests",
+    path: "/requests/:page?",
     name: "requests",
     component: RequestsListView,
   },
   {
-    path: "/requests/:requestID",
+    path: "/requests-detail/:requestID",
     name: "requestsDetail",
     component: RequestDetailView,
   },
   {
-    path: "/tickets/newticket",
+    path: "/newticket",
     name: "newTicket",
     component: NewTicketView,
   },
   {
-    path: "/requests/newrequest",
+    path: "/newrequest",
     name: "newRequest",
     component: NewRequestView,
   },

@@ -3,6 +3,11 @@
     <h1>Credits:</h1>
     <h1>Tomáš Dvořák & Juraj Dedič</h1>
     <h3>{{store.getUser}}</h3>
+
+    <br>
+    <button @click="$router.push({ name: 'about', query: {id: '123'} })"></button>
+
+    {{$route.query}}
   </div>
 </template>
 

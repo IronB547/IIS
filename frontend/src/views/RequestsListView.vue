@@ -1,42 +1,103 @@
 <template>
   <section class="requests-list-header">
-    <h1>Servisní požadavky</h1>
-    <router-link :to="`/requests/newrequest`">
-      <Button class="p-button-primary">
-        Nový servisní požadavek
-      </Button>
-    </router-link>
+    <Toolbar class="toolbar">
+        <template #start>
+          <h1 class="tickets">Servisní požadavky</h1>
+          <div class="grid p-fluid tickets-toolbox">
+            <div class="col-12 md:col-4">
+                <div class="p-inputgroup">
+                    <Button label="Vyhledat" @click="search"/>
+                    <InputText placeholder="Název" v-model="searchParams.title"/>
+                    <Dropdown @change="stateChange()" :options="states" optionLabel="label" placeholder="Vyberte stav" v-model="selectedState"/>
+                </div>
+            </div>
+        </div>
+          <router-link :to="`newrequest`">
+            <Button class="p-button p-button-primary">
+              Vytvoř servicní požadavek
+            </Button>
+          </router-link>
+        </template>
+      </Toolbar>
   </section>
   <div class="requests-list">
     <RequestItem v-for="request in requests" v-bind:key="request.id" :request="request"/>
   </div>
+  <Paginator :rows="9" :totalRecords="totalItemsCount" @page="onPage($event)"></Paginator>
 </template>
 
 <script>
 import RequestItem from "@/components/ServiceItem.vue";
 
 import { useRequestsStore } from "@/stores/RequestsStore";
+import QueryString from "query-string";
 
 import Button from "primevue/button";
+import Toolbar from "primevue/toolbar";
+import Dropdown from "primevue/dropdown";
+import InputText from "primevue/inputtext";
+import Paginator from "primevue/paginator";
+
 
 export default {
   name: "RequestsListView",
   components: {
     RequestItem,
     Button,
+    Toolbar,
+    Dropdown,
+    InputText,
+    Paginator,
   },
   data() {
     return {
       requests: [],
-      
+      searchParams: {
+        title: "",
+        assignedTechnician: undefined,
+        solutionState: undefined,
+      },
+      states: [
+        { label: "Všechny", value: undefined},
+        { label: "Nevyřešeno", value: 0 },
+        { label: "Vyřešeno", value: 1 },
+      ],
+      selectedState: undefined,
+      totalItemsCount: 0,
     }
   },
   async mounted() {
-    const requestsStore = useRequestsStore();
-    this.requests = await requestsStore.getBySearch()
+    this.loadRequests();
   },
   methods: {
-    
+    async loadRequests() {
+      let page = Number(this.$route.params.page) || 1;
+      this.requests = await useRequestsStore().getBySearch(page,this.$route.query);
+      let totalItemsCount = await useRequestsStore().getBySearch(this.page,this.$route.query, true);
+      this.totalItemsCount = totalItemsCount.count || this.requests.length;
+    },
+    async search() {
+      let queryStr = QueryString.stringify(this.searchParams);
+      await this.$router.push(`${this.$route.path}?${queryStr}`);
+      this.loadRequests();
+    },
+    stateChange() {
+      this.searchParams.solutionState = this.selectedState.value;
+      this.search();
+    },
+    async onPage(event) {
+      await this.$router.push({
+        name: this.$route.name,
+        query: {
+          ...this.$route.query,
+        },
+        params: {
+          ...this.$route.params,
+          page: event.page + 1,
+        }
+      });
+      this.loadRequests();
+    }
   },
   
 };
@@ -49,10 +110,25 @@ export default {
     gap: 50px;
     max-width: 1450px;
     margin: 0 auto;
+    margin-bottom: 1rem;
 
   }
   .requests-list > div{
     box-sizing : border-box;
+  }
+
+  .toolbar{
+    width: 100%;
+    h1{
+      margin: 0;
+    }
+    :deep(.p-toolbar-group-left){
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
   }
 
   .requests-list-header{
@@ -61,7 +137,6 @@ export default {
     align-items: center;
     margin: 0 auto;
     max-width: 1450px;
-    padding: 0 20px;
     margin-bottom: 2rem;
   }
 </style>
