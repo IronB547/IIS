@@ -109,6 +109,8 @@ export const useTicketsStore = defineStore('tickets', {
 
             if(res.status === 201){
                 return {message: "Komentář úspěšně přidán"}
+            }else if(res.status === 204){
+                return {error: "Nemůžete přidat komentář"}
             }else{
                 return {error: "Přidání komentáře selhalo"}
             }

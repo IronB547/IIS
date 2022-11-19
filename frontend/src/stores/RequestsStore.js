@@ -134,9 +134,9 @@ export const useRequestsStore = defineStore('requests', {
             })
 
             if(res.status === 204){
-                return {message: "Smazání technika bylo úspěšné"}
+                return {message: "Odebrání technika bylo úspěšné"}
             }else{
-                return {error: "Nemůžete smazat technika"}
+                return {error: "Nemůžete odebrat technika"}
             }
         },
 
@@ -153,11 +153,11 @@ export const useRequestsStore = defineStore('requests', {
             })
 
             if(res.status === 204){
-                return {message: "Komentář úspěšně smazán"}
+                return {message: "Požadavek úspěšně smazán"}
             }else if(res.status === 403) {
-                return {error: "Nemůžete smazat cizí komentář"}
+                return {error: "Nemůžete smazat požadavek"}
             }else{
-                return {error: "Smazání komentáře selhalo"}
+                return {error: "Smazání požadavku selhalo"}
             }
         },
 
@@ -198,7 +198,7 @@ export const useRequestsStore = defineStore('requests', {
             if(res.status === 204){
                 return {message: "Komentář úspěšně změněn"}
             }else if(res.status === 403){
-                return {message: "Nemůžete editovat komentář"}
+                return {error: "Nemůžete editovat cizí komentář"}
             }else{
                 return {error: "Editace komentáře selhala"}
             }

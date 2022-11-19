@@ -336,8 +336,21 @@
       },
       async addComment() {
         const response = await this.requestsStore.addComment(this.requestID,{comment: this.commentText});
-        if(response.error){
-          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Nelze přidat komentář", life: 3000});
+        if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Komentář byl úspěšně vytvořen",
+            life: 3000,
+          })
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Chyba při vytvoření komentáře",
+            life: 3000,
+          })
         }
         this.loadRequest();
         this.showCommentDialog = false;
@@ -345,8 +358,21 @@
       },
       async technicianChange(event) {
         const response = await this.requestsStore.addTechnician(this.requestID, event.value.id);
-        if(response.error){
-          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Nelze přidat technika", life: 3000});
+        if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Technik byl úspěšně přidán",
+            life: 3000,
+          })
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Chyba při přidání technika",
+            life: 3000,
+          })
         }
         this.loadRequest();
         this.addTechnician = null;
@@ -354,8 +380,21 @@
       async removeTechnician(technicianID) {
         console.log("removing technician",technicianID);
         const response = await this.requestsStore.removeTechnician(this.requestID,technicianID);
-        if(response.error){
-          this.$toast.add({severity:'error', summary: 'Chyba', detail: response.error || "Nelze odebrat technika", life: 3000});
+        if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Technik byl úspěšně odebrán",
+            life: 3000,
+          })
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Chyba při odebrání technika",
+            life: 3000,
+          })
         }
         this.loadRequest();
       },

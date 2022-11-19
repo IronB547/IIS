@@ -309,13 +309,21 @@
       async addComment() {
         const ticketsStore = useTicketsStore();
         const response = await ticketsStore.addComment(this.ticketID, {comment: this.commentText});
-        if(response.error){
+        if(response.message){
           this.$toast.add({
-            severity: "error",
-            summary: "Chyba",
-            detail: response?.message || "Nelze přidat komentář",
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Komentář úspěšně přidán",
             life: 3000,
           })
+          }
+          else {
+            this.$toast.add({
+              severity: "error",
+              summary: "Chyba",
+              detail: response?.error || "Nelze přidat komentář",
+              life: 3000,
+            })
         }
         this.loadTicket();
         this.showCommentDialog = false;
