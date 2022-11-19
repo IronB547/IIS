@@ -13,7 +13,7 @@
             <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="ticketTitle = ticket.title"/>
             
             <ConfirmPopup/> 
-            <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="editMode = !editMode">Smazat ticket</Button>
+            <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="deleteTicket(this.ticket.id)">Smazat ticket</Button>
           </div>
 
           <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
@@ -209,42 +209,44 @@
           })
         }
       },
-      async deleteTicket() {
-
+      async deleteTicket(ticketID) {
         this.$confirm.require({
-                target: event.currentTarget,
-                message: 'Opravdu chcete smazat ticket?',
-                icon: 'pi pi-exclamation-triangle',
-                acceptLabel: 'Potvrdit',
-                rejectLabel: 'Zrušit',
-                acceptIcon: 'pi pi-check',
-                rejectIcon: 'pi pi-times',
-                accept: async () => {
-                  const response = await this.ticketsStore.deleteTicket();
+          target: event.currentTarget,
+          message: 'Opravdu chcete smazat ticket?',
+          icon: 'pi pi-exclamation-triangle',
+          acceptLabel: 'Potvrdit',
+          rejectLabel: 'Zrušit',
+          acceptIcon: 'pi pi-check',
+          rejectIcon: 'pi pi-times',
+          accept: async () => {
+            const response = await this.ticketsStore.deleteTicket(ticketID);
 
-                  if(response.message){
-                  this.$toast.add({
-                    severity: "success",
-                    summary: "Úspěch",
-                    detail: response?.message || "Ticket úspěšně smazán",
-                    life: 3000,
-                  })
-                  }
-                  else {
-                    this.$toast.add({
-                      severity: "error",
-                      summary: "Chyba",
-                      detail: response?.error || "Smazání ticketu selhalo",
-                      life: 3000,
-                    })
-                  }
-
-                 this.loadRequest();
-                },
-                reject: () => {},
-                onShow: () => {},
-                onHide: () => {}
-            });
+            if(response.message){
+              this.$toast.add({
+                severity: "success",
+                summary: "Úspěch",
+                detail: response?.message || "Ticket úspěšně smazán",
+                life: 3000,
+              })
+              setTimeout(async () => {
+                await this.$router.push({
+                name: "tickets"
+                })
+              }, 1000);
+            }
+            else {
+              this.$toast.add({
+                severity: "error",
+                summary: "Chyba",
+                detail: response?.error || "Smazání ticketu selhalo",
+                life: 3000,
+              })
+            }
+          },
+          reject: () => {},
+          onShow: () => {},
+          onHide: () => {}
+      });
       },
       getStatus(status) {
         switch (status) {

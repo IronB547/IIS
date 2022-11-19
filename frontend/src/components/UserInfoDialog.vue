@@ -1,5 +1,5 @@
 <template>
-    <Dialog :visible="showUserInfo" @hide="$emit('closeUserInfo')">
+    <Dialog :visible="showUserInfo" closeIcon="">
       <template #header>
         <h3>Info o uživateli:</h3>
       </template>
@@ -49,5 +49,6 @@ export default {
 <style lang="scss">
     .p-dialog{
       min-width: 400px;
+      
     }
 </style>

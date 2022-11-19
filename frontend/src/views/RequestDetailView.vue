@@ -17,7 +17,7 @@
           </div>
 
           <div class="request-header-bottom-buttons">
-            <Button class="p-button-danger  p-button-title" v-if="editMode" @click="editMode = !editMode">Smazat požadavek</Button>
+            <Button class="p-button-danger  p-button-title" v-if="editMode" @click="deleteRequest(this.request.id)">Smazat požadavek</Button>
 
             <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID">Otevřít ticket</Button>
             <Button class="p-button-primary" v-if="!editMode" @click="editMode = !editMode">Upravit požadavek</Button>
@@ -28,7 +28,6 @@
             </div>
 
           </div>
-
         </div>
       </div>
     </div>
@@ -57,7 +56,7 @@
           <Card class="user-info">
             <template #header>
               <div class="request-technicians-body">
-                <span @click="displayUserInfo(technician)">
+                <span @click="displayUserInfo(technician)" v-tooltip.top="'Klikněte na jméno pro více informací'">
                   {{technician.name}} {{technician.surname}}
                 </span>
                 <div class="request-technicians-body-button">
@@ -379,6 +378,45 @@
           }
         },
         ]
+      },
+      async deleteRequest(requestID){
+        this.$confirm.require({
+          target: event.currentTarget,
+          message: 'Opravdu chcete smazat ticket?',
+          icon: 'pi pi-exclamation-triangle',
+          acceptLabel: 'Potvrdit',
+          rejectLabel: 'Zrušit',
+          acceptIcon: 'pi pi-check',
+          rejectIcon: 'pi pi-times',
+          accept: async () => {
+            const response = await this.requestsStore.deleteRequest(requestID);
+
+            if(response.message){
+              this.$toast.add({
+                severity: "success",
+                summary: "Úspěch",
+                detail: response?.message || "Požadavek úspěšně smazán",
+                life: 3000,
+              })
+              setTimeout(async () => {
+                await this.$router.push({
+                name: "tickets"
+                })
+              }, 1000);
+            }
+            else {
+              this.$toast.add({
+                severity: "error",
+                summary: "Chyba",
+                detail: response?.error || "Smazání požadavku selhalo",
+                life: 3000,
+              })
+            }
+          },
+          reject: () => {},
+          onShow: () => {},
+          onHide: () => {}
+      });
       },
       async deleteComment(commentID) {
         this.$confirm.require({

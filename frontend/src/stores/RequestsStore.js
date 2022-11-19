@@ -138,6 +138,27 @@ export const useRequestsStore = defineStore('requests', {
             }
         },
 
+        async deleteRequest(requestID) {
+            if(!localStorage.getItem("user"))
+                return {error: "You must be logged in to delete a comment"}
+
+            const res = await fetch(`${config.host}/requests/${requestID}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                }
+            })
+
+            if(res.status === 204){
+                return {message: "Komentář úspěšně smazán"}
+            }else if(res.status === 403) {
+                return {error: "Nemůžete smazat cizí komentář"}
+            }else{
+                return {error: "Smazání komentáře selhalo"}
+            }
+        },
+
         async deleteComment(commentId) {
             if(!localStorage.getItem("user"))
                 return {error: "You must be logged in to delete a comment"}

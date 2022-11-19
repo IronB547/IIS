@@ -136,6 +136,28 @@ export const useTicketsStore = defineStore('tickets', {
 
         },
 
+        async deleteTicket(ticketID) {
+            if(!localStorage.getItem("user"))
+                return {error: "You must be logged in to edit a comment"}
+
+            const res = await fetch(`${config.host}/tickets/${ticketID}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+            })
+
+            if(res.status === 204){
+                return {message: "Ticket úspěšně smazán"}
+            }else if(res.status === 403) {
+                return {error: "Nemůžete smazat ticket"}
+            }
+            else{
+                return {error: "Smazání ticketu selhalo"}
+            }
+        },
+
         async deleteComment(commentId) {
             if(!localStorage.getItem("user"))
                 return {error: "You must be logged in to delete a comment"}
