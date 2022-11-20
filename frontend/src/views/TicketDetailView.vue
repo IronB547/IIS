@@ -12,9 +12,7 @@
             <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode"/>
             <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editTicket"/>
             
-            <ConfirmPopup/> 
-            <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="deleteTicket(this.ticket.id)">Smazat ticket</Button>
-
+            
             <Button class="p-button-secondary p-button-sm" v-if="editMode" @click="openAddPhoto">Přidat fotku</Button>
             <ConfirmPopup group="addPhoto">
                 <template #message="slotProps">
@@ -26,6 +24,9 @@
                     </div>
                 </template>
             </ConfirmPopup>
+
+            <ConfirmPopup/> 
+            <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="deleteTicket(this.ticket.id)">Smazat ticket</Button>
           </div>
 
           <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
@@ -542,6 +543,7 @@
 
 
 <style lang="scss">
+
   .p-image{
     display: flex;
     justify-content: center;
@@ -602,9 +604,13 @@
       z-index: 1;
     }
   }
-  
+
   .p-confirm-popup .add-photo-content{
     margin: 20px;
+
+    .p-inputtext{
+      width: 100%;
+    }
   }
 
   .ticket-detail{
@@ -629,6 +635,7 @@
         justify-content: space-between;
         align-items: center;
         margin-bottom: 20px;
+
         .p-inputtextarea{
           width: 100%;
           font-size: 2rem;
@@ -643,12 +650,14 @@
           min-width: 123px;
           flex-wrap: wrap;
           align-items: baseline;
+
           .p-button-secondary{
             min-width: 120px;
+            margin-top: 10px;
           }
 
-          .p-button-danger:nth-child(3){
-            margin-top: 20px;
+          .p-button-danger:nth-child(4){
+            margin-top: 10px;
           }
         }
         .edit-buttons-image{

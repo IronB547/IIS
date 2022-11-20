@@ -24,7 +24,7 @@
             
             <div class="edit-buttons" v-if="editMode">
               <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode"/>
-              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="ticketTitle = ticket.title"/>
+              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editRequest"/>
             </div>
 
           </div>
@@ -277,6 +277,27 @@
       },
       getUserFromComment(comment){
         return {id: comment.userID, name: comment.userName, surname: comment.userSurname, userType: comment.userType}
+      },
+      async editRequest(){
+        const response = await this.requestsStore.updateRequest(this.request);
+        if(response.message){
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: response?.message || "Požadavek úspěšně upraven",
+            life: 3000,
+          })
+          this.editMode = false;
+        }
+        else {
+          this.$toast.add({
+            severity: "error",
+            summary: "Chyba",
+            detail: response?.error || "Úprava požadavku selhala",
+            life: 3000,
+          })
+        }
+        this.loadRequest();
       },
       displayCommentUserInfo(comment){
         this.selectedUser = this.getUserFromComment(comment);

@@ -121,6 +121,28 @@ export const useRequestsStore = defineStore('requests', {
             }
 
         },
+
+        async updateRequest(request) {
+            const res = await fetch(`${config.host}/requests/${request.id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+                body: JSON.stringify(request)
+            })
+
+            if(res.status === 204){
+                this.requests.push(request)
+                return {message: "Ticket úspěšně upraven"}
+            }if(res.status === 403){
+                return {error: "Nemůžete upravit ticket"}
+            }
+            else{
+                return {error: "Upravení ticketu selhalo"}
+            }
+        },
+
         async removeTechnician(requestId, technicianId) {
             if(!localStorage.getItem("user"))
                 return {error: "Musíte být přihlášení abyste mohli odebrat technika"}
