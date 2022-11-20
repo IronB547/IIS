@@ -27,11 +27,21 @@
                 <div class="image-container">
                   <Image :activeIndex="galleriaIndex" class="ticket-image" :src="slotProps.item?.url" alt="Image Text" preview>
                   </Image>
+                  <ConfirmPopup/>
+                  <Button class="image-delete-button p-button-danger p-button-rounded" @click="removePhoto(slotProps.item)" icon="pi pi-trash" v-tooltip.top="'Smazat fotku'"/>
                 </div>
               </template>
               </Galleria>
             </div>
-            <InputText type="url" v-model="photos.url" />
+
+            <div class="input-photo">
+              <span class="p-float-label">
+                <InputText type="url" v-model="newPhoto" />
+                <label for="title">Přidat foto</label>
+              </span>
+              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="addPhotoToBuffer(newPhoto)" v-tooltip.top="'Potvrdit změny'"/>
+            </div>
+
           </div>
 
       </div>
@@ -57,6 +67,7 @@
     import Button from 'primevue/button';
     import Image from "primevue/image";
     import Galleria from "primevue/galleria";
+    import ConfirmPopup from 'primevue/confirmpopup';
 
     import { useTicketsStore } from '@/stores/TicketsStore';
     
@@ -67,21 +78,28 @@
         InputText,
         Button,
         Galleria,
-        Image
+        Image,
+        ConfirmPopup
       },
       data() {
         return {
+          
           ticket: {
             title: "",
             location: "",
             description: ""
           },
+
+          newPhoto: "",
+
           photos:[
             {url: "https://1gr.cz/fotky/idnes/17/071/r7/ZT6c7291_131822_2546162.jpg"},
             {url: "https://thumbs.dreamstime.com/b/beautiful-rain-forest-ang-ka-nature-trail-doi-inthanon-national-park-thailand-36703721.jpg"},
             
           ],
+
           galleriaIndex: 0,
+
           responsiveOptions: [
           {
               breakpoint: '1024px',
@@ -101,24 +119,93 @@
       methods: {
         async addTicket() {
           const ticketsStore = useTicketsStore();
-          const response = await ticketsStore.createTicket(this.ticket);
-          if(response.message){
+          const response_ticket = await ticketsStore.createTicket(this.ticket);
+          
+          var photoCount = 0;
+          for(let photo in this.photos){
+            let response_photo = await ticketsStore.addPhoto(this.ticketID, photo.url);
+            if(response_photo.message){
+              photoCount++;
+            }
+          }
+
+          if(response_ticket.message && photoCount == this.photos?.length){
           this.$toast.add({
             severity: "success",
             summary: "Úspěch",
-            detail: response?.message || "Ticket byl úspěšně přidán",
+            detail: response_ticket?.message || "Ticket byl úspěšně přidán",
             life: 3000,
           })
+
+          setTimeout(async () => {
+            await this.$router.push({
+            name: "tickets"
+            })
+          }, 1000);
           }
           else {
             this.$toast.add({
               severity: "error",
               summary: "Chyba",
-              detail: response?.error || "Chyba při přidávání ticketu",
+              detail: response_ticket?.error || "Chyba při přidávání ticketu",
               life: 3000,
             })
         }
-        }
+        },
+        addPhotoToBuffer(photoUrl){
+          if(photoUrl == ""){
+            this.$toast.add({
+              severity: "error",
+              summary: "Chyba",
+              detail: "URL fotky nemůže být prázdná hodnota",
+              life: 3000,
+            })
+            
+            return
+          }
+          this.photos.push({url: photoUrl});
+
+          this.newPhoto = "";
+
+          this.$toast.add({
+            severity: "success",
+            summary: "Úspěch",
+            detail: "Fotka úspěšně přidána",
+            life: 3000,
+          })
+        },
+
+        removePhoto(photoObject){
+          this.$confirm.require({
+            target: event.currentTarget,
+            message: 'Opravdu chcete smazat fotku?',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Potvrdit',
+            rejectLabel: 'Zrušit',
+            acceptIcon: 'pi pi-check',
+            rejectIcon: 'pi pi-times',
+            accept:() => {
+              console.log(this.photos)
+              const photoIndex = this.photos.indexOf(photoObject)
+
+              if(photoIndex > -1) { // only splice when item is found
+                this.photos.splice(photoIndex, 1)
+
+                this.$toast.add({
+                  severity: "success",
+                  summary: "Úspěch",
+                  detail: "Fotka úspěšně smazána",
+                  life: 3000,
+                })
+
+                this.galleriaIndex = 0;
+              }
+            },
+            reject: () => {},
+            onShow: () => {},
+            onHide: () => {}
+          });
+        },
       }
     };
   </script>
@@ -140,6 +227,22 @@
 </style>
 
 <style scoped lang="scss">
+.image-container{
+    width: 384px;
+    height: 216px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    :deep(.image-delete-button){
+      position: absolute;
+      bottom: 0;
+      left: calc(50% - 24px);
+      z-index: 1;
+    }
+  }
+  .header{
+    margin-bottom: 50px;
+  }
 
   main{
     max-width: 900px;
@@ -150,8 +253,26 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 50px;
 
+      .content-header-right{
+
+        .input-photo{
+          display: inline-flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          width: 100%;
+          margin-top: 30px;
+
+          .p-float-label{
+            margin-bottom: 0;
+          }
+
+          .p-button-rounded{
+            margin-left: 10px;
+          }
+        }
+      }
       .content-header-left:nth-child(1){
         width: calc(50% - 1rem);
       }
@@ -162,7 +283,6 @@
     }
     .content-header-photo{
       height: 100%;
-      
     }
 
     .p-float-label{
@@ -172,7 +292,8 @@
       width: 100%;
     }
     :deep(.p-inputtext){
-      width: 100%;
+        width: 100%;
     }
+    
 }
 </style>
