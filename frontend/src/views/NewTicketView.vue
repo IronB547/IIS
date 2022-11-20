@@ -39,7 +39,7 @@
                 <InputText type="url" v-model="newPhoto" />
                 <label for="title">Přidat foto</label>
               </span>
-              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="addPhotoToBuffer(newPhoto)" v-tooltip.top="'Potvrdit změny'"/>
+              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="addPhotoToBuffer(newPhoto)" v-tooltip.top="'Uložit fotku'"/>
             </div>
 
           </div>
