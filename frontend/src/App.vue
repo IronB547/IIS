@@ -23,11 +23,28 @@
     </template>
   </Menubar>
   <router-view />
+
+  <v-idle
+  @idle="onidle"
+  :loop="true"
+  :wait="300"
+  :duration="1" />
+
+  <Dialog header="Upozrnění" v-model:visible="displayInactiveDialog" :breakpoints="{'960px': '75vw', '640px': '90vw'}" :style="{width: '50vw'}" :modal="true">
+      <p class="m-0">Byli jste odhlášeni z důvodu nečinnosti.</p>
+      <template #footer>
+          <Button label="Zavřít" class="p-button-warning" icon="pi pi-check" autofocus @click="displayInactiveDialog = false" />
+      </template>
+  </Dialog>
+
+
 </template>
 
 <script>
 
 import Menubar from 'primevue/menubar';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
 // import {useAuthStore} from '@/stores/AuthStore.js';
 
 // eslint-disable-next-line
@@ -37,7 +54,9 @@ import { useAuthStore } from '@/stores/AuthStore';
 
 export default {
   components: {
-    Menubar
+    Menubar,
+    Dialog,
+    Button
   },
   setup() {
     const store = useAuthStore();
@@ -93,7 +112,8 @@ export default {
           to: '/register',
           visible: () => !this.store.isLoggedIn
         },
-      ]
+      ],
+      displayInactiveDialog: false,
     }
   },
   methods: {
@@ -103,7 +123,12 @@ export default {
     logOut(){
       this.store.logOut();
       this.$router.push({name: "login"})
-    }
+    },
+
+    onidle() {
+      this.logOut();
+      this.displayInactiveDialog = true;
+    },
   },
   computed: {
   }
@@ -140,7 +165,8 @@ body{
   color: white;
   margin: 0;
 }
-</style>
 
-<style>
+.v-idle{
+  display: none;
+}
 </style>

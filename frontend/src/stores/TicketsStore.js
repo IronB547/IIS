@@ -62,7 +62,7 @@ export const useTicketsStore = defineStore('tickets', {
                 },
                 body: JSON.stringify(ticket)
             })
-            
+            console.log(res)
             if(res.status === 204){
                 this.tickets.push(ticket)
                 return {message: "Úspěšně změněn stav ticketu"}

@@ -21,6 +21,13 @@ if(!process.env.TOKEN_SECRET)
 
 let blockedUsers = [];
 
+initBlockedUsers();
+
+async function initBlockedUsers(){
+	const rows = await db.query(`SELECT id FROM Users WHERE isBlocked = 1`);
+	blockedUsers = rows.map( (row) => row.id);
+}
+
 async function getAll(page = 1, userType = undefined){
 	const offset = helper.getOffset(page, config.usersPerPage);
 	//TODO: add pagination
@@ -92,22 +99,36 @@ async function create(user){
 
 async function remove(requestingUser, id){
 	if(requestingUser.id == id || requestingUser.userType >= 3){
-		blockedUsers.push(id);
+		block(requestingUser, id);
 		return result = await db.query(`DELETE FROM Users WHERE id = ?`, [id]);
 	}else if(requestingUser.userType == 2){
-		blockedUsers.push(id);
+		block(requestingUser, id);
 		return result = await db.query(`DELETE FROM Users WHERE id = ? AND userType = 1`, [id]);
 	}else{
 		return {error: "User is not authorized to delete this user"};
 	}
 }
 
+/**
+ * 
+ * @param {*} requestingUser 
+ * @param {*} id id of user to update
+ * @param {*} user the new user object 
+ * @returns 
+ */
 async function edit(requestingUser, id, user){
 	if(user.password != undefined){
 		user.password = await bcrypt.hash(user.password, 10)
 	}else{
 		delete user.password;
 	}
+
+	if(user.isBlocked){
+		block(requestingUser, id);
+	}else if(isBlocked(user)){
+		unblock(requestingUser, id);
+	}
+
 	if(requestingUser.id == id || requestingUser.userType >= 3){
 		if(user.password != undefined){
 			const query = `UPDATE Users SET name = ?, surname = ?, userType = ?, email = ?, phoneNum = ?, password = ?, isBlocked = ? WHERE id = ?`;
@@ -123,13 +144,38 @@ async function edit(requestingUser, id, user){
 	}
 }
 
+/**
+ * Adds to blocked users list (on backend)
+ * @param {*} requestingUser 
+ * @param {*} id 
+ * @returns 
+ */
 async function block(requestingUser, id){
+	id = parseInt(id);
 	if(requestingUser.userType >= 3){
 		if(!blockedUsers.includes(id))
 			blockedUsers.push(id);
 		return {message: "User blocked"};
 	}else{
 		return {error: "User is not authorized to block this user"};
+	}
+}
+
+/**
+ * Removes from blocked users list (on backend)
+ * @param {*} requestingUser
+ * @param {*} id
+ * @returns
+ */
+async function unblock(requestingUser, id){
+	id = parseInt(id);
+	if(requestingUser.userType >= 3){
+		if(blockedUsers.includes(id)){
+			blockedUsers.splice(blockedUsers.indexOf(id), 1);
+		}
+		return {message: "User unblocked"};
+	}else{
+		return {error: "User is not authorized to unblock this user"};
 	}
 }
 
@@ -186,7 +232,7 @@ async function login(credentials){
 
 function generateAccessToken(user) {
 	const userPermission = {userType: user.userType, id: user.id};
-	return jwt.sign(userPermission, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
+	return jwt.sign(userPermission, process.env.TOKEN_SECRET, { expiresIn: '1d' });
 }
 
 function hasAccessToken(req,res){
@@ -279,7 +325,6 @@ module.exports = {
 	remove,
 	edit,
 	login,
-	block,
 	generateAccessToken,
 	authenticateToken,
 	hasAccessToken,

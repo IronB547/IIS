@@ -30,7 +30,7 @@ router.post('/login', async function(req, res, next) {
 		if(result.token != null)
 			res.status(200).json(result);
 		else{
-			res.status(401).json({message: "Invalid credentials"});
+			res.status(401).json(result?.error ? result.error : {message: "Invalid credentials"});
 		}
 	} catch (err) {
 		console.error(`Error while getting users `, err.message);

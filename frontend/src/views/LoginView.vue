@@ -35,6 +35,7 @@
   import Password from 'primevue/password';
   import mitt from 'mitt';
   import {useAuthStore} from '@/stores/AuthStore';
+  import Toast from 'primevue/toast';
 
   const emitter = mitt();
   // @ is an alias to /src
@@ -44,7 +45,8 @@
     components: {
       Button,
       InputText,
-      Password
+      Password,
+      Toast
     },
     data() {
     return {
@@ -67,7 +69,7 @@
           this.$toast.add({
             severity: "error",
             summary: "Wrong credentials",
-            detail: "The email or password is incorrect",
+            detail: response.error || "The email or password is incorrect",
             life: 3000,
           });
         }

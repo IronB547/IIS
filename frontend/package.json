@@ -16,6 +16,7 @@
     "primevue": "^3.18.1",
     "query-string": "^7.1.1",
     "register-service-worker": "^1.7.2",
+    "v-idle-3": "^0.3.13",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
   },

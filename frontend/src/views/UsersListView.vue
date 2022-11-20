@@ -118,6 +118,11 @@
                 <label for="userType">Typ uživatele</label>
                 <Dropdown v-model="editingUser.userType" :options="userTypes" optionLabel="name" optionValue="value" placeholder="Select a UserType" />
             </div>
+
+            <div class="input-block switch-block">
+                <label for="blocked">Zablokování účtu</label>
+                <InputSwitch name="blocked" v-model="editingUser.isBlocked" class=""/>
+            </div>
         </div>
 
         <template #footer>
@@ -137,6 +142,8 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Dropdown from 'primevue/dropdown';
 import UserTypeBadge from '@/components/UserTypeBadge.vue';
+import InputSwitch from 'primevue/inputswitch';
+
 // import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
 // import Row from 'primevue/row';                     //optional for row
 
@@ -182,6 +189,7 @@ export default {
         async editUser(user) {
             // await this.store.createUser(this.newUser);
             this.editUserDialog = true;
+            user.isBlocked = !!user.isBlocked;
             this.editingUser = user;
         },
         async submitEditUser() {
@@ -203,7 +211,8 @@ export default {
         InputText,
         Password,
         Dropdown,
-        UserTypeBadge
+        UserTypeBadge,
+        InputSwitch
     },
     async mounted(){
         this.load();
@@ -227,6 +236,13 @@ export default {
             }
             .pwd {
                 padding: 0;
+            }
+        }
+        .switch-block {
+            display: flex;
+            align-items: center;
+            label{
+                margin-right: 1rem;
             }
         }
     }

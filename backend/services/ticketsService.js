@@ -23,7 +23,6 @@ async function create(ticket, userID){
 	ticket = validationRes.value;	
 	const result = await db.query(`INSERT INTO Tickets (title, location, description, status, userID, createdAt)  
 	VALUES ('${ticket.title}', '${ticket.location}', '${ticket.description}', '${ticket.status}', '${userID}', '${moment().format("YYYY-MM-DD HH:mm:ss")}')` );
-
 	return result;
 }
 
