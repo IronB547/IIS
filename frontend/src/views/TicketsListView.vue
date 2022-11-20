@@ -165,5 +165,22 @@
     .tickets-list{
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
+
+    .toolbar{
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      :deep(.p-toolbar-group-left){
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+        > {
+          width: 100%;
+          margin-bottom: 1rem;
+        }
+      }
+    }
   }
 </style>

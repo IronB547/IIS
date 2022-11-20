@@ -22,7 +22,7 @@
 
                 <div class="content-header-item">
                     <span class="p-float-label">
-                        <InputText type="text" v-model="request.ticketID" />
+                        <Dropdown v-model="request.ticketID" :options="availableTickets" optionLabel="title" :filter="true"/>
                         <label for="ticket">Ticket</label>
                     </span>
                 </div>
@@ -44,10 +44,12 @@
 
 <script>
 import { useRequestsStore } from '@/stores/RequestsStore';
+import { useTicketsStore } from '@/stores/TicketsStore';
 import InputText from 'primevue/inputtext';
 // import Dropdown from 'primevue/dropdown';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
 
 export default {
     name: 'NewRequestView',
@@ -56,31 +58,43 @@ export default {
             request: {
                 title: '',
                 description: '',
-                ticketID: null,
+                ticketID: undefined,
             },
             solutionStates: [
                 { name: 'Open', code: 0 },
                 { name: 'Closed', code: 1 },
             ],
-            selectedCity: null,
-            cities: [
-                {name: 'New York', code: 'NY'},
-                {name: 'Rome', code: 'RM'},
-                {name: 'London', code: 'LDN'},
-                {name: 'Istanbul', code: 'IST'},
-                {name: 'Paris', code: 'PRS'}
-            ]
+            availableTickets: [
+                
+            ],
         }
+    },
+    async mounted() {
+        this.getTickets();
     },
     methods: {
         addRequest() {
             const requestsStore = useRequestsStore();
             requestsStore.createRequest(this.request);
+        },
+        async getTickets() {
+            const ticketsStore = useTicketsStore();
+            const response = await ticketsStore.getBySearch(1,{});
+            if(response.error) {
+                this.$toast.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: response.error,
+                    life: 3000
+                });
+            } else {
+                this.availableTickets = response;
+            }
         }
     },
     components: {
         InputText,
-        // Dropdown,
+        Dropdown,
         Textarea,
         Button
     }
@@ -128,6 +142,19 @@ main{
     // Textarea{
     //     width: 100%;
     // }
+
+    @media screen and (max-width: 768px){
+        .content-header{
+            flex-direction: column;
+            .content-header-item:nth-child(1){
+                width: 100%;
+            }
+            .content-header-item:nth-child(2){
+                width: 100%;
+                margin: 1rem 0 0 0;
+            }
+        }
+    }
 }
 
 </style>

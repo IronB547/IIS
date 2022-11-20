@@ -8,6 +8,7 @@
 
         <div class="request-header-bottom">
           <div class="request-header-bottom-left">
+            <h4 v-if="request.ticket">Přiřazen k ticketu: {{request.ticket.title}}</h4>
             <div class="request-creator">
               <h4>Vytvořil: {{request?.userName}} {{request?.userSurname}}</h4>
             </div>

@@ -62,10 +62,17 @@ async function getByID(requestID) {
 	const technicians = await db.query(`SELECT technicianID,name,surname,userType,email,phoneNum FROM Service_request_technician srt 
 	NATURAL JOIN Users u WHERE u.id = srt.technicianID AND serviceRequestID = ?`, [requestID]);
 
+	
 	let request = requests[0];
-
+	
+	
 	if(!request)
 		return null;
+	
+	if(request.ticketID){
+		const ticket = await db.query(`SELECT * FROM Tickets WHERE id = ?`, [request.ticketID]);
+		request.ticket = ticket[0];
+	}
 
 	request.comments = comments;
 	request.technicians = technicians;

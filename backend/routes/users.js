@@ -29,8 +29,9 @@ router.post('/login', async function(req, res, next) {
 		const result = await users.login(req.body)
 		if(result.token != null)
 			res.status(200).json(result);
-		else
+		else{
 			res.status(401).json({message: "Invalid credentials"});
+		}
 	} catch (err) {
 		console.error(`Error while getting users `, err.message);
 		res.status(500).json({message: "Internal Server Error"});
@@ -104,4 +105,19 @@ router.delete('/:id', async function(req, res, next) {
 	}
 });
 
+router.put('/:id', async function(req, res, next) {
+	try {
+		if(!users.authorize(req,res, 0, true))
+			return;
+
+		const result = await users.edit(req.user,req.params.id, req.body);
+		if(result.affectedRows === 0 || result.error)
+			res.status(400).json(result.error);
+		else
+			res.status(204).json();
+	} catch (err) {
+		console.error(`Error while updating user `, err.message);
+		res.status(500).json({message: "Internal Server Error"});
+	}
+});
 module.exports = router;

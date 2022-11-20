@@ -27,7 +27,6 @@ export default {
             return this.userTypes[this.userType].severity || 'danger';
         },
         getName: function () {
-            console.log(this.userType);
             return this.userTypes[this.userType].name || 'UNKNOWN';
         },
     }

@@ -59,6 +59,24 @@ export const useUsersStore = defineStore('user', {
             }else{
                 return {error: "Failed to delete user"}
             }
-        }
+        },
+
+        async editUser(id,user) {
+            const res = await fetch(`${config.host}/users/${id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem("user"))?.token
+                },
+                body: JSON.stringify(user)
+            })
+
+            if(res.status === 204){
+                return {message: "User edited"}
+            }else{
+                return {error: "Failed to edit user"}
+            }
+        },
+
     }
 })

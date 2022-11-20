@@ -14,7 +14,7 @@
         </div>
           <router-link :to="`newrequest`">
             <Button class="p-button p-button-primary">
-              Vytvoř servicní požadavek
+              Vytvoř servisní požadavek
             </Button>
           </router-link>
         </template>
@@ -138,5 +138,28 @@ export default {
     margin: 0 auto;
     max-width: 1450px;
     margin-bottom: 2rem;
+  }
+
+  @media screen and (max-width: 768px){
+    .requests-list{
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+
+    .toolbar{
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      :deep(.p-toolbar-group-left){
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+        > {
+          width: 100%;
+          margin-bottom: 1rem;
+        }
+      }
+    }
   }
 </style>

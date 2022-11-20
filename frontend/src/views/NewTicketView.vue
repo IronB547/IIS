@@ -103,4 +103,14 @@
     margin-top: 5px;
     width: 100%;
   }
+
+  @media screen and (max-width: 768px) {
+    .grid{
+      display: grid;
+      grid-template: "left" "right";
+      gap: 200px;
+      align-items: center;
+      margin: 100px 100px 0px 100px;
+    }
+  }
 </style>

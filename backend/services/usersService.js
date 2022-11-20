@@ -8,6 +8,9 @@ const schema = require('../schemas/users');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 // get config vars
 dotenv.config();
 
@@ -15,13 +18,16 @@ dotenv.config();
 if(!process.env.TOKEN_SECRET)
 	console.error("TOKEN_SECRET not set");
 
+
+let blockedUsers = [];
+
 async function getAll(page = 1, userType = undefined){
 	const offset = helper.getOffset(page, config.usersPerPage);
 	//TODO: add pagination
 	const rows = [];
 	if(userType == undefined){
 		const rows = await db.query(
-			`SELECT id, name, surname, password, userType, email, phoneNum
+			`SELECT id, name, surname, password, userType, email, phoneNum, isBlocked
 			FROM Users `//LIMIT ${offset}, ${config.listPerTicketPage}`
 		);
 		let data = helper.emptyOrRows(rows);
@@ -36,7 +42,7 @@ async function getAll(page = 1, userType = undefined){
 		}
 	}else{
 		const rows = await db.query(
-			`SELECT id, name, surname, password, userType, email, phoneNum
+			`SELECT id, name, surname, password, userType, email, phoneNum, isBlocked
 			FROM Users WHERE userType = ?`, [userType]
 		);
 
@@ -67,10 +73,12 @@ async function create(user){
 		
 		schema.createUserSchema.validateAsync(user).then( async (value) => 
 		{
+			const hash = await bcrypt.hash(value.password, 10)
+
 			const query = `INSERT INTO Users (name, surname, password, userType, email, phoneNum) 
 		VALUES (?, ?, ?, ?, ?, ?)`
 			resolve(db.query(query,
-				[value.name, value.surname, value.password, value.userType, value.email, value.phoneNum]));
+				[value.name, value.surname, hash, value.userType, value.email, value.phoneNum]));
 		} ).catch( (err) => {
 			reject(err);
 		} );
@@ -84,27 +92,89 @@ async function create(user){
 
 async function remove(requestingUser, id){
 	if(requestingUser.id == id || requestingUser.userType >= 3){
+		blockedUsers.push(id);
 		return result = await db.query(`DELETE FROM Users WHERE id = ?`, [id]);
 	}else if(requestingUser.userType == 2){
+		blockedUsers.push(id);
 		return result = await db.query(`DELETE FROM Users WHERE id = ? AND userType = 1`, [id]);
 	}else{
 		return {error: "User is not authorized to delete this user"};
 	}
 }
 
-async function login(user){
-	const rows = await db.query(`SELECT * FROM Users WHERE email = ? AND password = ?`, [user.email, crypto.Hash('sha256').update(user.password).digest('hex')]);
+async function edit(requestingUser, id, user){
+	if(user.password != undefined){
+		user.password = await bcrypt.hash(user.password, 10)
+	}else{
+		delete user.password;
+	}
+	if(requestingUser.id == id || requestingUser.userType >= 3){
+		if(user.password != undefined){
+			const query = `UPDATE Users SET name = ?, surname = ?, userType = ?, email = ?, phoneNum = ?, password = ?, isBlocked = ? WHERE id = ?`;
+			const result = await db.query(query, [user.name, user.surname, user.userType, user.email, user.phoneNum, user.password, user.isBlocked, id ]);
+			return result;
+		}else{
+			const query = `UPDATE Users SET name = ?, surname = ?, userType = ?, email = ?, phoneNum = ?, isBlocked = ? WHERE id = ?`;
+			const result = await db.query(query, [user.name, user.surname, user.userType, user.email, user.phoneNum, user.isBlocked, id ]);
+			return result;
+		}
+	}else{
+		return {error: "User is not authorized to edit this user"};
+	}
+}
+
+async function block(requestingUser, id){
+	if(requestingUser.userType >= 3){
+		if(!blockedUsers.includes(id))
+			blockedUsers.push(id);
+		return {message: "User blocked"};
+	}else{
+		return {error: "User is not authorized to block this user"};
+	}
+}
+
+/**
+ * Checks if user is blocked
+ * @param {*} user User object (id,userType) (must be trustworthy)
+ * @returns 
+ */
+function isBlocked(user){
+	return user.isBlocked || blockedUsers.includes(user.id);
+}
+
+async function login(credentials){
+	
+	const rows = await db.query(`SELECT * FROM Users WHERE email = ?`, [credentials.email]);
 	const data = helper.emptyOrRows(rows);
 	const meta = {};
-
-	if(data.length > 0){
-		const token = generateAccessToken(data[0]);
 	
-		return {
-			data,
-			meta,
-			token
+	
+	if(data.length > 0){
+		
+		const user = data[0];
+
+		const match = await bcrypt.compare(credentials.password, user.password);
+		
+		if(isBlocked(user)){
+			return {error: "User is blocked"};
 		}
+
+		if(match){
+			const token = generateAccessToken(user);
+			return {
+				data: user,
+				meta,
+				token
+			}
+		}else{
+			return {
+				data: null,
+				meta: {},
+				token: null
+			}
+		}
+			
+		
 	} else {
 		return {
 			data,
@@ -152,7 +222,10 @@ function authenticateToken(req, res) {
 	jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
 		
 		if (err) return res.sendStatus(403)
-	
+		
+		if(isBlocked(user))
+			return res.status(401).send("User is blocked");
+
 		req.user = user
 		result = true;
 	})
@@ -204,7 +277,9 @@ module.exports = {
 	getAll,
 	create,
 	remove,
+	edit,
 	login,
+	block,
 	generateAccessToken,
 	authenticateToken,
 	hasAccessToken,

@@ -1,7 +1,7 @@
 <template>
     <Toolbar>
         <template #start>
-            <h3>Users</h3>
+            <h3>Správa uživatelů</h3>
             <!-- <i class="pi pi-bars p-toolbar-separator mr-2" /> -->
             <!-- <SplitButton label="Save" icon="pi pi-check" :model="items" class="p-button-warning"></SplitButton> -->
         </template>
@@ -19,25 +19,29 @@
             :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
             <Column field="id" header="ID" :sortable="true"></Column>
-            <Column field="name" header="Name" :sortable="true"></Column>
-            <Column field="surname" header="Surname" :sortable="true"></Column>
-            <Column field="userType" header="User Type" :sortable="true">
+            <Column field="name" header="Jméno" :sortable="true"></Column>
+            <Column field="surname" header="Příjmení" :sortable="true"></Column>
+            <Column field="userType" header="Typ uživatele" :sortable="true">
                 <template #body="{data}">
                     <UserTypeBadge :userType="data.userType"></UserTypeBadge>
                 </template>
             </Column>
             <Column field="email" header="E-mail" :sortable="true"></Column>
             <Column field="phoneNum" header="Telefonní číslo" :sortable="true"></Column>
-            <Column header="Action" :sortable="false">
+            <Column header="Akce" :sortable="false" class="column-action">
                 <template #body="{data}">
-                    <Button class="p-button-danger" @click="removeUser(data.id)">Remove</Button>
+                    <span class="p-buttonset">
+                        <Button class="p-button-sm" icon="pi pi-user-edit" @click="editUser(data)" v-tooltip.top="'Upravit uživatele'"></Button>
+                        <Button class="p-button-sm p-button-warning" icon="pi pi-lock" @click="banUser(data)" v-tooltip.top="'Zablokovat uživatele'"></Button>
+                        <Button class="p-button-danger p-button-sm" icon="pi pi-trash" @click="removeUser(data.id)" v-tooltip.top="'Smazat uživatele'"></Button>
+                    </span>
                 </template>
             </Column>
             <template #paginatorstart>
-                <Button type="button" icon="pi pi-refresh" class="p-button-text" />
+                <Button type="button" icon="pi pi-refresh" class="p-button-text" @click="load"/>
             </template>
             <template #paginatorend>
-                <Button type="button" icon="pi pi-cloud" class="p-button-text" />
+                <!-- <Button type="button" icon="pi pi-cloud" class="p-button-text" /> -->
             </template>
         </DataTable>
 	</div>
@@ -81,6 +85,46 @@
             <Button label="Odeslat" icon="pi pi-check" autofocus @click="createUser"/>
         </template>
     </Dialog>
+    <Dialog v-model:visible="editUserDialog">
+        <template #header>
+            <h3>Změna údajů uživatele</h3>
+        </template>
+        
+        <div class="dialog-body">
+            <div class="input-block">
+                <label for="name">Jméno</label>
+                <InputText id="name" type="text" v-model="editingUser.name" class="p-inputtext" required/>
+            </div>
+            <div class="input-block">
+                <label for="surname">Príjmení</label>
+                <InputText id="surname" type="text" v-model="editingUser.surname" class="p-inputtext" required/>
+            </div>
+            <div class="input-block">
+                <label for="email">E-mail</label>
+                <InputText id="email" type="email" v-model="editingUser.email" class="p-inputtext" required/>
+            </div>
+
+            <div class="input-block">
+                <label for="phone">Telefonní číslo</label>
+                <InputText id="phone" type="tel" v-model="editingUser.phoneNum" class="p-inputtext" required/>
+            </div>
+
+            <div class="input-block">
+                <label for="password">Heslo</label>
+                <Password v-model="editingUser.password" class="p-inputtext pwd" toggleMask required/>
+            </div>
+
+            <div class="input-block">
+                <label for="userType">Typ uživatele</label>
+                <Dropdown v-model="editingUser.userType" :options="userTypes" optionLabel="name" optionValue="value" placeholder="Select a UserType" />
+            </div>
+        </div>
+
+        <template #footer>
+            <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="createUserDialog = false"/>
+            <Button label="Odeslat" icon="pi pi-check" autofocus @click="submitEditUser"/>
+        </template>
+    </Dialog>
 </template>
 
 <script>
@@ -108,16 +152,18 @@ export default {
                 surname: '',
                 email: '',
                 phoneNum: '',
-                password: '',
+                password: null,
                 userType: 0
             },
+            editingUser: null,
             userTypes: [
-                {name: 'User', value: 0},
-                {name: 'Service technician', value: 1},
-                {name: 'City manager', value: 2},
+                {name: 'Uživatel', value: 0},
+                {name: 'Servisní technik', value: 1},
+                {name: 'Správce města', value: 2},
                 {name: 'Admin', value: 3},
             ],
             createUserDialog: false,
+            editUserDialog: false,
             store: useUsersStore()
         }
     },
@@ -131,6 +177,16 @@ export default {
         async createUser() {
             await this.store.createUser(this.newUser);
             this.createUserDialog = false;
+            this.load();
+        },
+        async editUser(user) {
+            // await this.store.createUser(this.newUser);
+            this.editUserDialog = true;
+            this.editingUser = user;
+        },
+        async submitEditUser() {
+            await this.store.editUser(this.editingUser.id,this.editingUser);
+            this.editUserDialog = false;
             this.load();
         },
         async removeUser(id) {
@@ -171,6 +227,19 @@ export default {
             }
             .pwd {
                 padding: 0;
+            }
+        }
+    }
+
+    
+    .p-datatable {
+        :deep(.column-action){
+            min-width: 9rem;
+        }
+        .p-buttonset{
+            width: 100%;
+            .p-button{
+                width: 33%;
             }
         }
     }

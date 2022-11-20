@@ -785,6 +785,17 @@
         }
       }
     }
+    .ticket-header-main-bottom, .ticket-header-main-top{
+      flex-direction: column;
+      .header-info{
+        text-align: left;
+        margin-top: 20px;
+      }
+      
+    }
+    .creator{
+      text-align: left;
+    }
   }
 </style>
 

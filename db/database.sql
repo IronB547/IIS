@@ -9,16 +9,17 @@ CREATE TABLE Users (
     userType INT NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     phoneNum VARCHAR(255) NOT NULL,
+    isBlocked BOOLEAN NOT NULL DEFAULT FALSE,
     PRIMARY KEY (id)
 );
 
 #trigger to hash password
-CREATE TRIGGER hash_password
-BEFORE INSERT ON Users
-FOR EACH ROW
-BEGIN
-    SET NEW.password = SHA2(NEW.password, 256);
-END;
+# CREATE TRIGGER hash_password
+# BEFORE INSERT ON Users
+# FOR EACH ROW
+# BEGIN
+#     SET NEW.password = SHA2(NEW.password, 256);
+# END;
 
 # STATUS: 0,1,2,3
 #         'open', 'waiting', 'solved', 'rejected'

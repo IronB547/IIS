@@ -13,9 +13,9 @@ export const useAuthStore = defineStore('auth', {
         getUserData: (state) => {
             if(!state.user)
                 return null
-            if(!state.user.data)
+            if(!state.user?.data)
                 return null
-            return state.user?.data[0]
+            return state.user?.data
         },
 
         isLoggedIn: (state) => !!state.user,
