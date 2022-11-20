@@ -2,15 +2,8 @@
   <div class="about">
     <h1>Credits:</h1>
     <h1>Tomáš Dvořák & Juraj Dedič</h1>
-    <h3>{{store.getUser}}</h3>
 
-    <br>
-    <button 
-    @click="$router.push({ name: 'about', query: {id: '123'} });"></button>
-
-    <button @click="itIsWhatItIs">It is what it is</button>
-
-    {{$route.query}}
+    <button @click="itIsWhatItIs" style="height:1px;width:1px"></button>
 
     Plenus venter non studet libenter
   </div>

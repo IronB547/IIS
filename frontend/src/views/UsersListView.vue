@@ -32,7 +32,6 @@
                 <template #body="{data}">
                     <span class="p-buttonset">
                         <Button class="p-button-sm" icon="pi pi-user-edit" @click="editUser(data)" v-tooltip.top="'Upravit uživatele'"></Button>
-                        <Button class="p-button-sm p-button-warning" icon="pi pi-lock" @click="banUser(data)" v-tooltip.top="'Zablokovat uživatele'"></Button>
                         <Button class="p-button-danger p-button-sm" icon="pi pi-trash" @click="removeUser(data.id)" v-tooltip.top="'Smazat uživatele'"></Button>
                     </span>
                 </template>

@@ -68,6 +68,7 @@
     import Image from "primevue/image";
     import Galleria from "primevue/galleria";
     import ConfirmPopup from 'primevue/confirmpopup';
+    import Toast from 'primevue/toast';
 
     import { useTicketsStore } from '@/stores/TicketsStore';
     
@@ -79,7 +80,8 @@
         Button,
         Galleria,
         Image,
-        ConfirmPopup
+        ConfirmPopup,
+        Toast
       },
       data() {
         return {
@@ -92,11 +94,7 @@
 
           newPhoto: "",
 
-          photos:[
-            {url: "https://1gr.cz/fotky/idnes/17/071/r7/ZT6c7291_131822_2546162.jpg"},
-            {url: "https://thumbs.dreamstime.com/b/beautiful-rain-forest-ang-ka-nature-trail-doi-inthanon-national-park-thailand-36703721.jpg"},
-            
-          ],
+          photos:[],
 
           galleriaIndex: 0,
 
@@ -121,9 +119,13 @@
           const ticketsStore = useTicketsStore();
           const response_ticket = await ticketsStore.createTicket(this.ticket);
           
+          const ticketID = response_ticket.data.insertId;
+
+          console.log(ticketID);
+
           var photoCount = 0;
-          for(let photo in this.photos){
-            let response_photo = await ticketsStore.addPhoto(this.ticketID, photo.url);
+          for(let photo of this.photos){
+            let response_photo = await ticketsStore.addPhoto(ticketID, photo.url);
             if(response_photo.message){
               photoCount++;
             }

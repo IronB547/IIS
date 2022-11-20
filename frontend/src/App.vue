@@ -27,13 +27,13 @@
   <v-idle
   @idle="onidle"
   :loop="true"
-  :wait="300"
-  :duration="1" />
+  :wait="30"
+  :duration="inactivityDuration" />
 
-  <Dialog header="Upozrnění" v-model:visible="displayInactiveDialog" :breakpoints="{'960px': '75vw', '640px': '90vw'}" :style="{width: '50vw'}" :modal="true">
+  <Dialog header="Upozornění" v-model:visible="displayInactiveDialog" :breakpoints="{'960px': '75vw', '640px': '90vw'}" :style="{width: '50vw'}" :modal="true">
       <p class="m-0">Byli jste odhlášeni z důvodu nečinnosti.</p>
       <template #footer>
-          <Button label="Zavřít" class="p-button-warning" icon="pi pi-check" autofocus @click="displayInactiveDialog = false" />
+          <Button label="Zavřít" class="p-button-warning" icon="pi pi-check" autofocus @click="displayInactiveDialog = false; inactivityDuration = 270" />
       </template>
   </Dialog>
 
@@ -73,16 +73,16 @@ export default {
       ],
       user: {},
       navigation: [
-        {
-          label: 'Domů',
-          icon: 'pi pi-fw pi-home',
-          to: '/'
-        },
-        {
-          label: 'Informace',
-          icon: 'pi pi-fw pi-info',
-          to: '/about'
-        },
+        // {
+        //   label: 'Domů',
+        //   icon: 'pi pi-fw pi-home',
+        //   to: '/'
+        // },
+        // {
+        //   label: 'Informace',
+        //   icon: 'pi pi-fw pi-info',
+        //   to: '/about'
+        // },
         {
           label: 'Tickety',
           icon: 'pi pi-fw pi-ticket',
@@ -114,6 +114,7 @@ export default {
         },
       ],
       displayInactiveDialog: false,
+      inactivityDuration: 270,
     }
   },
   methods: {

@@ -77,6 +77,7 @@ export const useTicketsStore = defineStore('tickets', {
             if(!localStorage.getItem("user"))
                 return {error: "Musíte být přihlášení abyste mohli vytvořit ticket"}
 
+
             const res = await fetch(`${config.host}/tickets/`, {
                 method: 'POST',
                 headers: {
@@ -86,9 +87,12 @@ export const useTicketsStore = defineStore('tickets', {
                 body: JSON.stringify(ticket)
             })
 
+            
             if(res.status === 201){
                 this.tickets.push(ticket)
-                return {message: "Ticket úspěšně vytvořen"}
+                //get the ticket id
+                const data = await res.json()
+                return {data,message: "Ticket úspěšně vytvořen"}
             }else{
                 return {error: "Vytvoření ticketu selhalo"}
             }

@@ -8,6 +8,8 @@ import { createPinia } from 'pinia'
 import ConfirmationService from 'primevue/confirmationservice';
 import Tooltip from 'primevue/tooltip';
 import Vidle from 'v-idle-3'
+import Toast from "primevue/toast";
+import Card from "primevue/card";
 
 // import "primevue/resources/themes/vela-green/theme.css"; //theme
 import "primevue/resources/themes/lara-dark-indigo/theme.css"
@@ -27,7 +29,10 @@ app.use(Vidle)
 app.directive('tooltip', Tooltip);
 
 // eslint-disable-next-line
+app.component("Toast", Toast)
 // eslint-disable-next-line
+app.component("Card", Card)
+
 app.mount("#app");
 
 
