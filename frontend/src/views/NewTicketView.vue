@@ -9,12 +9,12 @@
 
           <div class="content-header-left">
             <span class="p-float-label">
-              <InputText type="text" v-model="ticket.title" />
+              <InputText type="text" v-model="ticket.title" :class="{'p-invalid': !ticket.title && submitted}"/>
               <label for="title">Nadpis Ticketu</label>
             </span>
 
             <span class="p-float-label">
-              <InputText type="text" v-model="ticket.location" />
+              <InputText type="text" v-model="ticket.location" :class="{'p-invalid': !ticket.location && submitted}"/>
               <label for="ticket">Lokace</label>
             </span>
           </div>
@@ -48,7 +48,8 @@
           
       <div>
           <span class="p-float-label">
-              <Textarea :autoResize="true" name="description" rows="10" class="textarea" type="text" v-model="ticket.description" />
+              <Textarea :autoResize="true" name="description" rows="10" class="textarea" type="text" v-model="ticket.description" 
+              :class="{'p-invalid': !ticket.description && submitted}"/>
               <label for="description">Popis Ticketu</label>
           </span>
       </div>
@@ -98,6 +99,8 @@
 
           galleriaIndex: 0,
 
+          submitted: false,
+
           responsiveOptions: [
           {
               breakpoint: '1024px',
@@ -116,18 +119,18 @@
       },
       methods: {
         async addTicket() {
+          this.submitted = true;
           const ticketsStore = useTicketsStore();
           const response_ticket = await ticketsStore.createTicket(this.ticket);
           
-          const ticketID = response_ticket.data.insertId;
-
-          console.log(ticketID);
-
-          var photoCount = 0;
-          for(let photo of this.photos){
-            let response_photo = await ticketsStore.addPhoto(ticketID, photo.url);
-            if(response_photo.message){
-              photoCount++;
+          if(!response_ticket.error){
+            var photoCount = 0;
+            for(let photo of this.photos){
+              const ticketID = response_ticket.data.insertId;
+              let response_photo = await ticketsStore.addPhoto(ticketID, photo.url);
+              if(response_photo.message){
+                photoCount++;
+              }
             }
           }
 

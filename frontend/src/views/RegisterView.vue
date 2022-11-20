@@ -12,18 +12,18 @@
 
       <Toast />
       
-    <form class="register-form" @submit.prevent="register">
+    <form class="register-form" @submit.prevent="handleSubmit()">
       <h1>Registrace</h1>
 
       <div class="name-block">
         <div class="name-block-item">
           <label for="name">Jméno</label>
-          <InputText id="name" type="text" v-model="credentials.name" class="p-inputtext-lg" required/>
+          <InputText id="name" type="text" v-model="credentials.name"  class="p-inputtext-lg" required :class="{'p-invalid' : !credentials.name && submitted}"/>
         </div>
 
         <div class="name-block-item">
           <label for="surname">Příjmení</label>
-          <InputText id="surname" type="text" v-model="credentials.surname" class="p-inputtext-lg" required/>
+          <InputText id="surname" type="text" v-model="credentials.surname" class="p-inputtext-lg" required :class="{'p-invalid' : !credentials.surname && submitted}"/>
         </div>
       </div>
 
@@ -31,10 +31,10 @@
       <InputText id="email" type="email" v-model="credentials.email" class="p-inputtext-lg" required/>
 
       <label for="phone">Telefonní číslo</label>
-      <InputText id="phone" type="tel" v-model="credentials.phoneNum" class="p-inputtext-lg" required/>
+      <InputText id="phone" type="tel" v-model="credentials.phoneNum" class="p-inputtext-lg" required :class="{'p-invalid' : !credentials.phoneNum.match(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im) && submitted}"/>
 
       <label for="password">Heslo</label>
-      <Password v-model="credentials.password" class="p-inputtext-lg" toggleMask required/>
+      <Password v-model="credentials.password" class="p-inputtext-lg" toggleMask required :class="{'p-invalid' : (credentials.password.length < 8) && submitted}"/>
 <!-- 
       <label for="password-again">Password again</label>
       <Password v-model="credentials.passwordRepeat" class="p-inputtext-lg" toggleMask required/> -->
@@ -75,6 +75,7 @@
         phoneNum: "",
       },
       user: {},
+      submitted: false,
     }},
     methods: {
       async register(){
@@ -92,8 +93,14 @@
             life: 3000,
           });
         }
-      }
-    }
+      },
+      handleSubmit(isFormValid) {
+        console.log(isFormValid)
+        this.submitted = true;
+
+        this.register();
+      },
+    },
   };
 </script>
 

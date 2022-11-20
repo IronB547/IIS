@@ -23,7 +23,7 @@
 
             <span class="p-buttonset">
               <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID" v-if="!editMode" label="Otevřít ticket"/>
-              <Button class="p-button-primary" v-if="!editMode" @click="editMode = !editMode" label="Upravit požadavek"/>
+              <Button class="p-button-primary" v-if="!editMode && isManager" @click="editMode = !editMode" label="Upravit požadavek"/>
             </span>
 
             <div class="edit-buttons" v-if="editMode">
@@ -64,13 +64,13 @@
                   {{technician.name}} {{technician.surname}}
                 </span>
                 <div class="request-technicians-body-button">
-                  <Button icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" @click="removeTechnician(technician.technicianID)" v-tooltip.top="'Odebrat technika'"/>
+                  <Button v-if="isManager" icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" @click="removeTechnician(technician.technicianID)" v-tooltip.top="'Odebrat technika'"/>
                 </div>
               </div>
               </template>
           </Card>
         </div>
-        <div class="request-body-left-dropdown">
+        <div class="request-body-left-dropdown" v-if="isManager">
           <Dropdown  @change="technicianChange($event)" class="addtechnician" v-model="addTechnician" :options="technicians" :optionLabel="getTechnicianLabel" placeholder="Přidat technika" :loading="technicians.length == 0"/>
         </div>
       </div>
@@ -118,9 +118,9 @@
                   <span>{{comment.comment}}</span>
 
                   <div class="request-comment-body-buttons">
-                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
+                    <Button icon="pi pi-file-edit" v-if="isAdmin || isCommentOwner(comment)" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
                     <ConfirmPopup/> 
-                    <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)" v-tooltip.top="'Smazat komentář'"/>
+                    <Button icon="pi pi-times" v-if="isAdmin || isCommentOwner(comment)" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)" v-tooltip.top="'Smazat komentář'"/>
                   </div>
                 </div>
               </template>
@@ -143,26 +143,26 @@
     </template>
 
     <div class="edit-request-inputtext">
-      <InputText type="text" class="p-inputtext"  placeholder="Předpokládaný čas řešení"/>
+      <InputText type="text" class="p-inputtext" v-model="request.expectedTime"  placeholder="Předpokládaný čas řešení"/>
       <br>
       <small>Do pole vepisujte ve formátu: XX<b>h</b> XX<b>m</b></small>
       
     </div>
     <div class="edit-request-inputtext">
-      <InputText type="text" class="p-inputtext"  placeholder="Vykázaný čas"/>
+      <InputText type="text" class="p-inputtext" v-model="request.solutionTime"  placeholder="Vykázaný čas"/>
       <br>
       <small >Do pole vepisujte ve formátu: XX<b>h</b> XX<b>m</b></small>
     </div>
 
     <div class="edit-request-inputtext">
-      <InputText type="text" class="p-inputtext"  placeholder="Cena"/>
+      <InputText type="text" class="p-inputtext" v-model="request.price"  placeholder="Cena"/>
       <br>
       <small>Do pole vepište částku i měnu: 1000 CZK, 50 €, 100 $</small>
     </div>
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditRequestData = false"/>
-      <Button label="Upravit" icon="pi pi-check" autofocus/>
+      <Button label="Upravit" icon="pi pi-check" autofocus @click="editRequest"/>
     </template>
   </Dialog>
 
@@ -202,6 +202,7 @@
 
   import { useRequestsStore } from "@/stores/RequestsStore";
   import { useUsersStore} from "@/stores/UsersStore";
+  import { useAuthStore } from "@/stores/AuthStore";
   // import { useAuthStore } from "@/stores/AuthStore";
   import Button from "primevue/button";
   import Dropdown from 'primevue/dropdown';
@@ -255,6 +256,8 @@
 
       const requestsStore = useRequestsStore();
       this.requestsStore = requestsStore;
+
+      this.authStore = useAuthStore();
       
       await this.loadRequest();
     },
@@ -266,10 +269,12 @@
         this.request.comments = this.request.comments.sort((objA, objB) => Number(new Date(objB.createdAt)) - Number(new Date(objA.createdAt)))
         
         //console.log(this.request.comments.sort(function(a, b){return new Date(b) - new Date(a)}))
-
         this.loadTechnicians();
       },
       async loadTechnicians() {
+        if(!this.authStore.hasRole(2))
+          return;
+
         const usersStore = useUsersStore();
 
         let technicians = await usersStore.getUsers(1);
@@ -489,39 +494,39 @@
       },
       async deleteComment(commentID) {
         this.$confirm.require({
-                target: event.currentTarget,
-                message: 'Opravdu chcete smazat komentář?',
-                icon: 'pi pi-exclamation-triangle',
-                acceptLabel: 'Potvrdit',
-                rejectLabel: 'Zrušit',
-                acceptIcon: 'pi pi-check',
-                rejectIcon: 'pi pi-times',
-                accept: async () => {
-                  const response = await this.requestsStore.deleteComment(commentID);
+          target: event.currentTarget,
+          message: 'Opravdu chcete smazat komentář?',
+          icon: 'pi pi-exclamation-triangle',
+          acceptLabel: 'Potvrdit',
+          rejectLabel: 'Zrušit',
+          acceptIcon: 'pi pi-check',
+          rejectIcon: 'pi pi-times',
+          accept: async () => {
+            const response = await this.requestsStore.deleteComment(commentID);
 
-                  if(response.message){
-                  this.$toast.add({
-                    severity: "success",
-                    summary: "Úspěch",
-                    detail: response?.message || "Komentář úspěšně smazán",
-                    life: 3000,
-                  })
-                  }
-                  else {
-                    this.$toast.add({
-                      severity: "error",
-                      summary: "Chyba",
-                      detail: response?.error || "Smazání komentáře selhalo",
-                      life: 3000,
-                    })
-                  }
+            if(response.message){
+            this.$toast.add({
+              severity: "success",
+              summary: "Úspěch",
+              detail: response?.message || "Komentář úspěšně smazán",
+              life: 3000,
+            })
+            }
+            else {
+              this.$toast.add({
+                severity: "error",
+                summary: "Chyba",
+                detail: response?.error || "Smazání komentáře selhalo",
+                life: 3000,
+              })
+            }
 
-                 this.loadRequest();
-                },
-                reject: () => {},
-                onShow: () => {},
-                onHide: () => {}
-            });
+            this.loadRequest();
+          },
+          reject: () => {},
+          onShow: () => {},
+          onHide: () => {}
+        });
       },
       async editComment(commentID) {
         const response = await this.requestsStore.editComment(commentID,{comment: this.commentText});
@@ -546,8 +551,17 @@
         this.showEditCommentDialog = false;
         this.commentText = "";
       },
+      isCommentOwner(comment) {
+        return comment.userID == useAuthStore().getUserData?.id;
+      },
     },
     computed: {
+      isManager(){
+        return useAuthStore().hasRole(2);
+      },
+      isAdmin(){
+        return useAuthStore().hasRole(3);
+      },
       // techniciansLabels() {
       //   return this.technicians.map(technician => ({name: technician.name + " " + technician.surname, id: technician.id}));
       // }

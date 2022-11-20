@@ -38,6 +38,8 @@ app.use((err, req, res, next) => {
 	return;
 });
 
+app.use(express.static('../frontend/dist'));
+
 app.listen(port, () => {
 	console.log(`Example app listening at http://localhost:${port}`);
 });

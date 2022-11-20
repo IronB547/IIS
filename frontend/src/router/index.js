@@ -61,7 +61,7 @@ const routes = [
     component: NewTicketView,
   },
   {
-    path: "/newrequest",
+    path: "/newrequest/:ticketID?",
     name: "newRequest",
     component: NewRequestView,
   },

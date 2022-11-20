@@ -20,8 +20,17 @@
 
         <div class="redirect-buttons">
             <span class="p-buttonset">
-              <Button class="p-button-primary p-button-title" label="Upravit ticket" v-if="!editMode" @click="editMode = !editMode"/>
-              <Button class="p-button-primary p-button-title" label="Vytvořit požadavek" v-if="!editMode" @click="editMode = !editMode"/>
+              <Button class="p-button-primary p-button-title" label="Upravit ticket" v-if="!editMode && (isOwner || isManager)" @click="editMode = !editMode"/>
+              <Button 
+                class="p-button-primary p-button-title" 
+                label="Vytvořit požadavek" 
+                v-if="!editMode && isManager" 
+                @click="$router.push({
+                  name: 'newRequest',
+                  params: {
+                    ticketID: ticket.id,
+                  }
+                })"/>
             </span>
         </div>
 
@@ -76,7 +85,7 @@
         {{getStatus(ticket?.status)}}
         </h3>
       </div>
-      <Dropdown @change="stateChange($event)" class="changestate" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
+      <Dropdown @change="stateChange($event)" class="changestate" v-model="changeState" v-if="isManager" :options="states" optionLabel="name" placeholder="Změnit stav" />
     </div>
 
     <div class="ticket-comments">
@@ -85,6 +94,7 @@
 
         <Button 
           class="p-button-primary" 
+          v-if="isTechnician"
           @click="$router.push({
             name:'requests',
             query: {
@@ -102,7 +112,7 @@
             <template #content>
               <div class="ticket-comment-body">
                   <span>{{comment.comment}}</span>
-                  <div class="ticket-comment-body-buttons">
+                  <div class="ticket-comment-body-buttons" v-if="isCommentOwner(comment) || isAdmin">
                     <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
                     <ConfirmPopup/>
                     <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)" v-tooltip.top="'Smazat komentář'"/>
@@ -163,6 +173,7 @@
   import Textarea from "primevue/textarea";
   import Dropdown from 'primevue/dropdown';
   import { useTicketsStore } from "@/stores/TicketsStore";
+  import { useAuthStore } from "@/stores/AuthStore";
   import ConfirmPopup from 'primevue/confirmpopup';
   import InputText from "primevue/inputtext";
 
@@ -541,7 +552,24 @@
         }
         this.loadTicket();
       },
+      isCommentOwner(comment) {
+        return comment.userID == useAuthStore().getUserData?.id;
+      },
     },
+    computed: {
+      isTechnician(){
+        return useAuthStore().hasRole(1);
+      },
+      isManager(){
+        return useAuthStore().hasRole(2);
+      },
+      isAdmin(){
+        return useAuthStore().hasRole(3);
+      },
+      isOwner(){
+        return this.ticket?.userID == useAuthStore().getUserData?.id;
+      },
+    }
   };
 </script>
 

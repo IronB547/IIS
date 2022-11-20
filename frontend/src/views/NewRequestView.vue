@@ -9,14 +9,14 @@
             <div class="content-header">
                 <div class="content-header-item">
                     <span class="p-float-label">
-                        <InputText type="text" v-model="request.title" />
+                        <InputText type="text" v-model="request.title" :class="{'p-invalid': !request.title.length >= 2  && submitted}"/>
                         <label for="title">Nadpis požadavku</label>
                     </span>
                 </div>
 
                 <div class="content-header-item">
                     <span class="p-float-label">
-                        <Dropdown v-model="request.ticketID" :options="availableTickets" optionLabel="title" :filter="true"/>
+                        <Dropdown v-model="ticket" :options="availableTickets" optionLabel="title" :filter="true"/>
                         <label for="ticket">Ticket</label>
                     </span>
                 </div>
@@ -24,7 +24,8 @@
                 
             <div>
                 <span class="p-float-label">
-                    <Textarea :autoResize="true" name="description" rows="10" class="textarea" type="text" v-model="request.description" />
+                    <Textarea :autoResize="true" name="description" rows="10" class="textarea" type="text" v-model="request.description"
+                    :class="{'p-invalid': !request.description.length >= 2 && submitted}" />
                     <label for="description">Popis požadavku</label>
                 </span>
             </div>
@@ -59,13 +60,23 @@ export default {
             availableTickets: [
                 
             ],
+            ticket: {},
+            submitted: false,
         }
     },
     async mounted() {
-        this.getTickets();
+        await this.getTickets();
+        
+        console.log(this.$route.params)
+        if(this.$route.params.ticketID){
+            let ticketID = Number( this.$route.params.ticketID );
+            this.ticket = this.availableTickets.find( ticket => ticket.id === ticketID );
+        }
     },
     methods: {
         async addRequest() {
+            this.submitted = true;
+            this.request.ticketID = this.ticket?.id;
             const requestsStore = useRequestsStore();
             const response = await requestsStore.createRequest(this.request);
 
@@ -144,8 +155,11 @@ main{
     .p-float-label{
         margin-bottom: 2.5rem;
     }
-    .dropdown{
+    .p-dropdown{
         width: 100%;
+        :deep(.p-dropdown-label){
+            text-align: left;
+        }
     }
     :deep(.p-inputtext){
         width: 100%;

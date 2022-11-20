@@ -10,6 +10,13 @@ module.exports = defineConfig({
       }
     }
   },
+  pwa: {
+    manifestOptions: {
+      name: "Smart City - IIS 2022",
+      short_name: "Smart City",
+      display: "standalone",
+    },
+  },
   chainWebpack: (config) => {
     config
         .plugin('html')
