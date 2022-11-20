@@ -19,12 +19,12 @@
           <div class="request-header-bottom-buttons">
             <Button class="p-button-danger  p-button-title" v-if="editMode" @click="deleteRequest(this.request.id)">Smazat požadavek</Button>
 
-            <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID">Otevřít ticket</Button>
+            <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID" v-if="!editMode">Otevřít ticket</Button>
             <Button class="p-button-primary" v-if="!editMode" @click="editMode = !editMode">Upravit požadavek</Button>
             
             <div class="edit-buttons" v-if="editMode">
-              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode"/>
-              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editRequest"/>
+              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode" v-tooltip.top="'Zrušit změny'" />
+              <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editRequest" v-tooltip.top="'Potvrdit změny'"/>
             </div>
 
           </div>
@@ -60,7 +60,7 @@
                   {{technician.name}} {{technician.surname}}
                 </span>
                 <div class="request-technicians-body-button">
-                  <Button icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" @click="removeTechnician(technician.technicianID)" />
+                  <Button icon="pi pi-times" class="p-button-rounded p-button-danger cross-button" @click="removeTechnician(technician.technicianID)" v-tooltip.top="'Odebrat technika'"/>
                 </div>
               </div>
               </template>
@@ -114,9 +114,9 @@
                   <span>{{comment.comment}}</span>
 
                   <div class="request-comment-body-buttons">
-                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
+                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
                     <ConfirmPopup/> 
-                    <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
+                    <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)" v-tooltip.top="'Smazat komentář'"/>
                   </div>
                 </div>
               </template>

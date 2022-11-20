@@ -9,20 +9,20 @@
           <Button class="p-button-primary p-button-sm p-button-title" v-if="!editMode" @click="editMode = !editMode">Upravit ticket</Button>
           
           <div class="edit-buttons" :class="{'edit-buttons-image': ticket?.photos?.length}" v-if="editMode">
-            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode"/>
-            <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editTicket"/>
+            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode" v-tooltip.top="'Zrušit změny'"/>
+            <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editTicket" v-tooltip.top="'Potvrdit změny'"/>
             
             
             <Button class="p-button-secondary p-button-sm" v-if="editMode" @click="openAddPhoto">Přidat fotku</Button>
             <ConfirmPopup group="addPhoto">
-                <template #message="slotProps">
-                    <div class="add-photo-content">
-                      <h3>Zadejte URL fotky:</h3>
-                      <InputText type="url" v-model="newPhotoUrl"/>
-                      <i :class="slotProps.message.icon" style="font-size: 1.5rem"></i>
-                      <p class="pl-2">{{slotProps.message.message}}</p>
-                    </div>
-                </template>
+              <template #message="slotProps">
+                <div class="add-photo-content">
+                  <h3>Zadejte URL fotky:</h3>
+                  <InputText type="url" v-model="newPhotoUrl"/>
+                  <i :class="slotProps.message.icon" style="font-size: 1.5rem"></i>
+                  <p class="pl-2">{{slotProps.message.message}}</p>
+                </div>
+              </template>
             </ConfirmPopup>
 
             <ConfirmPopup/> 
@@ -35,7 +35,7 @@
             <div class="image-container">
               <Image :activeIndex="galleriaIndex" class="ticket-image" :src="slotProps.item?.url" alt="Image Text" preview>
               </Image>
-              <Button v-if="editMode" class="image-delete-button p-button-danger p-button-rounded" @click="removePhoto(slotProps.item?.id)" icon="pi pi-trash" />
+              <Button v-if="editMode" class="image-delete-button p-button-danger p-button-rounded" @click="removePhoto(slotProps.item?.id)" icon="pi pi-trash" v-tooltip.top="'Smazat fotku'"/>
             </div>
             </template>
           </Galleria>
@@ -100,9 +100,9 @@
               <div class="ticket-comment-body">
                   <span>{{comment.comment}}</span>
                   <div class="ticket-comment-body-buttons">
-                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment"/>
+                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
                     <ConfirmPopup/>
-                    <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)"/>
+                    <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)" v-tooltip.top="'Smazat komentář'"/>
                   </div>
               </div>
             </template>
@@ -651,13 +651,24 @@
           flex-wrap: wrap;
           align-items: baseline;
 
-          .p-button-secondary{
+          .p-button-secondary{ // Přidat fotku
             min-width: 120px;
+            margin-top: 10px;
+            display: block;
+          }
+
+          .p-button-danger:nth-child(4){ // Smazat ticket
             margin-top: 10px;
           }
 
-          .p-button-danger:nth-child(4){
-            margin-top: 10px;
+          .p-button-rounded{
+            margin-left: 2.5px;
+            margin-right: 5px;
+          }
+
+          .p-button-danger:nth-child(1){ // Deny button
+            margin-left: 5px;
+            margin-right: 2.5px;
           }
         }
         .edit-buttons-image{

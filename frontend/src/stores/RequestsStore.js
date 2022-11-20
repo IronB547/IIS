@@ -134,12 +134,12 @@ export const useRequestsStore = defineStore('requests', {
 
             if(res.status === 204){
                 this.requests.push(request)
-                return {message: "Ticket úspěšně upraven"}
+                return {message: "Požadavek úspěšně upraven"}
             }if(res.status === 403){
-                return {error: "Nemůžete upravit ticket"}
+                return {error: "Nemůžete upravit požadavek"}
             }
             else{
-                return {error: "Upravení ticketu selhalo"}
+                return {error: "Upravení požadavků selhalo"}
             }
         },
 
