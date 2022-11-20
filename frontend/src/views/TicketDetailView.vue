@@ -5,15 +5,31 @@
       <div class="ticket-header-main">
         <div class="ticket-header-main-top">
           <h3 class="title" v-if="!editMode">{{ticket?.title}}</h3>
-          <Textarea :autoResize="true" v-if="editMode" v-model="ticket.title"/>
-          <Button class="p-button-primary p-button-sm p-button-title" v-if="!editMode" @click="editMode = !editMode">Upravit ticket</Button>
-          
-          <div class="edit-buttons" :class="{'edit-buttons-image': ticket?.photos?.length}" v-if="editMode">
+          <Textarea :autoResize="true" v-if="editMode" v-model="ticket.title"/>        
+          <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
+          :showItemNavigators="true" :showThumbnails="false">
+          <template #item="slotProps">
+            <div class="image-container">
+              <Image :activeIndex="galleriaIndex" class="ticket-image" :src="slotProps.item?.url" alt="Image Text" preview>
+              </Image>
+              <Button v-if="editMode" class="image-delete-button p-button-danger p-button-rounded" @click="removePhoto(slotProps.item?.id)" icon="pi pi-trash" v-tooltip.top="'Smazat fotku'"/>
+            </div>
+            </template>
+          </Galleria>
+        </div>
+
+        <div class="redirect-buttons">
+            <span class="p-buttonset">
+              <Button class="p-button-primary p-button-title" label="Upravit ticket" v-if="!editMode" @click="editMode = !editMode"/>
+              <Button class="p-button-primary p-button-title" label="Vytvořit požadavek" v-if="!editMode" @click="editMode = !editMode"/>
+            </span>
+        </div>
+
+        <div class="edit-buttons" :class="{'edit-buttons-image': ticket?.photos?.length}" v-if="editMode">
             <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode" v-tooltip.top="'Zrušit změny'"/>
             <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editTicket" v-tooltip.top="'Potvrdit změny'"/>
-            
-            
-            <Button class="p-button-secondary p-button-sm" v-if="editMode" @click="openAddPhoto">Přidat fotku</Button>
+                        
+            <Button class="p-button-secondary p-button-sm" v-if="editMode" @click="openAddPhoto" label="Přidat fotku"/>
             <ConfirmPopup group="addPhoto">
               <template #message="slotProps">
                 <div class="add-photo-content">
@@ -26,20 +42,9 @@
             </ConfirmPopup>
 
             <ConfirmPopup/> 
-            <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="deleteTicket(this.ticket.id)">Smazat ticket</Button>
+            <Button class="p-button-danger p-button-sm p-button-title" v-if="editMode" @click="deleteTicket(this.ticket.id)" label="Smazat ticket"/>
           </div>
 
-          <Galleria :value="ticket?.photos" :responsiveOptions="responsiveOptions" :numVisible="ticket?.photos?.length || 0" :circular="true" containerStyle="max-width: 640px; max-height: 300px;"
-          :showItemNavigators="true" :showThumbnails="false">
-          <template #item="slotProps">
-            <div class="image-container">
-              <Image :activeIndex="galleriaIndex" class="ticket-image" :src="slotProps.item?.url" alt="Image Text" preview>
-              </Image>
-              <Button v-if="editMode" class="image-delete-button p-button-danger p-button-rounded" @click="removePhoto(slotProps.item?.id)" icon="pi pi-trash" v-tooltip.top="'Smazat fotku'"/>
-            </div>
-            </template>
-          </Galleria>
-        </div>
         <div class="ticket-header-main-bottom">
           <span class="location" v-if="!editMode">Lokace: {{ticket?.location}}</span>
           <Textarea :autoResize="true" v-if="editMode" v-model="ticket.location"/>
@@ -85,13 +90,11 @@
             query: {
               ticketID: ticket.id,
             }
-          })">
-          Servisní požadavky
-        </Button>
+          })"
+          label="Servisní požadavky"
+          />
 
-        <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="ticket?.status > 2">
-          Přidat komentář
-        </Button>
+        <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="ticket?.status > 2" label="Přidat komentář"/>
       </div>
       <div class="ticket-comments-body">
         <div class="ticket-comment" v-for="comment in ticket?.comments" :key="comment.id">
@@ -192,10 +195,11 @@
         newPhotoUrl: "",
         states: [
           {name: 'Vytvořeno'},
-          {name: 'Čeká na schválení'},
+          {name: 'Čeká na vyřízení'},
           {name: 'Vyřešeno'},
           {name: 'Zamítnuto'}
         ],
+        
         galleriaIndex: 0,
         responsiveOptions: [
 				{
@@ -292,7 +296,7 @@
           case 0:
             return "Vytvořeno";
           case 1:
-            return "Čeká na schválení";
+            return "Čeká na vyřízení";
           case 2:
             return "Vyřešeno";
           case 3:
@@ -307,7 +311,7 @@
           case "Vytvořeno":
             state = 0
             break
-          case "Čeká na schválení":
+          case "Čeká na vyřízení":
             state = 1
             break
           case "Vyřešeno":
@@ -629,6 +633,36 @@
         align-items: center;
         width: 100%;
       }
+
+      .redirect-buttons{
+        margin-bottom: 20px;
+      }
+      .edit-buttons{
+          display: inline-flex;
+          justify-content: space-between;
+          margin-bottom: 20px;
+          flex-wrap: wrap;
+
+          .p-button-secondary{ // Přidat fotku
+            min-width: 120px;
+            display: block;
+          }
+
+          .p-button-danger:nth-child(4){ // Smazat ticket
+            margin-left: 30px;
+
+          }
+
+          .p-button-rounded{
+            margin-right: 25px;
+          }
+
+          .p-button-danger:nth-child(1){ // Deny button
+            margin-left: 25px;
+            margin-right: 15px;
+          }
+        }
+
       .ticket-header-main-top {
         width: 100%;
         display: flex;
@@ -642,35 +676,7 @@
           font-family: Avenir, Helvetica, Arial, sans-serif;
           font-weight: 700;
         }
-        .edit-buttons{
-          display: inline-flex;
-          justify-content: flex-end;
-          margin-right: 20px;
-          margin-left: 20px;
-          min-width: 123px;
-          flex-wrap: wrap;
-          align-items: baseline;
-
-          .p-button-secondary{ // Přidat fotku
-            min-width: 120px;
-            margin-top: 10px;
-            display: block;
-          }
-
-          .p-button-danger:nth-child(4){ // Smazat ticket
-            margin-top: 10px;
-          }
-
-          .p-button-rounded{
-            margin-left: 2.5px;
-            margin-right: 5px;
-          }
-
-          .p-button-danger:nth-child(1){ // Deny button
-            margin-left: 5px;
-            margin-right: 2.5px;
-          }
-        }
+        
         .edit-buttons-image{
           justify-content: space-evenly;
         }

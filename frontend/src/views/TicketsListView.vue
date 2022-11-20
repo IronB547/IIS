@@ -14,9 +14,7 @@
             </div>
         </div>
           <router-link :to="`newticket`">
-            <Button class="p-button-lg p-button-primary">
-              Vytvoř ticket
-            </Button>
+            <Button class="p-button-lg p-button-primary" label="Vytvoř ticket"/>
           </router-link>
         </template>
       </Toolbar>
@@ -137,7 +135,7 @@
   }
   .tickets{
     color: white;
-    background-color: var(--indigo-700);
+    //background-color: var(--indigo-700);
     border-radius: 10px;
     display: inline-block;
     padding: 7px 20px;

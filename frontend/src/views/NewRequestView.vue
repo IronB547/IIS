@@ -1,24 +1,18 @@
 <template>
     <main>
+        <Toast/>
         <div class="header">
-            <h3>Add new service request</h3>
+            <h1>Nový Servisní Požadavek</h1>
         </div>
-
+        <br>
         <form class="content" @submit.prevent="addRequest">
             <div class="content-header">
                 <div class="content-header-item">
                     <span class="p-float-label">
                         <InputText type="text" v-model="request.title" />
-                        <label for="title">Title</label>
+                        <label for="title">Nadpis požadavku</label>
                     </span>
                 </div>
-                
-                <!-- <div class="content-header-item">
-                    <span class="p-float-label">
-                        <Dropdown v-model="request.solutionState" :options="solutionStates" optionLabel="name" class="dropdown" placeholder="Select a solution state" />
-                        <label for="dropdown">Dropdown</label>
-                    </span>
-                </div> -->
 
                 <div class="content-header-item">
                     <span class="p-float-label">
@@ -31,13 +25,11 @@
             <div>
                 <span class="p-float-label">
                     <Textarea :autoResize="true" name="description" rows="10" class="textarea" type="text" v-model="request.description" />
-                    <label for="description">Description</label>
+                    <label for="description">Popis požadavku</label>
                 </span>
             </div>
-            <Button type="submit">Create new Request</Button>
+            <Button type="submit" label="Vytvořit nový požadavek"/>
         </form>
-
-
     </main>
 </template>
 
@@ -73,9 +65,31 @@ export default {
         this.getTickets();
     },
     methods: {
-        addRequest() {
+        async addRequest() {
             const requestsStore = useRequestsStore();
-            requestsStore.createRequest(this.request);
+            const response = await requestsStore.createRequest(this.request);
+
+            if(response.message){
+                this.$toast.add({
+                    severity: "success",
+                    summary: "Úspěch",
+                    detail: response?.message || "Požadavek úspěšně vytvořen",
+                    life: 3000,
+                })
+                setTimeout(async () => {
+                        await this.$router.push({
+                        name: "requests"
+                        })
+                    }, 1000);
+            }
+            else {
+                this.$toast.add({
+                severity: "error",
+                summary: "Chyba",
+                detail: response?.error || "Vytvoření požadavku selhalo",
+                life: 3000,
+                })
+            }
         },
         async getTickets() {
             const ticketsStore = useTicketsStore();

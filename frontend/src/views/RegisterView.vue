@@ -3,8 +3,8 @@
   <div class="registration-container container-reponsive">
     
     <section class="register container-item">
-      <h2>Already have an account?</h2>
-      <Button label="Log In" class="p-button-secondary p-button-lg" @click="$router.push('login')"/>
+      <h2>Máte už vytvořený účet?</h2>
+      <Button label="Přihlásit se" class="p-button-secondary p-button-lg" @click="$router.push('login')"/>
     </section>
 
 
@@ -13,16 +13,16 @@
       <Toast />
       
     <form class="register-form" @submit.prevent="register">
-      <h1>Register</h1>
+      <h1>Registrace</h1>
 
       <div class="name-block">
         <div class="name-block-item">
-          <label for="name">Name</label>
+          <label for="name">Jméno</label>
           <InputText id="name" type="text" v-model="credentials.name" class="p-inputtext-lg" required/>
         </div>
 
         <div class="name-block-item">
-          <label for="surname">Surname</label>
+          <label for="surname">Příjmení</label>
           <InputText id="surname" type="text" v-model="credentials.surname" class="p-inputtext-lg" required/>
         </div>
       </div>
@@ -30,16 +30,16 @@
       <label for="email">E-mail</label>
       <InputText id="email" type="email" v-model="credentials.email" class="p-inputtext-lg" required/>
 
-      <label for="phone">Phone Number</label>
+      <label for="phone">Telefonní číslo</label>
       <InputText id="phone" type="tel" v-model="credentials.phoneNum" class="p-inputtext-lg" required/>
 
-      <label for="password">Password</label>
+      <label for="password">Heslo</label>
       <Password v-model="credentials.password" class="p-inputtext-lg" toggleMask required/>
 <!-- 
       <label for="password-again">Password again</label>
       <Password v-model="credentials.passwordRepeat" class="p-inputtext-lg" toggleMask required/> -->
 
-      <Button type="submit" label="Register" class="p-button-lg p-button-primary"/>
+      <Button type="submit" label="Zaregistrovat se" icon="pi pi-check" iconPos="right" class="p-button-lg p-button-primary"/>
 
     </form> 
 

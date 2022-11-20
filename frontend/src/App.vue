@@ -1,7 +1,7 @@
 <template>
   <Menubar class="menu-bar" :model="navigation">
     <template #start>
-      <h3 class="navbar-title">Smart City</h3>
+      <h3 class="navbar-title">Chytré město</h3>
     </template>
     <!-- <template #item="{item}">
         <router-link :to="item.to" custom v-slot="{href, route, navigate, isActive, isExactActive}">
@@ -15,7 +15,7 @@
         <div class="p-menuitem-content">
           <a href="#/login" @click="logOut" class="p-menuitem-link router-link-active router-link-active-exact" tabindex="-1" aria-hidden="true">
             <span class="p-menuitem-icon pi pi-fw pi-sign-out"></span>
-            <span class="p-menuitem-text">Log Out</span>
+            <span class="p-menuitem-text">Odhlásit se</span>
           </a>
         </div>
       </li>
@@ -55,40 +55,40 @@ export default {
       user: {},
       navigation: [
         {
-          label: 'Home',
+          label: 'Domů',
           icon: 'pi pi-fw pi-home',
           to: '/'
         },
         {
-          label: 'About',
+          label: 'Informace',
           icon: 'pi pi-fw pi-info',
           to: '/about'
         },
         {
-          label: 'Tickets',
+          label: 'Tickety',
           icon: 'pi pi-fw pi-ticket',
           to: '/tickets'
         },
         {
-          label: 'Requests',
+          label: 'Požadavky',
           icon: 'pi pi-fw pi-question',
           to: '/requests',
           visible: () => this.store.hasRole(1)
         },
         {
-          label: 'Users',
+          label: 'Seznam uživatelů',
           icon: 'pi pi-fw pi-users',
           to: '/users',
           visible: () => this.store.hasRole(2)
         },
         {
-          label: 'Log In',
+          label: 'Přihlásit se',
           icon: 'pi pi-fw pi-sign-in',
           to: '/login',
           visible: () => !this.store.isLoggedIn 
         },
         {
-          label: 'Register',
+          label: 'Registerovat se',
           icon: 'pi pi-fw pi-user-plus',
           to: '/register',
           visible: () => !this.store.isLoggedIn

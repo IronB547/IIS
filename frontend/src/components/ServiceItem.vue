@@ -24,8 +24,9 @@
           params: {
             requestID: request.id,
           }
-        })">
-          Detail</Button>
+        })"
+        label="Detail"
+        />
       </div>
       </template>
   </Card>

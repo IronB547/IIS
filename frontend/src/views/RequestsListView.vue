@@ -13,9 +13,7 @@
             </div>
         </div>
           <router-link :to="`newrequest`">
-            <Button class="p-button p-button-primary">
-              Vytvoř servisní požadavek
-            </Button>
+            <Button class="p-button p-button-primary" label="Vytvoř servisní požadavek"/>
           </router-link>
         </template>
       </Toolbar>

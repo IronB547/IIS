@@ -3,26 +3,26 @@
   <div class="registration-container">
     <main class="login container-item">
 
-    <h1>Log In</h1>
+    <h1>Přihlášení</h1>
     <Toast />
 
     <form class="login-form" @submit.prevent="logIn">
 
-      <InputText id="email" type="text" v-model="credentials.email" class="p-inputtext-lg" required/>
+      <InputText id="email" type="text" v-model="credentials.email" class="p-inputtext-lg" required placeholder="E-mail"/>
       <br>
       <br>
-      <Password v-model="credentials.password" class="p-inputtext-lg" toggleMask required :feedback="false" />
+      <Password v-model="credentials.password" class="p-inputtext-lg" toggleMask required :feedback="false" placeholder="Heslo"/>
       <br>
       <br>
-      <Button type="submit" label="Log In" icon="pi pi-check" iconPos="right" class="p-button-lg p-button-primary"/>
+      <Button type="submit" label="Přihlásit se" icon="pi pi-check" iconPos="right" class="p-button-lg p-button-primary"/>
 
     </form> 
 
     </main>
 
     <section class="register container-item">
-      <h2>Don't have an account?</h2>
-      <Button label="Register" class="p-button-secondary p-button-lg" @click="$router.push('register')"/>
+      <h2>Nemáte ještě účet?</h2>
+      <Button label="Zaregistrovat se" class="p-button-secondary p-button-lg" @click="$router.push('register')"/>
     </section>
   </div>
 </template>

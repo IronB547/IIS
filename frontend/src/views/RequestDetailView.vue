@@ -18,11 +18,14 @@
           </div>
 
           <div class="request-header-bottom-buttons">
-            <Button class="p-button-danger  p-button-title" v-if="editMode" @click="deleteRequest(this.request.id)">Smazat požadavek</Button>
+            <ConfirmPopup/>
+            <Button class="p-button-danger  p-button-title" v-if="editMode" @click="deleteRequest(this.request.id)" label="Smazat požadavek"/>
 
-            <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID" v-if="!editMode">Otevřít ticket</Button>
-            <Button class="p-button-primary" v-if="!editMode" @click="editMode = !editMode">Upravit požadavek</Button>
-            
+            <span class="p-buttonset">
+              <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID" v-if="!editMode" label="Otevřít ticket"/>
+              <Button class="p-button-primary" v-if="!editMode" @click="editMode = !editMode" label="Upravit požadavek"/>
+            </span>
+
             <div class="edit-buttons" v-if="editMode">
               <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode" v-tooltip.top="'Zrušit změny'" />
               <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editRequest" v-tooltip.top="'Potvrdit změny'"/>
@@ -98,14 +101,14 @@
           </template>
         </Card>
 
-        <Button class="p-button-primary" @click="showEditRequestData = true" :disabled="request?.solutionState > 0">Upravit hodnoty</Button>
+        <Button class="p-button-primary" @click="showEditRequestData = true" :disabled="request?.solutionState > 0" label="Upravit hodnoty"/>
       </div>
     </div>
 
     <div class="request-comments">
       <div class="request-comments-header">
         <h3>Komentáře</h3>
-        <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="request?.solutionState > 0">Přidat komentář</Button>
+        <Button class="p-button-primary" @click="showCommentDialog = true" :disabled="request?.solutionState > 0" label="Přidat komentář"/>
       </div>
       <div class="request-comments-body">
           <div class="request-comment" v-for="comment in request?.comments" :key="comment.id">
@@ -448,7 +451,7 @@
       async deleteRequest(requestID){
         this.$confirm.require({
           target: event.currentTarget,
-          message: 'Opravdu chcete smazat ticket?',
+          message: 'Opravdu chcete smazat požadavek?',
           icon: 'pi pi-exclamation-triangle',
           acceptLabel: 'Potvrdit',
           rejectLabel: 'Zrušit',
@@ -466,7 +469,7 @@
               })
               setTimeout(async () => {
                 await this.$router.push({
-                name: "tickets"
+                name: "requests"
                 })
               }, 1000);
             }
@@ -701,9 +704,7 @@
           margin-left: 20px;
           min-width: 123px;
         }
-          .p-button{
-            margin-left: 20px;
-          }
+          
         }
       }
       .request-header-top {

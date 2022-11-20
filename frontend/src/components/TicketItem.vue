@@ -33,7 +33,8 @@
             ticketID: ticket.id,
           }
         })"
-        >Detail</Button>
+        label="Detail"
+        />
       
       </div>
     </template>
@@ -82,7 +83,7 @@ export default {
         case 0:
           return "Vytvořeno";
         case 1:
-          return "Čeká na schválení";
+          return "Čeká na vyřízení";
         case 2:
           return "Vyřešeno";
         case 3:
