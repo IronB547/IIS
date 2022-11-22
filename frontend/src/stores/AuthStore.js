@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
     state: () => ({
         // products: [ , , ],
         user: JSON.parse(localStorage.getItem('user')),
+        displayMode: localStorage.getItem('displayMode') || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'),
     }),
     getters: {   
         getUser: (state) => state.user,
@@ -42,5 +43,13 @@ export const useAuthStore = defineStore('auth', {
             this.user = null
             router.push('/login')
         },
+        setDisplayMode(mode) {
+            this.displayMode = mode
+            localStorage.setItem('displayMode', mode)
+        },
+        removeDisplayMode() {
+            this.displayMode = null
+            localStorage.removeItem('displayMode')
+        }
     }
 })

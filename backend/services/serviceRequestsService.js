@@ -97,8 +97,9 @@ async function editRequest(request, requestingUser) {
 		UPDATE Service_request
 		SET solutionTime = ?,
 		solutionState = ?,
-		price = ?
-		WHERE Service_request.id = ? ${userVerification}`, [request.solutionTime, request.solutionState, request.price, request.requestID]);
+		price = ?,
+		expectedTime = ?
+		WHERE Service_request.id = ? ${userVerification}`, [request.solutionTime, request.solutionState, request.price, request.expectedTime, request.requestID]);
 	}else{
 		//user is a city manager or admin
 
@@ -112,8 +113,11 @@ async function editRequest(request, requestingUser) {
 		UPDATE Service_request
 		SET title = ?,
 			description = ?,
-			solutionState = ?
-		WHERE Service_request.id = ?`, [request.title, request.description, request.solutionState, request.requestID]);
+			solutionState = ?,
+			solutionTime = ?,
+			price = ?,
+			expectedTime = ?
+		WHERE Service_request.id = ?`, [request.title, request.description, request.solutionState,request.solutionTime, request.price, request.expectedTime, request.requestID]);
 	}
 }
 

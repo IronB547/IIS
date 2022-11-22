@@ -12,9 +12,8 @@
                 </div>
             </div>
         </div>
-          <router-link :to="`newrequest`">
-            <Button class="p-button p-button-primary" label="Vytvoř servisní požadavek"/>
-          </router-link>
+          <Button class="p-button p-button-primary" label="Vytvoř servisní požadavek"
+          @click="$router.push({ name: 'newRequest' })"/>
         </template>
       </Toolbar>
   </section>

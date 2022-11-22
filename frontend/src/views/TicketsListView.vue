@@ -1,5 +1,5 @@
 <template>
-  <main class="main">
+  <main class="main" id="app-window-main">
     <div class="ticket-header">
       <Toolbar class="toolbar">
         <template #start>
@@ -13,9 +13,8 @@
                 </div>
             </div>
         </div>
-          <router-link :to="`newticket`">
-            <Button class="p-button-lg p-button-primary" label="Vytvoř ticket"/>
-          </router-link>
+            <Button class="p-button-lg p-button-primary" label="Vytvoř ticket" 
+            @click="$router.push({ name: 'newTicket' })" :disabled="!isLoggedIn"/>
         </template>
       </Toolbar>
     </div>
@@ -36,9 +35,9 @@
   import QueryString from 'query-string';
   import Paginator from 'primevue/paginator';
 
-
   import {useTicketsStore} from '@/stores/TicketsStore';
-  
+  import { useAuthStore } from '@/stores/AuthStore';
+
   export default {
     name: "TicketsListView",
     components: {
@@ -101,11 +100,20 @@
         this.loadTickets();
       }
     },
+    computed: {
+      isLoggedIn() {
+        return useAuthStore().isLoggedIn;
+      }
+    },
     
   };
 </script>
 
 <style scoped lang="scss">
+  #app-window-main {
+    min-height: 100%;
+  }
+
   main{
     max-width: 1450px;
     margin: 0 auto;
