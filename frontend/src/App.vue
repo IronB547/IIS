@@ -11,7 +11,7 @@
     <template #end>
       <span></span>
       <ul class="p-menubar-root-list">
-      <li role="menuitem" aria-level="1" aria-setsize="6" aria-posinset="5">
+      <li role="menuitem" aria-level="1" aria-setsize="6" aria-posinset="5" class="menu-settings-item">
         <div class="p-menuitem-content">
           <a @click="displaySettingsDialog = true" class="p-menuitem-link router-link-active router-link-active-exact" tabindex="-1" aria-hidden="true">
             <span class="p-menuitem-icon pi pi-fw pi-cog"></span>
@@ -19,8 +19,6 @@
           </a>
         </div>
       </li>
-      </ul>
-      <ul class="p-menubar-root-list">
       <li v-if="store.isLoggedIn" class="p-menuitem" role="menuitem" aria-label="Log Out" aria-level="1" aria-setsize="6" aria-posinset="5">
         <div class="p-menuitem-content">
           <a href="#/login" @click="logOut" class="p-menuitem-link router-link-active router-link-active-exact" tabindex="-1" aria-hidden="true">
@@ -91,7 +89,6 @@ export default {
     }
   },
   mounted() {
-    console.log(this.store.displayMode);
     if(this.store.displayMode == "dark"){
       import ("primevue/resources/themes/lara-dark-indigo/theme.css")
     }else{
@@ -207,7 +204,9 @@ export default {
 .menu-bar
 {
   margin-bottom: 2rem;
-
+  .menu-settings-item{
+    margin: 0rem 1rem;
+  }
   .p-focus .p-menuitem-content{
     background-color: inherit !important;
     .p-menuitem-icon{
