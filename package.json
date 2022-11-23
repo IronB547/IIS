@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "cd frontend && yarn install && yarn build && cd ../backend && npm install",
-    "run": "cd backend && npm run-script run"
+    "run": "cd backend && npm run-script run",
+    "start": "cd backend && npm run-script run"
   },
   "author": "Tomáš Dvořák, Juraj Dedič",
   "license": "ISC"
