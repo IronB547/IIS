@@ -234,9 +234,13 @@ export default {
             this.editingUser = user;
         },
         async submitEditUser() {
-            await this.store.editUser(this.editingUser.id,this.editingUser);
-            this.editUserDialog = false;
-            this.load();
+            const res = await this.store.editUser(this.editingUser.id,this.editingUser);
+            if(res.error){
+                this.$toast.add({severity:'error', summary: 'Chyba', detail: 'Uživatele se nepodařilo upravit', life: 3000});
+            }else{
+                this.editUserDialog = false;
+                this.load();
+            }
         },
         async removeUser(id) {
             await this.store.removeUser(id);
