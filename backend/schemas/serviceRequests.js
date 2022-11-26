@@ -20,9 +20,9 @@ const editServiceRequest = Joi.object().keys({
     description: Joi.string().min(2).max(1023).required(),
     title: Joi.string().min(2).max(255).required(),
     solutionState: Joi.number().min(0).max(1).required(),
-    solutionTime: Joi.string().max(255).allow(null),
-    expectedTime: Joi.string().max(255).allow(null),
-    price: Joi.string().max(255).allow(null),
+    solutionTime: Joi.string().max(255).allow(null).allow(''),
+    expectedTime: Joi.string().max(255).allow(null).allow(''),
+    price: Joi.string().max(255).allow(null).allow(''),
 }).unknown();
 
 const changeState = Joi.object().keys({

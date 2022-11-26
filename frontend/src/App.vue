@@ -176,7 +176,7 @@ export default {
         this.store.removeDisplayMode();
       }
       this.inactivityDuration = this.inactivityDurationSetting*60;
-      this.$forceUpdate();
+      window.location.reload();
     },
     getColorMode(mode){
       if(mode === "dark" || mode === true)

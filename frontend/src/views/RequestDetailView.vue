@@ -162,7 +162,7 @@
 
     <template #footer>
       <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="showEditRequestData = false"/>
-      <Button label="Upravit" icon="pi pi-check" autofocus @click="editRequest"/>
+      <Button label="Upravit" icon="pi pi-check" autofocus @click="editRequest();showEditRequestData = false"/>
     </template>
   </Dialog>
 

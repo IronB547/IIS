@@ -1,5 +1,5 @@
 <template>
-  <main class="main" id="app-window-main">
+  <section id="app-window-main">
     <div class="ticket-header">
       <Toolbar class="toolbar">
         <template #start>
@@ -13,7 +13,7 @@
                 </div>
             </div>
         </div>
-            <Button class="p-button-lg p-button-primary" label="Vytvoř ticket" 
+            <Button class="p-button p-button-primary" label="Vytvoř ticket" 
             @click="$router.push({ name: 'newTicket' })" :disabled="!isLoggedIn"/>
         </template>
       </Toolbar>
@@ -22,7 +22,7 @@
       <TicketItem v-for="ticket in tickets" v-bind:key="ticket.id" :ticket="ticket"/>
     </div>
     <Paginator :rows="9" :totalRecords="totalItemsCount" @page="onPage($event)"></Paginator>
-  </main>
+  </section>
 </template>
   
 <script>
@@ -112,9 +112,6 @@
 <style scoped lang="scss">
   #app-window-main {
     min-height: 100%;
-  }
-
-  main{
     max-width: 1450px;
     margin: 0 auto;
   }
@@ -142,7 +139,6 @@
     }
   }
   .tickets{
-    color: white;
     //background-color: var(--indigo-700);
     border-radius: 10px;
     display: inline-block;
@@ -158,7 +154,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 50px;
-    max-width: calc(100% - 40px);
+    max-width: 1450px;
     // max-width: 1450px;
     margin: 0 auto;
     margin-bottom: 1rem;

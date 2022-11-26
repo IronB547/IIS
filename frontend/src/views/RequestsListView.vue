@@ -13,7 +13,7 @@
             </div>
         </div>
           <Button class="p-button p-button-primary" label="Vytvoř servisní požadavek"
-          @click="$router.push({ name: 'newRequest' })"/>
+          @click="$router.push({ name: 'newRequest', params: {ticketID: $route.query.ticketID} })"/>
         </template>
       </Toolbar>
   </section>
@@ -27,7 +27,6 @@
 import RequestItem from "@/components/ServiceItem.vue";
 
 import { useRequestsStore } from "@/stores/RequestsStore";
-import QueryString from "query-string";
 
 import Button from "primevue/button";
 import Toolbar from "primevue/toolbar";
@@ -74,8 +73,14 @@ export default {
       this.totalItemsCount = totalItemsCount.count || this.requests.length;
     },
     async search() {
-      let queryStr = QueryString.stringify(this.searchParams);
-      await this.$router.push(`${this.$route.path}?${queryStr}`);
+      // let queryStr = QueryString.stringify(this.searchParams);
+      await this.$router.push({
+        name: this.$route.name,
+        query: {
+          ...this.searchParams,
+          ticketID: this.$route.query.ticketID,
+        }
+      }),
       this.loadRequests();
     },
     stateChange() {

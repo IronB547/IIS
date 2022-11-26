@@ -67,7 +67,6 @@ export default {
     async mounted() {
         await this.getTickets();
         
-        console.log(this.$route.params)
         if(this.$route.params.ticketID){
             let ticketID = Number( this.$route.params.ticketID );
             this.ticket = this.availableTickets.find( ticket => ticket.id === ticketID );
