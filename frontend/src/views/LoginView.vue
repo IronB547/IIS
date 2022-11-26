@@ -51,8 +51,8 @@
     data() {
     return {
       credentials: {
-        email: "lorem.ipsum@gmail.com",
-        password: "loremipsum"
+        email: "",
+        password: ""
       },
       user: {},
     }},
