@@ -59,7 +59,8 @@
           <Textarea :autoResize="true" v-if="editMode" v-model="ticket.location"/>
 
           <p class="header-info">
-          <span class="creator"> Vytvořil: {{ticket?.userName}} {{ticket?.userSurname}} </span>
+          <span class="creator" @click="displayUserInfo(ticket)" 
+          v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'"> Vytvořil: {{ticket?.userName}} {{ticket?.userSurname}} </span>
           <br>
           <span class="date">{{new Date(ticket?.createdAt).toLocaleString("cs")}}</span>
         </p>
@@ -122,7 +123,7 @@
 
             <template #footer>
               <div class="ticket-comment-footer">
-                <span @click="displayCommentUserInfo(comment)" v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'">Napsal: {{comment.userName}} {{comment.userSurname}}</span>
+                <span @click="displayUserInfo(comment)" v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'">Napsal: {{comment.userName}} {{comment.userSurname}}</span>
                 <span class="date">{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
               </div>
             </template>
@@ -243,11 +244,11 @@
         this.ticket = await this.ticketsStore.getTicket(this.ticketID)
         this.ticket.comments = this.ticket.comments.sort((objA, objB) => Number(new Date(objB.createdAt)) - Number(new Date(objA.createdAt)))
       },
-      getUserFromComment(comment){
-        return {id: comment.userID, name: comment.userName, surname: comment.userSurname, userType: comment.userType}
+      getUserFrom(parent){
+        return {id: parent.userID, name: parent.userName, surname: parent.userSurname, userType: parent.userType}
       },
-      displayCommentUserInfo(comment){
-        this.selectedUser = this.getUserFromComment(comment);
+      displayUserInfo(parent){
+        this.selectedUser = this.getUserFrom(parent);
         this.isUserInfoVisible = true;
       },
       async showRequests(ticketID){
@@ -743,6 +744,9 @@
           }
           .location{
             max-width: 575px;
+          }
+          .creator{
+            cursor: pointer;
           }
         }
         p{

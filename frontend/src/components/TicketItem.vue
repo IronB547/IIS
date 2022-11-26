@@ -113,6 +113,9 @@ export default {
   :deep(.p-card-content) {
   height: 140px;
   }
+  :deep(.p-badge-warning){
+    min-width: 155px;
+  }
 }
 
 .ticket-item{

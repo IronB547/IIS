@@ -9,7 +9,7 @@
         <div class="request-header-bottom">
           <div class="request-header-bottom-left">
             <h4 v-if="request.ticket">Přiřazen k ticketu: {{request.ticket.title}}</h4>
-            <div class="request-creator">
+            <div class="request-creator" @click="displayCreatorInfo(request)">
               <h4>Vytvořil: {{request?.userName}} {{request?.userSurname}}</h4>
             </div>
             <p class="header-info">
@@ -71,7 +71,7 @@
           </Card>
         </div>
         <div class="request-body-left-dropdown" v-if="isManager">
-          <Dropdown  @change="technicianChange($event)" class="addtechnician" v-model="addTechnician" :options="technicians" :optionLabel="getTechnicianLabel" placeholder="Přidat technika" :loading="technicians.length == 0"/>
+          <Dropdown  @change="technicianChange($event)" class="addtechnician" v-model="addTechnician" :options="technicians" :optionLabel="getTechnicianLabel" placeholder="Přidat technika" :disabled="technicians.length == 0"/>
         </div>
       </div>
 
@@ -127,7 +127,7 @@
 
               <template #footer>
                 <div class="request-comment-footer">
-                  <span @click="displayCommentUserInfo(comment)" v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'">Napsal: {{comment.userName}} {{comment.userSurname}}</span>
+                  <span @click="displayCreatorInfo(comment)" v-tooltip.top="'Klikněte na jméno pro více informací o uživateli'">Napsal: {{comment.userName}} {{comment.userSurname}}</span>
                   <span>{{new Date(comment.createdAt).toLocaleString("cs")}}</span>
                 </div>
               </template>
@@ -284,9 +284,6 @@
         else
           this.technicians = [];
       },
-      getUserFromComment(comment){
-        return {id: comment.userID, name: comment.userName, surname: comment.userSurname, userType: comment.userType}
-      },
       async editRequest(){
         const response = await this.requestsStore.updateRequest(this.request);
         if(response.message){
@@ -308,14 +305,20 @@
         }
         this.loadRequest();
       },
-      displayCommentUserInfo(comment){
-        this.selectedUser = this.getUserFromComment(comment);
+
+      getUserFrom(parent){
+        return {id: parent.userID, name: parent.userName, surname: parent.userSurname, userType: parent.userType}
+      },
+      displayCreatorInfo(parent){
+        this.selectedUser = this.getUserFrom(parent);
         this.isUserInfoVisible = true;
       },
+
       displayUserInfo(technician){
         this.selectedUser = technician;
         this.isUserInfoVisible = true;
       },
+      
       getStatus(solutionState) {
         switch (solutionState) {
           case 0:
@@ -413,7 +416,7 @@
         this.addTechnician = null;
       },
       async removeTechnician(technicianID) {
-        console.log("removing technician",technicianID);
+        
         const response = await this.requestsStore.removeTechnician(this.requestID,technicianID);
         if(response.message){
           this.$toast.add({
@@ -709,6 +712,9 @@
 
         .request-header-bottom-left{
           max-width: 40%;
+          .request-creator{
+            cursor: pointer;
+          }
         }
         .request-header-bottom-buttons{
           .edit-buttons{

@@ -193,6 +193,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 .navbar-title {
   margin: 0 1rem 0 0.4rem;
   padding: 0;
