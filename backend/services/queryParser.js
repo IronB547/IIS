@@ -13,6 +13,7 @@ const ValidationError = require("../helper").ValidationError;
 const ParamType = {
     EXACT: "exact",
     LIKE: "like",
+    FLAG: "flag",
     CUSTOM: "custom"
 };
 
@@ -37,6 +38,7 @@ class QueryParser {
             orderBy: "",
             order: ""
         };
+        this.flags = {};
 
         this.queryParams = [
             {name: "id", type: ParamType.EXACT},
@@ -81,6 +83,8 @@ class QueryParser {
                     where += ` ${key} LIKE '%${value}%' AND`;
                 } else if (param.type == ParamType.CUSTOM) {
                     where += param.handler(value) + " AND";
+                }else if(param.type == ParamType.FLAG) {
+                    this.flags[key] = true;
                 }
             }else if(key == "orderBy") {
                 if(!this.getQueryParam(value))
@@ -104,6 +108,10 @@ class QueryParser {
             order: order
         };
         return where;
+    }
+
+    getFlag(flag) {
+        return this.flags[flag] || false;
     }
 
     getWhereClause() {

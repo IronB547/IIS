@@ -8,6 +8,7 @@ class QueryParserTicket extends QueryParser {
             {name: "location", type: ParamType.LIKE},
             {name: "status", type: ParamType.EXACT},
             {name: "userID", type: ParamType.EXACT},
+            {name: "minimal", type: ParamType.FLAG},
         ]);
 
         super(query, queryParamsAdditional);

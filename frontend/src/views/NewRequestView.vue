@@ -104,7 +104,7 @@ export default {
         },
         async getTickets() {
             const ticketsStore = useTicketsStore();
-            const response = await ticketsStore.getBySearch(1,{});
+            const response = await ticketsStore.getBySearch(1,{"minimal": true});
             if(response.error) {
                 this.$toast.add({
                     severity: 'error',

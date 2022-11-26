@@ -16,8 +16,7 @@ import { useAuthStore } from "@/stores/AuthStore";
 const routes = [
   {
     path: "/",
-    name: "ticketsScreen",
-    component: TicketsListView,
+    redirect: "/tickets",
   },
   {
     path: "/about",
