@@ -21,8 +21,8 @@
     <div class="tickets-list">
       <TicketItem v-for="ticket in tickets" v-bind:key="ticket.id" :ticket="ticket"/>
     </div>
-    <Paginator :rows="9" :totalRecords="totalItemsCount" @page="onPage($event)"></Paginator>
   </section>
+  <Paginator :rows="9" :totalRecords="totalItemsCount" @page="onPage($event)"></Paginator>
 </template>
   
 <script>
@@ -109,7 +109,15 @@
   };
 </script>
 
+<style lang="scss"> 
+.p-paginator {
+    margin-top: 40px;
+
+  }
+</style>
+
 <style scoped lang="scss">
+
   #app-window-main {
     min-height: 100%;
     max-width: 1450px;

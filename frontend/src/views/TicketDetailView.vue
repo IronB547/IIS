@@ -720,9 +720,7 @@
           word-wrap: anywhere;
           margin: 0px 0px;
         }
-        .ticket-image{
-            // width: 300px;
-        }
+        
       }
       .ticket-header-main-bottom {
         width: 100%;
