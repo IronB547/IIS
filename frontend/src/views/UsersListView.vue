@@ -1,4 +1,5 @@
 <template>
+    <Toast/>
     <Toolbar>
         <template #start>
             <h3>Správa uživatelů</h3>
@@ -7,7 +8,7 @@
         </template>
         
         <template #end>
-            <Button label="New" icon="pi pi-plus" class="mr-2" @click="createUserDialog=true"/>
+            <Button label="New" icon="pi pi-plus" class="mr-2" @click="createUserDialog=true; submitted = false;"/>
             <!-- <Button icon="pi pi-search" class="mr-2" /> -->
             <!-- <Button icon="pi pi-calendar" class="p-button-success mr-2" /> -->
             <!-- <Button icon="pi pi-times" class="p-button-danger" /> -->
@@ -18,7 +19,7 @@
             paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
             :rowsPerPageOptions="[10,20,50]" responsiveLayout="scroll"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords}">
-            <Column field="id" header="ID" :sortable="true"></Column>
+            <Column field="id" header="ID" :sortable="true" ></Column>
             <Column field="name" header="Jméno" :sortable="true"></Column>
             <Column field="surname" header="Příjmení" :sortable="true"></Column>
             <Column field="userType" header="Typ uživatele" :sortable="true">
@@ -46,35 +47,45 @@
 	</div>
     <Dialog v-model:visible="createUserDialog">
         <template #header>
-            <h3>Register user</h3>
+            <h3>Registrovat uživatele</h3>
         </template>
         
         <div class="dialog-body">
             <div class="input-block">
-                <label for="name">Name</label>
-                <InputText id="name" type="text" v-model="newUser.name" class="p-inputtext" required/>
+                <label for="name">Jméno</label>
+                <InputText id="name" type="text" :class="{'p-invalid' :  newUser.name.length < 2 && submitted}" v-model="newUser.name" class="p-inputtext" required/>
             </div>
             <div class="input-block">
-                <label for="surname">Surname</label>
-                <InputText id="surname" type="text" v-model="newUser.surname" class="p-inputtext" required/>
+                <label for="surname">Příjmení</label>
+                <InputText id="surname" type="text" :class="{'p-invalid' :  newUser.surname.length < 2 && submitted}" v-model="newUser.surname" class="p-inputtext" required/>
             </div>
             <div class="input-block">
                 <label for="email">E-mail</label>
-                <InputText id="email" type="email" v-model="newUser.email" class="p-inputtext" required/>
+                <InputText id="email" type="email" :class="{'p-invalid' : !newUser.email.match(/^\S+@\S+\.\S+$/) && submitted}" v-model="newUser.email" class="p-inputtext" required/>
             </div>
 
             <div class="input-block">
-                <label for="phone">Phone Number</label>
-                <InputText id="phone" type="tel" v-model="newUser.phoneNum" class="p-inputtext" required/>
+                <label for="phone">Telefonní číslo</label>
+                <InputText id="phone" type="tel" v-model="newUser.phoneNum" 
+                :class="{'p-invalid' : !newUser.phoneNum.match(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im) && submitted}"
+                 class="p-inputtext" required/>
             </div>
 
             <div class="input-block">
-                <label for="password">Password</label>
-                <Password v-model="newUser.password" class="p-inputtext pwd" toggleMask required/>
+                <label for="password">Heslo</label>
+                <Password id="user-screen-reg-password" prompt-label="Vyberte heslo" weakLabel="Slabé heslo" mediumLabel="Průměrné heslo" strongLabel="Silné heslo" v-model="newUser.password" :class="{'p-invalid' :  newUser.password.length < 8 && submitted}" class="p-inputtext pwd" toggleMask required>
+                    <template #footer>
+                        <Divider />
+                        <p class="mt-2">Podmínka</p>
+                        <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                            <li>Alespoň 8 znaků</li>
+                        </ul>
+                    </template>    
+                </Password>
             </div>
 
             <div class="input-block">
-                <label for="userType">User type</label>
+                <label for="userType">Typ uživatele</label>
                 <Dropdown v-model="newUser.userType" :options="userTypes" optionLabel="name" optionValue="value" placeholder="Select a UserType" />
             </div>
         </div>
@@ -110,7 +121,18 @@
 
             <div class="input-block">
                 <label for="password">Heslo</label>
-                <Password v-model="editingUser.password" class="p-inputtext pwd" toggleMask required/>
+                <Password id="user-screen-reg-password" weakLabel="Slabé heslo" mediumLabel="Průměrné heslo" strongLabel="Silné heslo" v-model="editingUser.password" class="p-inputtext pwd" toggleMask required>
+                    <template #header>
+                        <h6>Vyberte heslo</h6>
+                    </template>
+                    <template #footer>
+                        <Divider />
+                        <p class="mt-2">Podmínka</p>
+                        <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                            <li>Alespoň 8 znaků</li>
+                        </ul>
+                    </template>    
+                </Password>
             </div>
 
             <div class="input-block">
@@ -142,6 +164,7 @@ import Password from 'primevue/password';
 import Dropdown from 'primevue/dropdown';
 import UserTypeBadge from '@/components/UserTypeBadge.vue';
 import InputSwitch from 'primevue/inputswitch';
+import Toast from 'primevue/toast';
 
 // import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
 // import Row from 'primevue/row';                     //optional for row
@@ -158,7 +181,7 @@ export default {
                 surname: '',
                 email: '',
                 phoneNum: '',
-                password: null,
+                password: '',
                 userType: 0
             },
             editingUser: null,
@@ -170,7 +193,9 @@ export default {
             ],
             createUserDialog: false,
             editUserDialog: false,
-            store: useUsersStore()
+            store: useUsersStore(),
+
+            submitted: false
         }
     },
     methods: {
@@ -181,9 +206,26 @@ export default {
             }
         },
         async createUser() {
-            await this.store.createUser(this.newUser);
-            this.createUserDialog = false;
-            this.load();
+            this.submitted = true;
+            const res = await this.store.createUser(this.newUser);
+            console.log(res);
+            if(res.status === 201){
+                this.createUserDialog = false;
+                this.newUser = {
+                    name: '',
+                    surname: '',
+                    email: '',
+                    phoneNum: '',
+                    password: '',
+                    userType: 0
+                };
+                this.load();
+                this.submitted = false;
+            }else if(res.status === 409){
+                this.$toast.add({severity:'error', summary: 'Chyba', detail: 'Uživatel s tímto emailem již existuje', life: 3000});
+            }else{
+                this.$toast.add({severity:'error', summary: 'Chyba', detail: 'Uživatele se nepodařilo vytvořit', life: 3000});
+            }
         },
         async editUser(user) {
             // await this.store.createUser(this.newUser);
@@ -211,7 +253,8 @@ export default {
         Password,
         Dropdown,
         UserTypeBadge,
-        InputSwitch
+        InputSwitch,
+        Toast
     },
     async mounted(){
         this.load();

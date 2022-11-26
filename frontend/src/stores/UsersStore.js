@@ -38,10 +38,10 @@ export const useUsersStore = defineStore('user', {
             })
 
             if(res.status === 201){
-                const user = await res.json()
+                const user = await {data: res.json(), status: res.status}
                 return user
             }else{
-                return {error: "Failed to create user"}
+                return {error: "Failed to create user", status: res.status}
             }
         },
 

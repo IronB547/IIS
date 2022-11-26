@@ -34,7 +34,15 @@
       <InputText id="phone" type="tel" v-model="credentials.phoneNum" class="p-inputtext-lg" required :class="{'p-invalid' : !credentials.phoneNum.match(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im) && submitted}"/>
 
       <label for="password">Heslo</label>
-      <Password v-model="credentials.password" class="p-inputtext-lg" toggleMask required :class="{'p-invalid' : (credentials.password.length < 8) && submitted}"/>
+      <Password v-model="credentials.password" prompt-label="Vyberte heslo" weakLabel="Slabé heslo" mediumLabel="Průměrné heslo" strongLabel="Silné heslo"  class="p-inputtext-lg" toggleMask required :class="{'p-invalid' : (credentials.password.length < 8) && submitted}">
+        <template #footer>
+            <Divider />
+            <p class="mt-2">Podmínka</p>
+            <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                <li>Alespoň 8 znaků</li>
+            </ul>
+        </template>
+      </Password>
 <!-- 
       <label for="password-again">Password again</label>
       <Password v-model="credentials.passwordRepeat" class="p-inputtext-lg" toggleMask required/> -->

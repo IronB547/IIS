@@ -55,9 +55,17 @@ router.post('/', async function(req, res, next) {
 	try {
 		if(users.hasAccessToken(req,res) === true) {
 			if(users.authorize(req,res, 3)){
-				res.json(await users.create(req.body));
+				users.create(req.body).then((result) => {
+					res.status(201).json(result);
+				}).catch((err) => { 
+					createFail(err, res);
+				});
 			}else if(users.authorize(req,res,2) === true && newUser.userType == 1) {
-				res.json(await users.create(req.body));
+				users.create(req.body).then((result) => {
+					res.status(201).json(result);
+				}).catch((err) => { 
+					createFail(err, res);
+				});
 			}else{
 				if(!res.headersSent)
 					res.status(403).json({message: "Forbidden"});
@@ -76,17 +84,20 @@ router.post('/', async function(req, res, next) {
 router.post('/', async function(req, res, next) { 
 	req.body.userType = 0; 
 	users.create(req.body).then((result) => {
-		console.debug(result);
 		res.status(201).json(result);
 	}).catch((err) => { 
-		if(err.code === 'ER_DUP_ENTRY') {
-			res.status(409).json({message: 'User already exists'});
-		}else{
-			console.error(`Error while creating user (service) `, err.message);
-			res.status(400).json({message: err.message});
-		}
+		createFail(err, res);
 	});
 });
+
+function createFail(err, res) {
+	if(err.code === 'ER_DUP_ENTRY') {
+		res.status(409).json({message: 'User with this email already exists'});
+	}else{
+		console.error(`Error while creating user (service) `, err.message);
+		res.status(400).json({message: err.message});
+	}
+}
 
 router.delete('/:id', async function(req, res, next) {
 	try {
