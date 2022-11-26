@@ -39,6 +39,12 @@ async function getBySearch(page = 1, query, countOnly = false) {
 	if(countOnly){
 		const rows = await db.query(`SELECT COUNT(*) AS count FROM Tickets ${where}`);
 		return rows[0];
+	}else if(parser.getFlag("minimal")){
+		const call = `SELECT id,title FROM Tickets ${where} ${orderBy}`
+		const rows = await db.query(call);
+		const data = helper.emptyOrRows(rows);
+	
+		return data;
 	}else{
 		const call = `SELECT * FROM Tickets ${where} ${orderBy} LIMIT ${offset}, ${config.listPerTicketPage}`
 		const rows = await db.query(call);
