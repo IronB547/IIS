@@ -10,9 +10,9 @@ const createServiceRequest = Joi.object().keys({
 
 const editServiceRequestTechnician = Joi.object().keys({
     requestID: Joi.number().required(),
-    solutionState: Joi.number().min(0).max(1).required(),
-    solutionTime: Joi.string().max(255).required(),
-    price: Joi.string().max(255).required(),
+    solutionState: Joi.number().min(0).max(1).allow(null, '').required(),
+    solutionTime: Joi.string().max(255).allow(null, '').required(),
+    price: Joi.string().max(255).allow(null, '').required(),
 }).unknown();
 
 const editServiceRequest = Joi.object().keys({
@@ -20,9 +20,9 @@ const editServiceRequest = Joi.object().keys({
     description: Joi.string().min(2).max(1023).required(),
     title: Joi.string().min(2).max(255).required(),
     solutionState: Joi.number().min(0).max(1).required(),
-    solutionTime: Joi.string().max(255).allow(null).allow(''),
-    expectedTime: Joi.string().max(255).allow(null).allow(''),
-    price: Joi.string().max(255).allow(null).allow(''),
+    solutionTime: Joi.string().max(255).allow(null, '').optional(),
+    expectedTime: Joi.string().max(255).allow(null, '').optional(),
+    price: Joi.string().max(255).allow(null, '').optional(),
 }).unknown();
 
 const changeState = Joi.object().keys({

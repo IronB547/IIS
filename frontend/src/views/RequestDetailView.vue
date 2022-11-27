@@ -557,13 +557,13 @@
       isCommentOwner(comment) {
         return comment.userID == useAuthStore().getUserData?.id;
       },
-      isAllowedToChange() {
-        let current_user = useAuthStore().getUserData?.id
-        if((this.request.technicians?.find(technic => technic.technicianID == current_user) == undefined)) {
+      isAllowedToChangeState() {
+        let currentUser = useAuthStore().getUserData?.id
+        if((this.request.technicians?.find(technic => technic.technicianID == currentUser) == undefined)) {
           return true;
         }
 
-        if((this.request.technicians?.find(technic => technic.technicianID == current_user).technicianID == current_user) || this.isManager || this.isAdmin)
+        if((this.request.technicians?.find(technic => technic.technicianID == currentUser).technicianID == currentUser) || this.isManager || this.isAdmin)
           return false;
         else
           return true;
