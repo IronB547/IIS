@@ -32,8 +32,8 @@
             <Column header="Akce" :sortable="false" class="column-action">
                 <template #body="{data}">
                     <span class="p-buttonset">
-                        <Button class="p-button-sm" icon="pi pi-user-edit" @click="editUser(data)" v-tooltip.top="'Upravit uživatele'"></Button>
-                        <Button class="p-button-danger p-button-sm" icon="pi pi-trash" @click="removeUser(data.id)" v-tooltip.top="'Smazat uživatele'"></Button>
+                        <Button class="p-button-sm" icon="pi pi-user-edit" :disabled="!isAdmin" @click="editUser(data)" v-tooltip.top="'Upravit uživatele'"></Button>
+                        <Button class="p-button-danger p-button-sm" icon="pi pi-trash" :disabled="!isAdmin && data.userType != 1" @click="removeUser(data.id)" v-tooltip.top="'Smazat uživatele'"></Button>
                     </span>
                 </template>
             </Column>
@@ -165,11 +165,13 @@ import Dropdown from 'primevue/dropdown';
 import UserTypeBadge from '@/components/UserTypeBadge.vue';
 import InputSwitch from 'primevue/inputswitch';
 import Toast from 'primevue/toast';
+import Divider from 'primevue/divider';
 
 // import ColumnGroup from 'primevue/columngroup';     //optional for column grouping
 // import Row from 'primevue/row';                     //optional for row
 
 import {useUsersStore} from '@/stores/UsersStore';
+import { useAuthStore } from '@/stores/AuthStore';
 
 export default {
     name: "UsersListView",
@@ -249,6 +251,11 @@ export default {
             this.load();
         }
     },
+    computed: {
+        isAdmin() {
+            return useAuthStore().hasRole(3)
+        }
+    },
     components: {
         DataTable,
         Column,
@@ -260,7 +267,8 @@ export default {
         Dropdown,
         UserTypeBadge,
         InputSwitch,
-        Toast
+        Toast,
+        Divider
     },
     async mounted(){
         this.load();
