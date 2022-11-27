@@ -50,7 +50,7 @@
         solved : request?.solutionState == 1}">
         <h3>{{getStatus(request?.solutionState)}}</h3>
       </div>
-      <Dropdown class="changestate" :disabled="isAllowedToChange()" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
+      <Dropdown class="changestate" :disabled="!isAllowedToChange()" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
     </div>
 
     <div class="request-body">
@@ -101,7 +101,7 @@
           </template>
         </Card>
 
-        <Button class="p-button-primary"  @click="showEditRequestData = true" :disabled="request?.solutionState > 0 || isAllowedToChange()" label="Upravit hodnoty"/>
+        <Button class="p-button-primary"  @click="showEditRequestData = true" :disabled="request?.solutionState > 0 || !isAllowedToChange()" label="Upravit hodnoty"/>
       </div>
     </div>
 
@@ -561,19 +561,19 @@
         return comment.userID == useAuthStore().getUserData?.id;
       },
       isAllowedToChange() {
-        let currentUser = useAuthStore().getUserData?.id
-        if((this.request.technicians?.find(technic => technic.technicianID == currentUser) == undefined)) {
-          return true;
-        }
 
-        if((this.request.technicians?.find(technic => technic.technicianID == currentUser).technicianID == currentUser) || this.isManager || this.isAdmin)
-          return false;
-        else
+        if(this.isAssignedTechnician || this.isManager)
           return true;
+        else
+          return false;
 
       },
     },
     computed: {
+      isAssignedTechnician() {
+        let currentUser = useAuthStore().getUserData?.id
+        return this.request.technicians?.find(technic => technic.technicianID == currentUser) ? true : false;
+      },
       isManager(){
         return useAuthStore().hasRole(2);
       },
