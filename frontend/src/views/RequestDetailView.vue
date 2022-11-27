@@ -50,7 +50,7 @@
         solved : request?.solutionState == 1}">
         <h3>{{getStatus(request?.solutionState)}}</h3>
       </div>
-      <Dropdown class="changestate" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
+      <Dropdown class="changestate" :disabled="isAllowedToChangeState()" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
     </div>
 
     <div class="request-body">
@@ -556,6 +556,18 @@
       },
       isCommentOwner(comment) {
         return comment.userID == useAuthStore().getUserData?.id;
+      },
+      isAllowedToChangeState() {
+        let current_user = useAuthStore().getUserData?.id
+        if((this.request.technicians?.find(technic => technic.technicianID == current_user) == undefined)) {
+          return true;
+        }
+
+        if((this.request.technicians?.find(technic => technic.technicianID == current_user).technicianID == current_user) || this.isManager || this.isAdmin)
+          return false;
+        else
+          return true;
+
       },
     },
     computed: {

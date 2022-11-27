@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title>Projekt IIS</title>
+	<style type="text/css">
+		table { border-collapse: collapse; }
+		td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
+		dt { font-weight: bold; margin-top: 0.5em; }
+	</style>
+</head>
+<body>
+
+<!-- Zkontrolujte prosím nastavení kódování v hlavičce dokumentu 
+	 podle použitého editoru -->
+
+<h1>Chytré město</h1> <!-- Nahradte názvem svého zadání -->
+
+<dl>
+	<dt>Autoři</dt>
+	<dd>Juraj Dedič <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+		<a href="mailto:xdedic07@stud.fit.vutbr.cz">xdedic07@stud.fit.vutbr.cz</a> -
+		Primárně správa uživatelů (backend i frontend), práce s frameworkem Vue a Node.js, ER diagram
+	</dd>
+	<dd>Tomáš Dvořák <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+		<a href="mailto:xdvora3r@stud.fit.vutbr.cz">xdvora3r@stud.fit.vutbr.cz</a> - 
+		Primárně správa ticketů a servisních požadavků (backend i frontend), celkové úpravy frontendu, databáze
+	</dd>
+	<br>
+	<dd> Dodatek - Oba dva jsme měli práci rozloženou 50/50 proto je rozložení práce velmi orientační. Spolupracovali jsme každý víkend od úplného začátku až do konce projektu.
+	</dd>
+	<dt>URL aplikace</dt>
+	<dd><a href="https://smart-city-iis.herokuapp.com/">https://smart-city-iis.herokuapp.com/</a></dd>
+	<dd>(pokud má aplikace více vstupních stránek, napište obdobně další URL)</dd>
+</dl>
+
+<h2>Uživatelé systému pro testování</h2>
+<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+<table>
+<tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+<tr><td>admin@admin.cz</td><td>admin</td><td>Administrátor</td></tr>
+<tr><td>themaster@laketown.com</td><td>lordoftherings</td><td>Správce města</td></tr>
+<tr><td>Stanislav.Dvořák@gmail.com</td><td>standa123</td><td>Technik</td></tr>
+<tr><td>Franta.Novak@gmail.com</td><td>frantajebest222</td><td>Uživatel</td></tr>
+</table>
+
+<p>(Diagram případů užití není nutné vkládat, pokud IS implementuje role a případy užití definované zadáním.)</p> 
+
+<h3>Video</h3>
+<a href="Video odkaz">https://smart-city-iis.herokuapp.com/</a>
+
+<p>Přiložte odkaz na komentované video demostrující použití informačního systému. Zaměřte se na případy užití definované zadáním (např. registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). Video nahrajte například na VUT Google Drive, kde ho bude možné přímo spustit z odkazu.</p> 
+
+<h2>Implementace</h2>
+<p>
+	Používáme databázový server (MySQL), HTTP požadavky (GET, POST, PUT, DELETE) obsluhuje server, který je vytvořený pomocí Node.JS. Uživateli zobrazujeme data přes frontendový framework Vue.JS.
+</p>
+
+<p>
+	Aplikační server využívá Express.JS pro zpracování HTTP požadavků nad databází. Poskytuje přístup ke koncovým bodům pomocí cest (routes). Existují jednotlivé cesty pro: uživatele, tickety a servisní požadavky a jejich detaily. Soubory těchto cest jsou umístěné ve složce „routes“. 
+</p>
+
+<p>
+	Část programu, která komunikuje s databází je umístěná v adresáři „services“. Ta zároveň zpracovává parametry dotazů (query params) a ověřuje správnost vstupů. Autentifikace a autorizace uživatelů probíhá pomocí JWT tokenů. Pro generování tokenů je potřebné, aby ve složce „ .env “ byla nastavená proměnná prostředí <code> TOKEN_SECRET="&ltsecret&gt"</code>. Zároveň je možná i volba portu pomocí <code>PORT="&ltport&gt"</code>.
+</p>
+
+<p>
+	Klientská strana je rozdělena do několika pohledů (views) a ty komunikují s aplikačním serverem pomocí metod definovaných v soubourech, které jsou ve složce „stores“. Výše zmíněné JWT tokeny ukládáme v „localStorage“, který zajišťuje perzistenci jednotlivých tokenů. Tyto tokeny odesíláme v HTTP hlavičce každého požadavku.
+</p>
+
+<h3>Rozšíření</h3>
+<p>
+	<ul>
+		<li>
+			Jednotlivé tickety jsou propojené s požadavky, které k nim patří.
+		</li>
+		<li>
+			Tmavý a světlý režim.
+		</li>
+		<li>
+			Filtrování pomocí query parametrů a stavu ticketu/požadavku.
+		</li>
+		<li>
+			Zobrazování informací o uživatelích.
+		</li>
+	</ul>
+</p>
+
+<h3>Databáze</h3>
+
+<img src="IIS.svg" width="1000px" height="auto" style="margin-left: 20px;">
+
+<h2>Instalace</h2>
+
+Stručně popište: 
+<ul>
+<li>Postup instalace na server</li>
+	<ul>
+		<li>Extrahujeme projekt a zadáme příkaz: <br>
+			<code>
+				cd ./frontend/ && yarn install && yarn build && cd ../backend/ && npm install && npm run-script run
+			</code>
+		</li>
+	</ul>
+<li>Softwarové požadavky (verze PHP apod.)</li>
+	<ul>
+		<li> 
+			node - 16.15.0  a vyšší
+		</li>
+
+		<li> 
+			yarn - 1.22.19  a vyšší
+		</li> 
+		<li> 
+			npm - 8.11.0 a vyšší
+		</li> 
+	</ul>
+<li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
+	<ul>
+		<li>
+			Používáme GOOGLE cloud hosting pro hostování databáze a pro přístup je nutné povolit staticky IP adresu zařízení. Ve složce „db“ je database.sql skript, který obsahuje celou databázi. Zároveň pro propojení databáze a backendu, je nutné ve složce „backend“ vytvořit soubor „ .env “, do kterého je nutné vepsat: <br> 
+			<code> DB_PASSWORD="&ltheslo&gt"</code>
+		</li>
+	</ul>
+</ul>
+
+<h2>Známé problémy</h2>
+<p>Zde popište, které body zadání nejsou implementovány a z jakého důvodu. Např. &bdquo;Z časových důvodů nebyla implementována správa uživatelů.&rdquo; Pomůžete tím zrychlit hodnocení, když neimplementované funkce nebudeme muset dlouze hledat.</p>
+
+</body>
+</html>

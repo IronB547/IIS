@@ -47,8 +47,9 @@ CREATE TABLE Service_request (
     price VARCHAR(255),
     cityManagerID INT NOT NULL,
     createdAt DATETIME NOT NULL,
-    PRIMARY KEY (id),
     ticketID INT DEFAULT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (cityManagerID) REFERENCES Users(id) ON DELETE CASCADE,
     FOREIGN KEY (ticketID) REFERENCES Tickets(id) ON DELETE CASCADE
 );
 
@@ -89,7 +90,7 @@ CREATE TABLE Service_request_comment (
     FOREIGN KEY (serviceRequestID) REFERENCES Service_request(id) ON DELETE CASCADE ,
     FOREIGN KEY (userID) REFERENCES Users(id) ON DELETE CASCADE
 );
-
+/*
 #function to drop all tables
 CREATE PROCEDURE delete_all_tables()
 BEGIN
@@ -109,6 +110,8 @@ CALL delete_all_tables();
 
 # USER_TYPE: 0,1,2,3
 #            'user', 'technician', 'city_manager', 'admin'
+Uživatelé nelze vkládat z důvodu hashování hesel. Z tohoto důvodu nebudou fungovat i referenční data.
+
 INSERT INTO Users (name, surname, password, userType, email, phoneNum) VALUES ('Zdenda', 'Holý', 'admin', 3, 'admin@admin.cz', '666666666');
 INSERT INTO Users (name, surname, password, userType, email, phoneNum) VALUES ('Franta', 'Novák', 'Frantajebest', 0, 'Franta.Pepa@seznam.cz', '786314245');
 INSERT INTO Users (name, surname, password, userType, email, phoneNum) VALUES ('Standa', 'Dvořák', 'Standa123', 1, 'Stanislav.Dvořák@gmail.com', '626425286');
@@ -152,3 +155,5 @@ INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userI
 INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Dobrá práce stando :).', '2021-02-15 11:21:52', 3, 4);
 INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Stando, dneska se k tomu už nedostanu, mohl by si se na to kouknout?', '2022-01-03 10:32:42', 4, 4);
 INSERT INTO Service_request_comment (comment, createdAt, serviceRequestID, userID) VALUES ('Jo, určitě na to mrknu, jedu tam.', '2022-01-03 12:41:22', 4, 3);
+
+ */
