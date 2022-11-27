@@ -114,7 +114,7 @@
               <div class="ticket-comment-body">
                   <span>{{comment.comment}}</span>
                   <div class="ticket-comment-body-buttons" v-if="isCommentOwner(comment) || isAdmin">
-                    <Button icon="pi pi-file-edit" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
+                    <Button icon="pi pi-file-edit" :disabled="ticket.status > 1" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
                     <ConfirmPopup/>
                     <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)" v-tooltip.top="'Smazat komentář'"/>
                   </div>

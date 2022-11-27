@@ -118,7 +118,7 @@
                   <span>{{comment.comment}}</span>
 
                   <div class="request-comment-body-buttons">
-                    <Button icon="pi pi-file-edit" v-if="isAdmin || isCommentOwner(comment)" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
+                    <Button icon="pi pi-file-edit" v-if="isAdmin || isCommentOwner(comment)" :disabled="request.solutionState == 1" class="p-button-rounded p-button-primary p-button-sm" @click="showEditCommentDialog = true; editingComment = comment.id; commentText = comment.comment" v-tooltip.top="'Editovat komentář'"/>
                     <ConfirmPopup/> 
                     <Button icon="pi pi-times" v-if="isAdmin || isCommentOwner(comment)" class="p-button-rounded p-button-danger p-button-sm" @click="deleteComment(comment.id)" v-tooltip.top="'Smazat komentář'"/>
                   </div>
