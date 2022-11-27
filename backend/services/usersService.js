@@ -78,7 +78,8 @@ async function getOne(id){
 async function create(user){
 	return new Promise((resolve, reject) => {
 		
-		schema.createUserSchema.validateAsync(user).then( async (value) => 
+		schema.createUserSchema.validateAsync(user, { errors: { language: "cs" } })
+		.then( async (value) => 
 		{
 			const hash = await bcrypt.hash(value.password, 10)
 

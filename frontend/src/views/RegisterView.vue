@@ -63,6 +63,7 @@
   import InputText from 'primevue/inputtext';
   import Password from 'primevue/password';
   import {useAuthStore} from '@/stores/AuthStore';
+  import Divider from 'primevue/divider';
   
   // @ is an alias to /src
   export default {
@@ -70,7 +71,8 @@
     components: {
       Button,
       InputText,
-      Password
+      Password,
+      Divider
     },
     data() {
     return {
@@ -93,11 +95,15 @@
         if(response.affectedRows){
           //emit to event bus
           // this.$eventBus.$emit('userLoggedIn', response.data)
+          this.$toast.add({severity:'success', summary: 'Úspěch', detail: 'Registrace byla úspěšná', life: 3000});
+          setTimeout(() => {
+            this.$router.push({name: 'login'})
+          }, 1000);
         }else{
           this.$toast.add({
             severity: "error",
-            summary: "Could not register",
-            detail: response.message || "An error occured while trying to register",
+            summary: "Nepodařilo se vytvořit účet",
+            detail: response.message || "Při registraci došlo k chybě",
             life: 3000,
           });
         }

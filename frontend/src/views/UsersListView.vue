@@ -147,7 +147,7 @@
         </div>
 
         <template #footer>
-            <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="createUserDialog = false"/>
+            <Button label="Zrušit" icon="pi pi-times" class="p-button-text" @click="editUserDialog = false"/>
             <Button label="Odeslat" icon="pi pi-check" autofocus @click="submitEditUser"/>
         </template>
     </Dialog>
@@ -221,6 +221,7 @@ export default {
                 };
                 this.load();
                 this.submitted = false;
+                this.$toast.add({severity:'success', summary: 'Uživatel byl úspěšně vytvořen', life: 3000});
             }else if(res.status === 409){
                 this.$toast.add({severity:'error', summary: 'Chyba', detail: 'Uživatel s tímto emailem již existuje', life: 3000});
             }else{
@@ -238,6 +239,7 @@ export default {
             if(res.error){
                 this.$toast.add({severity:'error', summary: 'Chyba', detail: 'Uživatele se nepodařilo upravit', life: 3000});
             }else{
+                this.$toast.add({severity:'success', summary: 'Úspěch', detail: 'Uživatel byl úspěšně upraven', life: 3000});
                 this.editUserDialog = false;
                 this.load();
             }
