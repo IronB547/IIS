@@ -145,8 +145,8 @@ export default {
         },
       ],
       displayInactiveDialog: false,
-      inactivityDuration: 270,
-      inactivityDurationSetting: 5,
+      inactivityDuration: 3600,
+      inactivityDurationSetting: 60,
       displaySettingsDialog: false,
       forceColorMode: null,
     }
