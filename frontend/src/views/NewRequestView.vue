@@ -17,7 +17,7 @@
                 <div class="content-header-item">
                     <span class="p-float-label">
 
-                        <Dropdown v-model="ticket" :options="availableTickets"  :filter="true">
+                        <Dropdown v-model="ticket" :options="availableTickets" optionLabel="title" :filter="true">
                             <template #option="slotProps">
                                     <span>{{limitLength(slotProps.option.title, 50)}}</span>
                             </template>
