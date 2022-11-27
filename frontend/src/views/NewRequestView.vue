@@ -16,7 +16,13 @@
 
                 <div class="content-header-item">
                     <span class="p-float-label">
-                        <Dropdown v-model="ticket" :options="availableTickets" optionLabel="title" :filter="true"/>
+
+                        <Dropdown v-model="ticket" :options="availableTickets"  :filter="true">
+                            <template #option="slotProps">
+                                    <span>{{limitLength(slotProps.option.title, 50)}}</span>
+                            </template>
+                        </Dropdown>
+
                         <label for="ticket">Ticket</label>
                     </span>
                 </div>
@@ -114,6 +120,15 @@ export default {
             } else {
                 this.availableTickets = response;
             }
+        },
+        limitLength(text, lengthLimit){
+            let numUpper = text.length - text.replace(/[A-Z]/g, '').length;  
+            if(numUpper > lengthLimit/2){
+                return text.substring(0, Math.round(lengthLimit/1.5)-3) + "..."
+            }if(text.length > lengthLimit){
+                return text.substring(0, lengthLimit-3) + "..."
+            }
+            return text
         }
     },
     components: {
