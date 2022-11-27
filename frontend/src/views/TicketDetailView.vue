@@ -20,7 +20,7 @@
 
         <div class="redirect-buttons">
             <span class="p-buttonset">
-              <Button class="p-button-primary p-button-title" label="Upravit ticket" v-if="!editMode && (isOwner || isManager)" @click="editMode = !editMode"/>
+              <Button class="p-button-primary p-button-title" label="Upravit ticket" v-if="!editMode && (isOwner || isManager)" @click="editMode = !editMode; backupTicket = JSON.parse(JSON.stringify(ticket))"/>
               <Button 
                 class="p-button-primary p-button-title" 
                 label="Vytvořit požadavek" 
@@ -35,7 +35,7 @@
         </div>
 
         <div class="edit-buttons" :class="{'edit-buttons-image': ticket?.photos?.length}" v-if="editMode">
-            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode" v-tooltip.top="'Zrušit změny'"/>
+            <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode; ticket = backupTicket" v-tooltip.top="'Zrušit změny'"/>
             <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editTicket" v-tooltip.top="'Potvrdit změny'"/>
                         
             <Button class="p-button-secondary p-button-sm" v-if="editMode" @click="openAddPhoto" label="Přidat fotku"/>
@@ -205,6 +205,9 @@
         commentText: "",
         changeState: null,
         newPhotoUrl: "",
+
+        backupTicket: null,
+
         states: [
           {name: 'Vytvořeno'},
           {name: 'Čeká na vyřízení'},

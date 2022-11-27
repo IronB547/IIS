@@ -23,11 +23,11 @@
 
             <span class="p-buttonset">
               <Button class="p-button-primary" @click="$router.push(`/tickets-detail/${request?.ticketID}`)" :disabled="!request?.ticketID" v-if="!editMode" label="Otevřít ticket"/>
-              <Button class="p-button-primary" v-if="!editMode && isManager" @click="editMode = !editMode" label="Upravit požadavek"/>
+              <Button class="p-button-primary" v-if="!editMode && isManager" @click="editMode = !editMode; backupRequest = JSON.parse(JSON.stringify(request))" label="Upravit požadavek"/>
             </span>
 
             <div class="edit-buttons" v-if="editMode">
-              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode" v-tooltip.top="'Zrušit změny'" />
+              <Button icon="pi pi-times" class="p-button-rounded p-button-danger p-button-sm" @click="editMode = !editMode; request = backupRequest" v-tooltip.top="'Zrušit změny'" />
               <Button icon="pi pi-check" class="p-button-rounded p-button-sm" @click="editRequest" v-tooltip.top="'Potvrdit změny'"/>
             </div>
 
@@ -211,6 +211,7 @@
   import InputText from 'primevue/inputtext';
   import Card from 'primevue/card';
   import ConfirmPopup from 'primevue/confirmpopup';
+  
   //import Badge from 'primevue/badge';
 
   export default {
@@ -237,6 +238,8 @@
 
         selectedUser: {},
         isUserInfoVisible: false,
+
+        backupRequest: null,
 
         editMode: false,
         commentText: "",
@@ -557,7 +560,7 @@
       isCommentOwner(comment) {
         return comment.userID == useAuthStore().getUserData?.id;
       },
-      isAllowedToChangeState() {
+      isAllowedToChange() {
         let currentUser = useAuthStore().getUserData?.id
         if((this.request.technicians?.find(technic => technic.technicianID == currentUser) == undefined)) {
           return true;
