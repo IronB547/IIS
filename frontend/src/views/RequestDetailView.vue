@@ -50,7 +50,7 @@
         solved : request?.solutionState == 1}">
         <h3>{{getStatus(request?.solutionState)}}</h3>
       </div>
-      <Dropdown class="changestate" :disabled="isAllowedToChangeState()" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
+      <Dropdown class="changestate" :disabled="isAllowedToChange()" @change="stateChange($event)" v-model="changeState" :options="states" optionLabel="name" placeholder="Změnit stav" />
     </div>
 
     <div class="request-body">
@@ -101,7 +101,7 @@
           </template>
         </Card>
 
-        <Button class="p-button-primary" @click="showEditRequestData = true" :disabled="request?.solutionState > 0" label="Upravit hodnoty"/>
+        <Button class="p-button-primary"  @click="showEditRequestData = true" :disabled="request?.solutionState > 0 || isAllowedToChange()" label="Upravit hodnoty"/>
       </div>
     </div>
 
@@ -557,7 +557,7 @@
       isCommentOwner(comment) {
         return comment.userID == useAuthStore().getUserData?.id;
       },
-      isAllowedToChangeState() {
+      isAllowedToChange() {
         let current_user = useAuthStore().getUserData?.id
         if((this.request.technicians?.find(technic => technic.technicianID == current_user) == undefined)) {
           return true;

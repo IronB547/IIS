@@ -12,7 +12,7 @@
                 </div>
             </div>
         </div>
-          <Button class="p-button p-button-primary" label="Vytvoř servisní požadavek"
+          <Button :disabled="isAllowedToCreate()" class="p-button p-button-primary" label="Vytvoř servisní požadavek"
           @click="$router.push({ name: 'newRequest', params: {ticketID: $route.query.ticketID} })"/>
         </template>
       </Toolbar>
@@ -27,6 +27,7 @@
 import RequestItem from "@/components/ServiceItem.vue";
 
 import { useRequestsStore } from "@/stores/RequestsStore";
+import { useAuthStore } from "@/stores/AuthStore";
 
 import Button from "primevue/button";
 import Toolbar from "primevue/toolbar";
@@ -87,6 +88,14 @@ export default {
       this.searchParams.solutionState = this.selectedState.value;
       this.search();
     },
+    isAllowedToCreate() {
+        if(this.isManager) {
+            return false;
+        }
+        else {
+            return true;
+        }
+      },
     async onPage(event) {
       await this.$router.push({
         name: this.$route.name,
@@ -101,7 +110,11 @@ export default {
       this.loadRequests();
     }
   },
-  
+  computed: {
+    isManager(){
+      return useAuthStore().hasRole(2);
+    },
+  }
 };
 </script>
 
