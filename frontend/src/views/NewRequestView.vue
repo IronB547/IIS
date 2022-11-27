@@ -9,7 +9,7 @@
             <div class="content-header">
                 <div class="content-header-item">
                     <span class="p-float-label">
-                        <InputText type="text" v-model="request.title" :class="{'p-invalid': !request.title.length >= 2  && submitted}"/>
+                        <InputText type="text" v-model="request.title" :class="{'p-invalid': request.title.length < 2  && submitted}"/>
                         <label for="title">Nadpis požadavku</label>
                     </span>
                 </div>
@@ -31,7 +31,7 @@
             <div>
                 <span class="p-float-label">
                     <Textarea :autoResize="true" name="description" rows="10" class="textarea" type="text" v-model="request.description"
-                    :class="{'p-invalid': !request.description.length >= 2 && submitted}" />
+                    :class="{'p-invalid': request.description.length < 2 && submitted}" />
                     <label for="description">Popis požadavku</label>
                 </span>
             </div>
